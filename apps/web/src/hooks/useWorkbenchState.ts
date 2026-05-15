@@ -3,10 +3,17 @@ import type { WorkbenchState } from "@/types/workbench";
 
 const STORAGE_KEY = "novel-analyzer-workbench-state-v2";
 
+// Override via apps/web/.env.local: NEXT_PUBLIC_API_BASE, NEXT_PUBLIC_DEFAULT_DATABASE_URL
+const DEFAULT_API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:8011";
+const DEFAULT_DATABASE_URL =
+  process.env.NEXT_PUBLIC_DEFAULT_DATABASE_URL ||
+  "postgresql+psycopg://d2:d2pass@127.0.0.1:5432/novel_analyzer";
+
 const defaultState: WorkbenchState = {
   title: "",
-  apiBase: "http://127.0.0.1:8011",
-  databaseUrl: "postgresql+psycopg://d2:d2pass@127.0.0.1:5432/novel_analyzer",
+  apiBase: DEFAULT_API_BASE,
+  databaseUrl: DEFAULT_DATABASE_URL,
   runId: "7e22a5d8-eb57-4306-858b-90386f1c2b22",
   branchId: "72da24e9-e65c-45a9-836d-957c4ae783ec",
   profile: "auto-lite",
