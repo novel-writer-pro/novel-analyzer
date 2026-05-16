@@ -1,5 +1,27 @@
 ## Unreleased
 
+- feat(imitation): 4-persona reader panel with comfort_score soft gate.
+
+  Changelist: `CL-reader-panel-20260516`
+
+  **背景**：Stage A spike（5 章）显示 3/5 pass，但 ch3/ch4 是 scaffold 污染（364 字 / `is_scaffold_only=True` / `stop_reason=critical_action_required`）。harness 的 score=80/84 无法区分"真正写出来的章节"和"scaffold 模板"。新增 reader panel 作为 comfort_score 软门控，让 LLM 从 4 个读者视角评估草稿，给出 0-100 分 + 维度级修改建议。
+
+  **Stage A 结果**（`/tmp/baseline-spike-after-fix/`）：
+  - ch2: pass / 1354 字 / score=84 ✅
+  - ch3: needs_revision / 364 字 / scaffold=True / stop=critical_action_required ⚠️
+  - ch4: needs_revision / 364 字 / scaffold=True / stop=critical_action_required ⚠️
+  - ch5: pass / 1269 字 / score=84 ✅
+  - ch6: pass / 2092 字 / score=84 ✅
+  - **pass_rate = 3/5 (60%)** — 超过 handoff 文档的 ≥1/5 最低门槛，prompt 修复有方向性效果
+  - scaffold 污染 2/5：ch3/ch4 的 `action_queue` 含 `expand_middle` priority=1，说明 LLM 在 max_rounds=2 内未能展开 scaffold → 需要更多 rounds 或 reader panel 触发重写
+
+  **代码改动**：
+  - `novel_analyzer/domain/schemas.py` — 新增 `ReaderPanelPersonaScore` / `ReaderPanelDimensionScore` / `ReaderPanelRevisionAction` / `ReaderPanelReport`
+  - `novel_analyzer/llm/prompts.py` — 新增 `READER_PANEL_PERSONAS` (4 视角) / `READER_PANEL_DIMENSIONS` (7 维度) / `build_reader_panel_prompt()`
+  - `novel_analyzer/services/reader_panel_service.py` — `ReaderPanelService.evaluate_draft()` 主入口
+  - `novel_analyzer/services/imitation_harness_service.py` — `--reader-panel` flag 接入 harness，comfort_score < threshold 时触发额外修改轮次
+  - `tests/test_reader_panel_service.py` — 9 个测试（mock LLM / schema 验证 / 边界情况）
+
 - fix(tests): fix 6 pre-existing test failures + retire dead WSGI contract tests.
 
   Changelist: `CL-test-fixes-wsgi-cleanup-20260516`
@@ -7,49 +29,36 @@
   **代码改动**：
   - `tests/test_qa_service.py` — 3 个 mock lambda 补 `**kw`（`search_branch` 后加了 `max_chapter` kwarg）
   - `tests/test_cli.py` — `_FakeHarnessService.run_harness` 补 `mapping_pack` 参数
-  - `tests/test_cli_pg_checks.py` — admin_url 断言改为 env-agnostic（`.env.local` 设 `DB_ADMIN_NAME=d2`，测试原来硬编码 `postgres`）
-  - `tests/contract/test_dual_parity.py` — 删除（docstring 明确说 v5.1 inline 后可删，v5.1 已在 28f9f28 完成）
+  - `tests/test_cli_pg_checks.py` — admin_url 断言改为 env-agnostic
+  - `tests/contract/test_dual_parity.py` — 删除（v5.1 inline 后可删，已在 28f9f28 完成）
   - `tests/contract/test_main_wsgi_contract.py` — 删除（测试 `application()` WSGI callable，已在 e5975d0 退役）
-  - `requirements.txt` — 补 `python-multipart>=0.0.20,<1.0`（FastAPI multipart 依赖，之前未声明）
+  - `requirements.txt` — 补 `python-multipart>=0.0.20,<1.0`
 
-  **验证**：702/705 pass（3 个 pre-existing 环境依赖失败：需要 `novel_analyzer_weitu_deconstruction_20260511` DB + sandbox LLM stub 返回空）
+  **验证**：702/705 pass（3 个 pre-existing 环境依赖失败）
 
 - refactor(api): retire WSGI dispatch; uvicorn FastAPI is the only entrypoint.
 
   Changelist: `CL-retire-wsgi-fallback-20260516`
 
-  **背景**：handoff 文档 (Option B) 给的提示是 "drop main.py /api/review-batch-execute dispatch"。实际 main.py 是 1585 行的 monolith，被 FastAPI router 反向依赖（`_BATCH_ACTION_CONFIG` / `_review_contract` / `_sse_event` / `_quality_dashboard_payload` 等 helper）。所以本次只删 WSGI 入口层，保留所有 helper。
-
-  **代码改动**：
-  - `apps/api/app/main.py` — 删除 `application()` (288 行)、`main()`、`__main__` 块、`ThreadingWSGIServer`；文件从 1585 → 1294 行。
-  - `Makefile` — 删除 `api-wsgi-legacy` target。
-  - `tests/test_api_main.py` — 移除 `application` 的未使用导入。
-  - `README.md` / `apps/api/README.md` / `apps/web/README.md` — 清理 WSGI 残留字眼。
+  `apps/api/app/main.py` 删除 `application()` (288 行) + `ThreadingWSGIServer` + `main()`；文件从 1585 → 1294 行。`Makefile` 删除 `api-wsgi-legacy` target。
 
 - chore(data): relink novel_sources.source_path to /home/user/migrate/novels/.
 
   Changelist: `CL-relink-novel-sources-20260516`
 
-  **背景**：DB 里 43 个 `novel_sources` 的 `source_path` 历史遗留指向 `/tmp/`、`/home/user/ai-books/.cache/...` 等已不存在的位置。新增 `scripts/dev/relink_novel_sources.py` 按 SHA256 重定位到 `/home/user/migrate/novels/`。
-
-  **数据变化（已 apply）**：7 行 relink / 20 行 already-OK / 16 行 SHA256 不匹配（留原 path，强换会导致 offset 错位）。
+  新增 `scripts/dev/relink_novel_sources.py`。7 行 relink / 20 行 already-OK / 16 行 SHA256 不匹配（留原 path）。
 
 - feat(llm): claude-haiku-4.5 + 共享 token-bucket 节流。
 
   Changelist: `CL-llm-haiku-rate-limit-20260516`
 
-  **代码改动**：
-  - `novel_analyzer/config/settings.py` 新增 4 个 settings：`llm_requests_per_second` (默认 0=disabled) / `llm_check_every_n_seconds` / `llm_max_bucket_size` / `llm_max_concurrent_requests`。
-  - `novel_analyzer/llm/client.py` 用 `langchain_core.rate_limiters.InMemoryRateLimiter` 包 `ChatOpenAI`。`_build_rate_limiter` 用 `lru_cache` 让所有并发 caller 共享同一个 bucket。
-  - `tests/test_llm_client.py` 新增 4 测试。
-
-  **配置切换**：`.env.local` 主模型 `deepseek-v4-flash` → `claude-haiku-4.5`，fallback 仍 `deepseek-v4-flash`。默认节流 rps=1.5 / bucket=3。
+  `config/settings.py` 新增 4 个 rate-limit settings。`llm/client.py` 用 `InMemoryRateLimiter` 包 `ChatOpenAI`（`lru_cache` 共享 bucket）。`.env.local` 切 `claude-haiku-4.5`，rps=1.5 / bucket=3。
 
 - docs(ops): postgres ops cheatsheet + 2026-05-16 session handoff.
 
   Changelist: `CL-ops-docs-20260516`
 
-  新增 `docs/runbook/postgres-ops-cheatsheet.md`（14 章 SQL 速查）+ `docs/session-handoff-20260516.md`（本会话进度 + 待办）。
+  新增 `docs/runbook/postgres-ops-cheatsheet.md`（14 章 SQL 速查）+ `docs/session-handoff-20260516.md`。
 
 
 
