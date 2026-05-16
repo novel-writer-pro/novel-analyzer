@@ -39,7 +39,7 @@
 | 逐章场景优化 | 场景推进与结构修复 | 中高 | harness/action queue 已可控制 | P0 |
 | 故事架构 | chapter-level / book-level structure | 中高 | 章级较强，书级正在增强 | P1 |
 | 资料研究 | 世界观 / 历史 / 题材 / 读者体系 | 低 | 目前主要是书内知识，不是真 research lane | P1 |
-| 模拟读者评审 | 小白读者 / 老书虫 / 爽点读者 / 编辑视角 | 低 | 目前只有 system review，不是 reader simulation | P1 |
+| 模拟读者评审 | 小白读者 / 老书虫 / 爽点读者 / 编辑视角 | **中高** | LLM 4-persona × 7-dim panel + comfort_score soft gate + Phase B 闭环重写 + reader-panel-stats CLI（commits `5a0eb94` / `3d78cc6` / `4fb3c97`，2026-05-16） | P1 |
 | 跨题材改写（mapping_pack） | name / world / power / rule 设定替换 | **高** | 已突破，3 题材 170/171 章 pass | **P0** |
 | 同题材整本仿写 | 保持原 setting 的整本仿写 | 中 | prompt self-check 已修复，待长跑验证 | **P0** |
 | 在飞 contamination 拦截 | thin / scaffold / action_queue 三类拦截 | 高 | service 层 in-flight + auto-retry | P0 |
