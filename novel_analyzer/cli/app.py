@@ -7774,6 +7774,7 @@ def writer_imitate(
     power_map: list[str] = typer.Option([], "--power-map"),
     rule_override: list[str] = typer.Option([], "--rule-override"),
     forbidden_transformation: list[str] = typer.Option([], "--forbidden-transformation"),
+    reader_panel: bool = typer.Option(False, "--reader-panel", help="Add 4-persona reader panel comfort_score evaluation."),
     database_url: str | None = None,
 ) -> None:
     """Writer-facing imitation entrypoint that writes artifacts into output/."""
@@ -7810,6 +7811,7 @@ def writer_imitate(
             model_name=model_name or None,
             steering_pack=steering,
             mapping_pack=mapping_pack_dict,
+            enable_reader_panel=reader_panel,
         )
         payload = report.model_dump(mode="json")
         payload["steering_pack"] = steering
@@ -7844,6 +7846,7 @@ def writer_imitate_range(
     power_map: list[str] = typer.Option([], "--power-map"),
     rule_override: list[str] = typer.Option([], "--rule-override"),
     forbidden_transformation: list[str] = typer.Option([], "--forbidden-transformation"),
+    reader_panel: bool = typer.Option(False, "--reader-panel", help="Add 4-persona reader panel comfort_score evaluation."),
     database_url: str | None = None,
 ) -> None:
     """Batch writer-facing imitation entrypoint for multiple source chapters."""
@@ -7886,6 +7889,7 @@ def writer_imitate_range(
                 model_name=model_name or None,
                 steering_pack=steering,
                 mapping_pack=mapping_pack_dict,
+                enable_reader_panel=reader_panel,
             )
             payload = report.model_dump(mode="json")
             item = {
@@ -7895,6 +7899,7 @@ def writer_imitate_range(
                 "stop_reason": payload.get("stop_reason"),
                 "final_draft": payload.get("final_draft", {}),
                 "policy_summary": payload.get("policy_summary", {}),
+                "reader_panel_report": payload.get("reader_panel_report"),
             }
             outputs.append(item)
             output_dir.mkdir(parents=True, exist_ok=True)
@@ -7911,9 +7916,13 @@ def writer_imitate_range(
             )
             elapsed = time.perf_counter() - chapter_started_at
             text_len = len(item["final_draft"].get("draft_text", "") or "")
+            comfort_str = ""
+            rpr = item.get("reader_panel_report")
+            if rpr and isinstance(rpr, dict) and rpr.get("comfort_score") is not None:
+                comfort_str = f" comfort={rpr.get('comfort_score')}/{rpr.get('overall_verdict')}"
             echo(
                 f"[{idx}/{len(parsed)}] ch{source_chapter_index} done in {elapsed:.1f}s "
-                f"chars={text_len} verdict={item['final_verdict']} -> {per_chapter_path}"
+                f"chars={text_len} verdict={item['final_verdict']}{comfort_str} -> {per_chapter_path}"
             )
         stem = f"writer-imitate-range-{parsed[0][0]}-{parsed[-1][0]}"
         json_path, md_path = _write_writer_imitation_outputs(
