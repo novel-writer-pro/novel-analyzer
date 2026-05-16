@@ -3274,6 +3274,29 @@ def _write_writer_imitation_outputs(
             lines.append(f"- target_goal: {target_goal}")
             lines.append(f"- final_verdict: {final_verdict}")
             lines.append(f"- stop_reason: {stop_reason}")
+            rpr = item.get("reader_panel_report")
+            if isinstance(rpr, dict) and rpr.get("comfort_score") is not None:
+                comfort = rpr.get("comfort_score")
+                panel_verdict = rpr.get("overall_verdict", "")
+                lines.append(f"- reader_panel: comfort={comfort} verdict={panel_verdict}")
+                dim_scores = rpr.get("dimension_scores") or []
+                if isinstance(dim_scores, list) and dim_scores:
+                    dim_inline = " | ".join(
+                        f"{d.get('dimension', '?')}={d.get('score', '?')}"
+                        for d in dim_scores
+                        if isinstance(d, dict)
+                    )
+                    lines.append(f"  - dimensions: {dim_inline}")
+                revisions = rpr.get("targeted_revisions") or []
+                if isinstance(revisions, list) and revisions:
+                    lines.append("  - targeted_revisions:")
+                    for r in revisions[:5]:
+                        if not isinstance(r, dict):
+                            continue
+                        pri = r.get("priority", "?")
+                        dim = r.get("dimension", "?")
+                        action = str(r.get("action", "")).strip().replace("\n", " ")
+                        lines.append(f"    - P{pri} [{dim}] {action[:160]}")
             final_draft = item.get("final_draft", {})
             if isinstance(final_draft, dict):
                 draft_title = str(final_draft.get("draft_title", "")).strip()
