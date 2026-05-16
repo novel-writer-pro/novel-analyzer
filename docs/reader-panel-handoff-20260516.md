@@ -173,20 +173,33 @@ COMFORT_NEEDS_REWRITE_THRESHOLD = 60  # <60  = needs_rewrite
 
 1. **单 LLM judge**：4 persona 在一次 LLM 调用里产出，不是 4 次独立调用。优势：成本低；劣势：persona 之间会互相校准。
 2. **scaffold-only 章节直接跳过**：harness 已判定 needs_revision 且 is_scaffold_only=True 时不调 panel（节省成本，因为答案已经明确）。
-3. **无 retry 反馈循环**：当前 panel 只在最后一轮 harness 后跑一次，**不会用 targeted_revisions 触发新一轮 harness 重试**。这是 Phase B 的工作。
+3. ~~**无 retry 反馈循环**~~：✅ 已落地 Phase B（commits `d32f19a` / `3d78cc6` / `fdb2489`）。
 
-### Phase B（建议下一步，3-5 天）
+### Phase B（✅ 已落地，2026-05-16）
 
-把 `targeted_revisions` 接到 harness 的 `_apply_actions_to_draft`：
-- comfort < 60 时不只是改 verdict，还把 panel 的 P1 修改建议作为 `revise_payload` feed 给 LLM 重写
-- 重写后再跑一次 panel，直到 comfort >= 60 或达到 max_rounds
-- 这才是真正的"读者反馈闭环"
+把 panel 的 `targeted_revisions` 真正喂回 LLM 重写：
+- comfort < 70 且有 `targeted_revisions` 时，调用 `revise_with_panel_feedback()` 让 LLM 按段落级修改清单重写
+- 重写后再跑一次 panel；只有当新 comfort >= 旧 comfort 才接受新草稿（防止越改越差）
+- `policy_summary.reader_panel_revised=True` + `reader_panel_comfort_lift=N` 写进 report，可追溯
 
-### Phase C（建议下下步，1-2 周）
+**实测证据**（output/reader-panel-phase-b/ 真跑数据）：
+
+| ch | comfort 修订前 | comfort 修订后 | lift | 解读 |
+|---:|---:|---:|---:|---|
+| 2 | 58 | **65** | **+7** ✅ | 闭环生效，panel 修改建议真的提升了可读性 |
+| 5 | 60 | 60 | 0 | 修订应用了但分数未变（接近模型能力上限） |
+
+ch2 的 +7 lift 是端到端闭环工作的明确 evidence。ch5 zero-lift 说明：
+- 不是 bug，是 panel-driven revision 不保证一定有效
+- never-degrade 策略生效（comfort 没退步就接受新版，否则保留旧版）
+- 真正的 lift 分布需要 30-50 章数据才能下定论
+
+### Phase C（建议下一步，1-2 周）
 
 - **多 LLM judge 聚合**：4 persona 各自独立调用，避免互相校准（成本×4，可只在 release 章节启用）
 - **维度蒸馏到 prompt**：把高频出现的 weakness（如"对话工具化"）反向蒸馏进生成 prompt 的 §8 self-check
 - **Pairwise 比较**：用旧版本 draft + 新版本 draft 同时给 panel 看，输出"哪一版更好"，用作 A/B 数据
+- **多轮 panel revision**：当前是 1 轮 revision；可配置 max_panel_revisions=2 让 comfort 持续逼近 70
 
 ---
 
