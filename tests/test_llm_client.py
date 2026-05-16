@@ -57,3 +57,30 @@ def test_build_chat_model_passes_model_override() -> None:
     settings = _settings(llm_model_name="claude-haiku-4.5")
     chat = build_chat_model(settings, model_name="deepseek-v4-flash")
     assert chat.model_name == "deepseek-v4-flash"
+
+
+def test_deepseek_models_capped_at_4000_tokens() -> None:
+    """Deepseek burns budget on reasoning_tokens; gateway also rejects > 4096."""
+    settings = _settings(llm_model_name="deepseek-v4-flash")
+    chat = build_chat_model(settings)
+    assert chat.max_tokens == 4000
+
+    settings_pro = _settings(llm_model_name="deepseek-v4-pro")
+    chat_pro = build_chat_model(settings_pro)
+    assert chat_pro.max_tokens == 4000
+
+
+def test_claude_models_have_no_token_cap() -> None:
+    settings = _settings(llm_model_name="claude-haiku-4.5")
+    chat = build_chat_model(settings)
+    assert chat.max_tokens is None
+
+
+def test_model_override_drives_cap_not_settings() -> None:
+    """Cap is decided by the actually-used model name, not by settings.llm_model_name."""
+    settings = _settings(llm_model_name="claude-haiku-4.5")
+    chat = build_chat_model(settings, model_name="deepseek-v4-flash")
+    assert chat.max_tokens == 4000
+
+    chat_back = build_chat_model(_settings(llm_model_name="deepseek-v4-flash"), model_name="claude-haiku-4.5")
+    assert chat_back.max_tokens is None
