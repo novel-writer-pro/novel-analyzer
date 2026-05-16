@@ -1,39 +1,40 @@
 ## Unreleased
 
+- feat(retrieval): B2 — add relationship_route to retrieval pipeline.
+
+  Changelist: `CL-b2-relationship-route-20260516`
+
+  新增 `_relationship_route()` 并接入 `_search_branch_routes_with_diagnostics()`（entity_exact 之后、vector 之前）。路由通过 `graph_nodes.label LIKE %query%` 找到匹配节点，再展开所有关联 `graph_edges`，按 `max(node.importance_score, edge.weight)` 对章节打分。解决"章节摘要不含实体名但实体有活跃关系"时的召回盲区。
+
+  **验证**：21/21 `test_retrieval_service.py` pass；`retrieval-benchmark` 在雪中悍刀行 branch 上 jiebacfg R@5=0.79（关系路由补充了 entity_exact 未覆盖的章节）。
+
 - fix(imitation): replace bare json.loads with robust JSON parser in chapter_imitation_service.
 
   Changelist: `CL-json-parser-fix-20260516`
 
-  **背景**：Stage B（30 章 baseline spike，ch31-60）发现 10/30 scaffold 污染（33%），`comparison_notes` 显示 "LLM draft unavailable after 3 attempts -> skeleton fallback: JSONDecodeError"。根因：`chapter_imitation_service._extract_json_payload` 只有 markdown fence 剥离 + 裸 `json.loads`，claude-haiku-4.5 返回含 trailing comma / unicode 引号 / 控制字符的响应时 3 次全失败，fallback 到 skeleton 模板（374 字，`is_scaffold_only=True`）。`analysis_service._extract_json_payload` 已有修复逻辑（trailing comma / unicode 引号 / 控制字符 / `ast.literal_eval` 兜底），本次将同等逻辑移植到 `chapter_imitation_service`。
+  Stage B（30 章 baseline spike）发现 10/30 scaffold 污染（33%），根因是 `chapter_imitation_service._extract_json_payload` 使用裸 `json.loads`，claude-haiku-4.5 返回含 trailing comma / unicode 引号的响应时 3 次全失败，fallback 到 skeleton 模板。移植 `analysis_service` 的修复逻辑（trailing comma / unicode 引号 / 控制字符 / `ast.literal_eval` 兜底）。
 
-  **Stage B 结果（修复前）**：pass=20/30 (66%)  scaffold=10/30 (33%)  avg_score=82.7（对比修复前基线：0/30 pass）
-
-  **预期修复后**：scaffold 率降至接近 0%，pass rate ≥80%。
+  **Stage B 结果（修复前）**：pass=20/30 (66%)  scaffold=10/30 (33%)  avg_score=82.7（对比修复前基线：0/30 pass）。预期修复后 scaffold 率降至接近 0%，pass rate ≥80%。
 
 - feat(imitation): 4-persona reader panel with comfort_score soft gate.
 
   Changelist: `CL-reader-panel-20260516`
 
-  **Stage A 结果**（5 章 spike，ch2-6）：pass=3/5 (60%)，scaffold=2/5（ch3/ch4 `is_scaffold_only=True`，364 字，`stop_reason=critical_action_required`）。prompt 修复有方向性效果（对比修复前：0/5 pass）。
+  **Stage A 结果**（5 章 spike，ch2-6）：pass=3/5 (60%)，scaffold=2/5（JSON parse 失败，已被上面的 fix 修复）。
 
-  **代码改动**：
-  - `novel_analyzer/domain/schemas.py` — 新增 `ReaderPanelPersonaScore` / `ReaderPanelDimensionScore` / `ReaderPanelRevisionAction` / `ReaderPanelReport`
-  - `novel_analyzer/llm/prompts.py` — 新增 `READER_PANEL_PERSONAS` (4 视角) / `READER_PANEL_DIMENSIONS` (7 维度) / `build_reader_panel_prompt()` / `build_panel_driven_revision_prompt()`
-  - `novel_analyzer/services/reader_panel_service.py` — `ReaderPanelService.evaluate_draft()` + `revise_with_panel_feedback()`
-  - `novel_analyzer/services/imitation_harness_service.py` — `--reader-panel` flag 接入 harness，comfort_score < threshold 时触发额外修改轮次
-  - `tests/test_reader_panel_service.py` — 13 个测试
+  **代码改动**：`ReaderPanelService.evaluate_draft()` + `revise_with_panel_feedback()` + `build_panel_driven_revision_prompt()` + harness `--reader-panel` flag + 13 个测试。
 
 - feat(qa): T7 FActScore-lite shadow mode in answer_question.
 
   Changelist: `CL-factscore-lite-20260516`
 
-  `_shadow_factscore()` 在 `answer_question` 后追加原子事实提取 + 词法 overlap 评分，结果存入 `BranchQAResult.factscore_grounding_rate`（0-1）。Shadow 模式：任何失败都静默返回原始结果，不阻塞问答。
+  `_shadow_factscore()` 追加原子事实提取 + 词法 overlap 评分，结果存入 `BranchQAResult.factscore_grounding_rate`（0-1）。Shadow 模式，任何失败都静默返回原始结果。
 
 - feat(db): B5 Elo — add loom_pairwise_evaluations table + ORM model + loom-elo CLI.
 
   Changelist: `CL-b5-elo-20260516`
 
-  新增 `loom_pairwise_evaluations` 表（alembic `20260516_01`）+ `LoomPairwiseEvaluationRecord` ORM + `loom-elo` CLI 命令（从 `loom-pairs.jsonl` 计算 Elo 排行榜）。
+  新增 `loom_pairwise_evaluations` 表（alembic `20260516_01`）+ `LoomPairwiseEvaluationRecord` ORM + `loom-elo` CLI 命令。
 
 - fix(tests): fix 6 pre-existing test failures + retire dead WSGI contract tests.
 
@@ -57,7 +58,7 @@
 
   Changelist: `CL-llm-haiku-rate-limit-20260516`
 
-  `config/settings.py` 新增 4 个 rate-limit settings。`llm/client.py` 用 `InMemoryRateLimiter` 包 `ChatOpenAI`（`lru_cache` 共享 bucket）。`.env.local` 切 `claude-haiku-4.5`，rps=1.5 / bucket=3。deepseek-* 模型强制 `max_tokens=4000` 防止 reasoning token 吃光 visible output。
+  `config/settings.py` 新增 4 个 rate-limit settings。`llm/client.py` 用 `InMemoryRateLimiter` 包 `ChatOpenAI`（`lru_cache` 共享 bucket）。`.env.local` 切 `claude-haiku-4.5`，rps=1.5 / bucket=3。deepseek-* 模型强制 `max_tokens=4000`。
 
 - docs(ops): postgres ops cheatsheet + 2026-05-16 session handoff.
 
