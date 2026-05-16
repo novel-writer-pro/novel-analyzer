@@ -1,5 +1,21 @@
 ## Unreleased
 
+- chore(data): relink novel_sources.source_path to /home/user/migrate/novels/.
+
+  Changelist: `CL-relink-novel-sources-20260516`
+
+  **背景**：DB 里 43 个 `novel_sources` 的 `source_path` 历史遗留指向 `/tmp/`、`/home/user/ai-books/.cache/...` 等已不存在的位置。新增 `scripts/dev/relink_novel_sources.py` 按 SHA256 重定位到 `/home/user/migrate/novels/`。
+
+  **代码改动**：
+  - `scripts/dev/relink_novel_sources.py` — 默认 dry-run，`--apply` 才写库；SHA256-only 匹配（标题在 DB 重复出现，不可信）；输出三段报告：already-OK / will-relink / unmatched。
+
+  **数据变化（已 apply）**：
+  - 7 行 source_path 重指向 `/home/user/migrate/novels/`（青华系列 4 行 / 诛仙-fixed 1 行 / 魔师 2 行）
+  - 20 行原 `/home/user/txt111/...` 仍存在 → 不动
+  - 16 行 SHA256 与磁盘所有文件不同 → 留原 path 不动（章节原文回看断；分析派生数据完整可用）
+
+  **为何不用同名文件覆盖那 16 行**：磁盘上的 `雪中悍刀行.txt` SHA256 已变（DB=`365edfe…` vs disk=`2cfdf86…`）。`chapter_segments.start_offset/end_offset` 是基于 DB 记录的 hash 锁定的，强行换 path 会导致 offset 错位 → 拉错章节内容。哈希不一致直接拒绝是设计上的安全门。
+
 - feat(llm): claude-haiku-4.5 + 共享 token-bucket 节流。
 
   Changelist: `CL-llm-haiku-rate-limit-20260516`
