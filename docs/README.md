@@ -49,6 +49,7 @@
 | **[runbook/postgres-ops-cheatsheet.md](./runbook/postgres-ops-cheatsheet.md)** | **PostgreSQL 运维速查（连接/巡检/检索/Embedding/性能/备份）** | **运维/数据/排障** |
 | **[cross-genre-imitation-commercial-readiness-20260515.md](./cross-genre-imitation-commercial-readiness-20260515.md)** | **跨题材改写 99.4% pass + 6 项 SLA gap + 3 条上线路径** | **业务/PM** |
 | **[baseline-imitation-quality-validation-handoff-20260515.md](./baseline-imitation-quality-validation-handoff-20260515.md)** | **同题材 prompt 修复后 Stage A/B/C 长跑验证步骤** | **下一棒接手** |
+| **[reader-panel-handoff-20260516.md](./reader-panel-handoff-20260516.md)** | **4-persona × 7-dim 阅读体验评估 + comfort_score soft gate** | **下一棒接手** |
 | [cli-operations-manual.md](./cli-operations-manual.md) | CLI 命令真相源 | 使用者 |
 | [direct-usage-guide.md](./direct-usage-guide.md) | 日常操作顺序 | 使用者 |
 | [novel-ingest-input-spec.md](./novel-ingest-input-spec.md) | 小说输入规范 (novel.txt 格式) | 使用者 |

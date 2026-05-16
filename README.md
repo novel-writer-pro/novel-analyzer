@@ -125,6 +125,7 @@ http://127.0.0.1:4173
 | **运维调试速查** | [`docs/ops-debug-manual-20260514.md`](./docs/ops-debug-manual-20260514.md) |
 | **跨题材改写商用就绪** | [`docs/cross-genre-imitation-commercial-readiness-20260515.md`](./docs/cross-genre-imitation-commercial-readiness-20260515.md) |
 | **同题材修复长跑验证** | [`docs/baseline-imitation-quality-validation-handoff-20260515.md`](./docs/baseline-imitation-quality-validation-handoff-20260515.md) |
+| **Reader Panel 阅读体验评估** | [`docs/reader-panel-handoff-20260516.md`](./docs/reader-panel-handoff-20260516.md) |
 | 商业化路线图 | [`docs/strategy/writer-studio-roadmap.md`](./docs/strategy/writer-studio-roadmap.md) |
 | 端到端运维 | [`docs/runbook/business-loop.md`](./docs/runbook/business-loop.md) |
 | 全部文档 | [`docs/README.md`](./docs/README.md) |
