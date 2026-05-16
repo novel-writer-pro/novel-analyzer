@@ -1693,6 +1693,33 @@ class HarnessControllerService:
                 comfort = reader_panel_report.comfort_score
                 final_policy_summary["reader_panel_comfort_score"] = comfort
                 final_policy_summary["reader_panel_verdict"] = reader_panel_report.overall_verdict
+
+                if (
+                    comfort < COMFORT_PASS_THRESHOLD
+                    and reader_panel_report.targeted_revisions
+                ):
+                    revised_draft = panel_svc.revise_with_panel_feedback(
+                        draft,
+                        reader_panel_report,
+                        model_name=model_name,
+                    )
+                    if revised_draft is not draft and revised_draft.draft_text != draft.draft_text:
+                        revised_report = panel_svc.evaluate_draft(
+                            revised_draft,
+                            target_goal=target_goal,
+                            model_name=model_name,
+                        )
+                        if revised_report.comfort_score >= reader_panel_report.comfort_score:
+                            draft = revised_draft
+                            reader_panel_report = revised_report
+                            final_policy_summary["reader_panel_comfort_score"] = revised_report.comfort_score
+                            final_policy_summary["reader_panel_verdict"] = revised_report.overall_verdict
+                            final_policy_summary["reader_panel_revised"] = True
+                            final_policy_summary["reader_panel_comfort_lift"] = (
+                                revised_report.comfort_score - comfort
+                            )
+                            comfort = revised_report.comfort_score
+
                 if final_verdict == "pass" and comfort < COMFORT_NEEDS_REWRITE_THRESHOLD:
                     final_verdict = "needs_revision"
                     stop_reason = "reader_panel_comfort_below_threshold"

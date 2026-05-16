@@ -26,6 +26,7 @@ from novel_analyzer.llm.client import build_chat_model
 from novel_analyzer.llm.prompts import (
     READER_PANEL_DIMENSIONS,
     READER_PANEL_PERSONAS,
+    build_panel_driven_revision_prompt,
     build_reader_panel_prompt,
 )
 
@@ -85,6 +86,64 @@ class ReaderPanelService:
                 comfort_score=60,
                 rejection_reason=f"reader panel LLM error: {type(exc).__name__}",
             )
+
+    def revise_with_panel_feedback(
+        self,
+        draft: ChapterImitationDraft,
+        report: ReaderPanelReport,
+        *,
+        model_name: str | None = None,
+    ) -> ChapterImitationDraft:
+        """Use panel report's targeted_revisions to drive a one-pass revision.
+
+        Returns the original draft unchanged when the LLM call fails or the
+        response is malformed - revision is opportunistic, never blocking.
+        Adds revision_summary entries to method_notes for traceability.
+        """
+        if not report.targeted_revisions:
+            return draft
+
+        weak_dims = [
+            (d.dimension, d.score)
+            for d in sorted(report.dimension_scores, key=lambda x: x.score)[:3]
+        ]
+        revisions_payload = [
+            {"dimension": r.dimension, "action": r.action, "priority": r.priority}
+            for r in report.targeted_revisions
+        ]
+        prompt = build_panel_driven_revision_prompt(
+            chapter_title=draft.draft_title or draft.original_title,
+            draft_text=draft.draft_text,
+            comfort_score=report.comfort_score,
+            weak_dimensions=weak_dims,
+            targeted_revisions=revisions_payload,
+        )
+
+        try:
+            model = build_chat_model(self.settings, model_name=model_name)
+            response = model.invoke(prompt)
+            content = response.content if hasattr(response, "content") else response
+            payload = self._extract_json_payload(content)
+        except Exception:  # noqa: BLE001
+            return draft
+
+        revised_text = payload.get("revised_draft_text") if isinstance(payload, dict) else None
+        if not isinstance(revised_text, str) or len(revised_text) < 200:
+            return draft
+
+        revision_summary = payload.get("revision_summary") or []
+        summary_lines = [str(s) for s in revision_summary if str(s).strip()] if isinstance(revision_summary, list) else []
+
+        return draft.model_copy(
+            update={
+                "draft_text": revised_text,
+                "method_notes": [
+                    *draft.method_notes,
+                    f"reader_panel revision: comfort={report.comfort_score} -> targeted by {len(report.targeted_revisions)} actions",
+                    *[f"revision: {s}" for s in summary_lines[:5]],
+                ],
+            }
+        )
 
     @staticmethod
     def _extract_json_payload(raw: object) -> dict[str, object]:
