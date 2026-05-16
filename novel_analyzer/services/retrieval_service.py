@@ -638,6 +638,49 @@ class RetrievalService:
             chapter_scores[row.chapter_index] = max(chapter_scores.get(row.chapter_index, 0.0), score)
         return self._document_hits_for_chapters(branch_id, chapter_scores)[:limit]
 
+    def _relationship_route(
+        self,
+        branch_id: str,
+        query: str,
+        limit: int,
+    ) -> list[RetrievalHit]:
+        query_text = query.strip()
+        if not query_text:
+            return []
+        from novel_analyzer.database.models import GraphEdge, GraphNode
+        node_rows = self.session.scalars(
+            select(GraphNode)
+            .where(GraphNode.branch_id == branch_id)
+            .where(GraphNode.label.like(f"%{query_text}%"))
+            .where(GraphNode.conflict_status != "contradiction")
+            .order_by(GraphNode.importance_score.desc())
+            .limit(10)
+        ).all()
+        if not node_rows:
+            return []
+        node_ids = [n.id for n in node_rows]
+        edge_rows = self.session.scalars(
+            select(GraphEdge)
+            .where(GraphEdge.branch_id == branch_id)
+            .where(GraphEdge.is_active.is_(True))
+            .where(
+                (GraphEdge.source_node_id.in_(node_ids)) |
+                (GraphEdge.target_node_id.in_(node_ids))
+            )
+            .order_by(GraphEdge.weight.desc())
+            .limit(50)
+        ).all()
+        chapter_scores: dict[int, float] = {}
+        for edge in edge_rows:
+            for ch in range(edge.chapter_first_seen, edge.chapter_last_seen + 1):
+                score = float(edge.weight) * 0.5
+                chapter_scores[ch] = max(chapter_scores.get(ch, 0.0), score)
+        for node in node_rows:
+            for ch in range(node.chapter_first_seen, node.chapter_last_seen + 1):
+                score = float(node.importance_score) * 0.8
+                chapter_scores[ch] = max(chapter_scores.get(ch, 0.0), score)
+        return self._document_hits_for_chapters(branch_id, chapter_scores)[:limit]
+
     @staticmethod
     def _cosine_similarity(left: list[float], right: list[float]) -> float:
         if not left or not right or len(left) != len(right):
@@ -864,6 +907,17 @@ class RetrievalService:
                 route_name="entity_exact",
                 started_at=started_at,
                 hits=entity_exact_hits,
+                route_diagnostics=route_diagnostics,
+            )
+            if route is not None:
+                routes.append(route)
+
+            started_at = time.perf_counter()
+            relationship_hits = self._relationship_route(branch_id, query, fetch_limit)
+            route = self._timed_route(
+                route_name="relationship",
+                started_at=started_at,
+                hits=relationship_hits,
                 route_diagnostics=route_diagnostics,
             )
             if route is not None:
