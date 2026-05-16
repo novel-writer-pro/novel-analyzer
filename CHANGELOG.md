@@ -1,14 +1,84 @@
 ## Unreleased
 
+- fix(imitation): strip marketing tags from chapter title before building LLM prompt.
+
+  Changelist: `CL-title-clean-20260517`
+
+  Stage B2（JSON parser 修复后重跑 30 章）发现 5/30 scaffold 章节全部含 `（求收藏，求追读）` 标题。根因：`source_title` 原样嵌入 JSON 模板 `"draft_title": "贿赂县令（求收藏，求追读）"`，LLM 把括号内容当读者运营指令，返回纯文本而非 JSON，3 次全失败。新增 `_clean_title()` 在传入 prompt 前剥离营销括号（求收藏/求追读/求月票/加更/本章完/谢谢支持）。
+
+  **Stage B2 结果**：pass=25/30 (83%)  scaffold=5/30 (16%)（对比修复前：20/30 (66%)  scaffold=10/30 (33%)）。预期 title fix 后 ≥28/30 pass，scaffold ≤2/30。
+
+- feat(loom): Phase 3 P1 — switch loom_memory_mode to ab + enable pairwise.
+
+  Changelist: `CL-loom-ab-mode-20260517`
+
+  `.env.local` 新增 `NOVEL_ANALYZER_LOOM_MEMORY_MODE=ab` + `NOVEL_ANALYZER_LOOM_PAIRWISE_ENABLED=true`。前提：alembic `20260509_01` 已在生产 PG 上运行（fact_records / graph_nodes / graph_edges 三张表的 Loom 字段已存在）。ab 模式下 50% 章节走 Loom 记忆注入路径，50% 走原路径，`loom-ab-compare` 可对比 character_ooc 触发率。
+
 - feat(retrieval): B2 — add relationship_route to retrieval pipeline.
 
   Changelist: `CL-b2-relationship-route-20260516`
 
-  新增 `_relationship_route()` 并接入 `_search_branch_routes_with_diagnostics()`（entity_exact 之后、vector 之前）。路由通过 `graph_nodes.label LIKE %query%` 找到匹配节点，再展开所有关联 `graph_edges`，按 `max(node.importance_score, edge.weight)` 对章节打分。解决"章节摘要不含实体名但实体有活跃关系"时的召回盲区。
-
-  **验证**：21/21 `test_retrieval_service.py` pass；`retrieval-benchmark` 在雪中悍刀行 branch 上 jiebacfg R@5=0.79（关系路由补充了 entity_exact 未覆盖的章节）。
+  新增 `_relationship_route()` 并接入 `_search_branch_routes_with_diagnostics()`（entity_exact 之后、vector 之前）。路由通过 `graph_nodes.label LIKE %query%` 找到匹配节点，再展开所有关联 `graph_edges`，按 `max(node.importance_score, edge.weight)` 对章节打分。解决"章节摘要不含实体名但实体有活跃关系"时的召回盲区。验证：21/21 `test_retrieval_service.py` pass；`search-branch-diagnostics` 显示 relationship 路由命中 10 章。
 
 - fix(imitation): replace bare json.loads with robust JSON parser in chapter_imitation_service.
+
+  Changelist: `CL-json-parser-fix-20260516`
+
+  Stage B（30 章 baseline spike）发现 10/30 scaffold 污染（33%），根因是 `chapter_imitation_service._extract_json_payload` 使用裸 `json.loads`，claude-haiku-4.5 返回含 trailing comma / unicode 引号的响应时 3 次全失败，fallback 到 skeleton 模板。移植 `analysis_service` 的修复逻辑（trailing comma / unicode 引号 / 控制字符 / `ast.literal_eval` 兜底）。
+
+  **Stage B 结果（修复前）**：pass=20/30 (66%)  scaffold=10/30 (33%)  avg_score=82.7（对比修复前基线：0/30 pass）。
+
+- feat(imitation): 4-persona reader panel with comfort_score soft gate.
+
+  Changelist: `CL-reader-panel-20260516`
+
+  **Stage A 结果**（5 章 spike，ch2-6）：pass=3/5 (60%)，scaffold=2/5（JSON parse 失败，已被上面的 fix 修复）。
+
+  **代码改动**：`ReaderPanelService.evaluate_draft()` + `revise_with_panel_feedback()` + `build_panel_driven_revision_prompt()` + harness `--reader-panel` flag + 13 个测试。
+
+- feat(qa): T7 FActScore-lite shadow mode in answer_question.
+
+  Changelist: `CL-factscore-lite-20260516`
+
+  `_shadow_factscore()` 追加原子事实提取 + 词法 overlap 评分，结果存入 `BranchQAResult.factscore_grounding_rate`（0-1）。Shadow 模式，任何失败都静默返回原始结果。
+
+- feat(db): B5 Elo — add loom_pairwise_evaluations table + ORM model + loom-elo CLI.
+
+  Changelist: `CL-b5-elo-20260516`
+
+  新增 `loom_pairwise_evaluations` 表（alembic `20260516_01`）+ `LoomPairwiseEvaluationRecord` ORM + `loom-elo` CLI 命令。
+
+- fix(tests): fix 6 pre-existing test failures + retire dead WSGI contract tests.
+
+  Changelist: `CL-test-fixes-wsgi-cleanup-20260516`
+
+  3 个 mock lambda 补 `**kw`，`_FakeHarnessService.run_harness` 补 `mapping_pack` + `enable_reader_panel` 参数，admin_url 断言改为 env-agnostic，删除 2 个 WSGI 合约测试，补 `python-multipart>=0.0.20`。验证：715/718 pass（3 个 pre-existing 环境依赖失败）。
+
+- refactor(api): retire WSGI dispatch; uvicorn FastAPI is the only entrypoint.
+
+  Changelist: `CL-retire-wsgi-fallback-20260516`
+
+  `apps/api/app/main.py` 删除 `application()` + `ThreadingWSGIServer` + `main()`（-291 行）。`Makefile` 删除 `api-wsgi-legacy` target。
+
+- chore(data): relink novel_sources.source_path to /home/user/migrate/novels/.
+
+  Changelist: `CL-relink-novel-sources-20260516`
+
+  新增 `scripts/dev/relink_novel_sources.py`。7 行 relink / 20 行 already-OK / 16 行 SHA256 不匹配（留原 path）。
+
+- feat(llm): claude-haiku-4.5 + 共享 token-bucket 节流 + deepseek max_tokens cap.
+
+  Changelist: `CL-llm-haiku-rate-limit-20260516`
+
+  `config/settings.py` 新增 4 个 rate-limit settings。`llm/client.py` 用 `InMemoryRateLimiter` 包 `ChatOpenAI`（`lru_cache` 共享 bucket）。`.env.local` 切 `claude-haiku-4.5`，rps=1.5 / bucket=3。deepseek-* 模型强制 `max_tokens=4000`。
+
+- docs(ops): postgres ops cheatsheet + 2026-05-16 session handoff.
+
+  Changelist: `CL-ops-docs-20260516`
+
+  新增 `docs/runbook/postgres-ops-cheatsheet.md`（14 章 SQL 速查）+ `docs/session-handoff-20260516.md`。
+
+
 
   Changelist: `CL-json-parser-fix-20260516`
 
