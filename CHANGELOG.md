@@ -1,5 +1,19 @@
 ## Unreleased
 
+- fix(tests): fix 6 pre-existing test failures + retire dead WSGI contract tests.
+
+  Changelist: `CL-test-fixes-wsgi-cleanup-20260516`
+
+  **代码改动**：
+  - `tests/test_qa_service.py` — 3 个 mock lambda 补 `**kw`（`search_branch` 后加了 `max_chapter` kwarg）
+  - `tests/test_cli.py` — `_FakeHarnessService.run_harness` 补 `mapping_pack` 参数
+  - `tests/test_cli_pg_checks.py` — admin_url 断言改为 env-agnostic（`.env.local` 设 `DB_ADMIN_NAME=d2`，测试原来硬编码 `postgres`）
+  - `tests/contract/test_dual_parity.py` — 删除（docstring 明确说 v5.1 inline 后可删，v5.1 已在 28f9f28 完成）
+  - `tests/contract/test_main_wsgi_contract.py` — 删除（测试 `application()` WSGI callable，已在 e5975d0 退役）
+  - `requirements.txt` — 补 `python-multipart>=0.0.20,<1.0`（FastAPI multipart 依赖，之前未声明）
+
+  **验证**：702/705 pass（3 个 pre-existing 环境依赖失败：需要 `novel_analyzer_weitu_deconstruction_20260511` DB + sandbox LLM stub 返回空）
+
 - refactor(api): retire WSGI dispatch; uvicorn FastAPI is the only entrypoint.
 
   Changelist: `CL-retire-wsgi-fallback-20260516`
@@ -7,18 +21,37 @@
   **背景**：handoff 文档 (Option B) 给的提示是 "drop main.py /api/review-batch-execute dispatch"。实际 main.py 是 1585 行的 monolith，被 FastAPI router 反向依赖（`_BATCH_ACTION_CONFIG` / `_review_contract` / `_sse_event` / `_quality_dashboard_payload` 等 helper）。所以本次只删 WSGI 入口层，保留所有 helper。
 
   **代码改动**：
-  - `apps/api/app/main.py` — 删除 `application()` (288 行)、`main()`、`__main__` 块、`ThreadingWSGIServer` (`socketserver.ThreadingMixIn`)、`wsgiref.simple_server` / `wsgiref.types` imports；module docstring 改为 "shared payload builders + FastAPI router helpers"。文件从 1585 → 1294 行（-291 行 WSGI dispatch，留下 helpers 给 routers/ 复用）。
-  - `Makefile` — 删除 `api-wsgi-legacy` target + `.PHONY` 项 + help 行。`make api-dev` 仍是唯一入口。
+  - `apps/api/app/main.py` — 删除 `application()` (288 行)、`main()`、`__main__` 块、`ThreadingWSGIServer`；文件从 1585 → 1294 行。
+  - `Makefile` — 删除 `api-wsgi-legacy` target。
   - `tests/test_api_main.py` — 移除 `application` 的未使用导入。
-  - `README.md` / `apps/api/README.md` / `apps/web/README.md` — 全部清理 "WSGI 兜底" / "v5 cutover 回退用" 残留字眼。
-
-  **真实验证**：
-  - `tests/test_api_main.py` 65/67 pass（2 个 multipart 测试因 `python-multipart` 未安装跳过；安装后 67/67 pass）
-  - `tests/test_llm_client.py` 4/4 pass
-  - 总计 71/71 pass
-  - `from apps.api.app import main` 加载干净
+  - `README.md` / `apps/api/README.md` / `apps/web/README.md` — 清理 WSGI 残留字眼。
 
 - chore(data): relink novel_sources.source_path to /home/user/migrate/novels/.
+
+  Changelist: `CL-relink-novel-sources-20260516`
+
+  **背景**：DB 里 43 个 `novel_sources` 的 `source_path` 历史遗留指向 `/tmp/`、`/home/user/ai-books/.cache/...` 等已不存在的位置。新增 `scripts/dev/relink_novel_sources.py` 按 SHA256 重定位到 `/home/user/migrate/novels/`。
+
+  **数据变化（已 apply）**：7 行 relink / 20 行 already-OK / 16 行 SHA256 不匹配（留原 path，强换会导致 offset 错位）。
+
+- feat(llm): claude-haiku-4.5 + 共享 token-bucket 节流。
+
+  Changelist: `CL-llm-haiku-rate-limit-20260516`
+
+  **代码改动**：
+  - `novel_analyzer/config/settings.py` 新增 4 个 settings：`llm_requests_per_second` (默认 0=disabled) / `llm_check_every_n_seconds` / `llm_max_bucket_size` / `llm_max_concurrent_requests`。
+  - `novel_analyzer/llm/client.py` 用 `langchain_core.rate_limiters.InMemoryRateLimiter` 包 `ChatOpenAI`。`_build_rate_limiter` 用 `lru_cache` 让所有并发 caller 共享同一个 bucket。
+  - `tests/test_llm_client.py` 新增 4 测试。
+
+  **配置切换**：`.env.local` 主模型 `deepseek-v4-flash` → `claude-haiku-4.5`，fallback 仍 `deepseek-v4-flash`。默认节流 rps=1.5 / bucket=3。
+
+- docs(ops): postgres ops cheatsheet + 2026-05-16 session handoff.
+
+  Changelist: `CL-ops-docs-20260516`
+
+  新增 `docs/runbook/postgres-ops-cheatsheet.md`（14 章 SQL 速查）+ `docs/session-handoff-20260516.md`（本会话进度 + 待办）。
+
+
 
   Changelist: `CL-relink-novel-sources-20260516`
 
