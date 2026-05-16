@@ -46,6 +46,7 @@
 |------|------|--------|
 | **[runbook/deployment-and-operations-manual-20260515.md](./runbook/deployment-and-operations-manual-20260515.md)** | **从零部署 + 日常运维总章 (1038 行)** | **接手人优先读** |
 | **[ops-debug-manual-20260514.md](./ops-debug-manual-20260514.md)** | **scenario-first 故障速查（自检/常见操作/故障决策树/反模式）** | **运维/调试** |
+| **[runbook/postgres-ops-cheatsheet.md](./runbook/postgres-ops-cheatsheet.md)** | **PostgreSQL 运维速查（连接/巡检/检索/Embedding/性能/备份）** | **运维/数据/排障** |
 | **[cross-genre-imitation-commercial-readiness-20260515.md](./cross-genre-imitation-commercial-readiness-20260515.md)** | **跨题材改写 99.4% pass + 6 项 SLA gap + 3 条上线路径** | **业务/PM** |
 | **[baseline-imitation-quality-validation-handoff-20260515.md](./baseline-imitation-quality-validation-handoff-20260515.md)** | **同题材 prompt 修复后 Stage A/B/C 长跑验证步骤** | **下一棒接手** |
 | [cli-operations-manual.md](./cli-operations-manual.md) | CLI 命令真相源 | 使用者 |
