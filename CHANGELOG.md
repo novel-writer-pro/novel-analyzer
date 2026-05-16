@@ -1,5 +1,23 @@
 ## Unreleased
 
+- refactor(api): retire WSGI dispatch; uvicorn FastAPI is the only entrypoint.
+
+  Changelist: `CL-retire-wsgi-fallback-20260516`
+
+  **背景**：handoff 文档 (Option B) 给的提示是 "drop main.py /api/review-batch-execute dispatch"。实际 main.py 是 1585 行的 monolith，被 FastAPI router 反向依赖（`_BATCH_ACTION_CONFIG` / `_review_contract` / `_sse_event` / `_quality_dashboard_payload` 等 helper）。所以本次只删 WSGI 入口层，保留所有 helper。
+
+  **代码改动**：
+  - `apps/api/app/main.py` — 删除 `application()` (288 行)、`main()`、`__main__` 块、`ThreadingWSGIServer` (`socketserver.ThreadingMixIn`)、`wsgiref.simple_server` / `wsgiref.types` imports；module docstring 改为 "shared payload builders + FastAPI router helpers"。文件从 1585 → 1294 行（-291 行 WSGI dispatch，留下 helpers 给 routers/ 复用）。
+  - `Makefile` — 删除 `api-wsgi-legacy` target + `.PHONY` 项 + help 行。`make api-dev` 仍是唯一入口。
+  - `tests/test_api_main.py` — 移除 `application` 的未使用导入。
+  - `README.md` / `apps/api/README.md` / `apps/web/README.md` — 全部清理 "WSGI 兜底" / "v5 cutover 回退用" 残留字眼。
+
+  **真实验证**：
+  - `tests/test_api_main.py` 65/67 pass（2 个 multipart 测试因 `python-multipart` 未安装跳过；安装后 67/67 pass）
+  - `tests/test_llm_client.py` 4/4 pass
+  - 总计 71/71 pass
+  - `from apps.api.app import main` 加载干净
+
 - chore(data): relink novel_sources.source_path to /home/user/migrate/novels/.
 
   Changelist: `CL-relink-novel-sources-20260516`

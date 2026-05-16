@@ -1,5 +1,5 @@
 .PHONY: help tei-prefetch tei-up tei-down tei-doctor tei-restart \
-	api-dev api-wsgi-legacy smoke-external
+	api-dev smoke-external
 
 help:
 	@echo "TEI Development Targets:"
@@ -21,9 +21,8 @@ help:
 	@echo "  make v2-down-all   - (needs docker) tear down dify + n8n + langfuse"
 	@echo "  make v2-pickup-checklist - Step-by-step pickup guide for next session"
 	@echo ""
-	@echo "Backend launch (v5 cutover):"
-	@echo "  make api-dev          - Start FastAPI backend on :8011 via uvicorn (default)"
-	@echo "  make api-wsgi-legacy  - Start WSGI fallback (will be removed after T10 cutover)"
+	@echo "Backend launch:"
+	@echo "  make api-dev          - Start FastAPI backend on :8011 via uvicorn"
 	@echo ""
 	@echo "External dependency smoke test:"
 	@echo "  make smoke-external   - Probe DB / LLM / TEI embed / TEI rerank endpoints"
@@ -132,12 +131,6 @@ v2-down-all:
 api-dev:
 	@echo "Starting FastAPI backend on http://127.0.0.1:8011 (uvicorn)..."
 	.venv/bin/uvicorn apps.api.app.fastapi_app:app --host 127.0.0.1 --port 8011 --reload
-
-api-wsgi-legacy:
-	@echo "[deprecated] Launching WSGI dispatch backend on :8011..."
-	@echo "  This path is retained only for v5 cutover rollback."
-	@echo "  Default launch is 'make api-dev' (uvicorn + FastAPI)."
-	.venv/bin/python -m apps.api.app.main
 
 # --- external dependency smoke test ---
 smoke-external:

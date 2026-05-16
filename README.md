@@ -66,7 +66,7 @@
 
 | 层 | 技术 |
 |----|------|
-| 后端 | Python 3.11 · FastAPI / WSGI · LangGraph · SQLAlchemy |
+| 后端 | Python 3.11 · FastAPI · LangGraph · SQLAlchemy |
 | 数据库 | PostgreSQL（pg_trgm / pgvector / pg_jieba） |
 | 前端 | Next.js 15 · React 18 · Ant Design 5 |
 | AI 编排 | Dify（Chatbot / Workflow / Prompt Studio） |
@@ -397,7 +397,6 @@ make v3-smoke                                          # e2e 烟雾测试
 
 # 后端
 make api-dev                                           # uvicorn FastAPI on :8011
-make api-wsgi-legacy                                   # WSGI 兜底（cutover 后移除）
 
 # 前端
 cd apps/web && npm run dev                             # Next.js on :4173
