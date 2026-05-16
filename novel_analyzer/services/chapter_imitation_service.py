@@ -629,6 +629,7 @@ class ChapterImitationService:
     @staticmethod
     def _extract_json_payload(raw_content: object) -> dict[str, object]:
         import ast
+        import json as _json
         import re as _re
 
         text = str(raw_content).strip()
@@ -644,9 +645,9 @@ class ChapterImitationService:
 
         def _try(s: str) -> dict[str, object] | None:
             try:
-                loaded = json.loads(s)
+                loaded = _json.loads(s)
                 return loaded if isinstance(loaded, dict) else None
-            except json.JSONDecodeError:
+            except _json.JSONDecodeError:
                 return None
 
         result = _try(text)
@@ -670,7 +671,7 @@ class ChapterImitationService:
         except Exception:
             pass
 
-        raise json.JSONDecodeError("no valid JSON object found", text, 0)
+        raise _json.JSONDecodeError("no valid JSON object found", text, 0)
 
     @staticmethod
     def _render_skeleton_text(*, title: str, plan: ChapterImitationPlan) -> str:
