@@ -353,6 +353,7 @@ def test_writer_imitate_and_range_write_output_files(monkeypatch: MonkeyPatch, t
             use_llm: bool,
             model_name: str | None,
             steering_pack: dict[str, list[str]] | None = None,
+            mapping_pack: dict[str, str] | None = None,
         ) -> _FakeReport:
             seen["steering_pack"] = steering_pack
             _ = branch_id, source_chapter_index, target_goal, max_rounds, use_llm, model_name

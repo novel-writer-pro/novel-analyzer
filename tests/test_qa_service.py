@@ -221,7 +221,7 @@ def test_branch_qa_falls_back_when_llm_temporarily_unavailable(tmp_path: Path, m
         monkeypatch.setattr(
             service.retrieval_service,
             'search_branch',
-            lambda branch_id, question, limit: [
+            lambda branch_id, question, limit, **kw: [
                 type(
                     'Hit',
                     (),
@@ -271,7 +271,7 @@ def test_branch_qa_dedupes_outputs_and_prioritizes_question_type(tmp_path: Path,
             type('Hit', (), {'chapter_index': 1, 'title': '万相世界', 'summary_text': '李洛面临觉醒压力。', 'score': 0.8, 'keyword_list': ['李洛', '相力']} )(),
         ]
 
-        monkeypatch.setattr(service.retrieval_service, 'search_branch', lambda branch_id, question, limit: hits)
+        monkeypatch.setattr(service.retrieval_service, 'search_branch', lambda branch_id, question, limit, **kw: hits)
         monkeypatch.setattr(service, '_window_context', lambda branch_id, chapters: ['[窗口 1-5] 李洛准备参加觉醒仪式。'])
         monkeypatch.setattr(service, '_graph_context', lambda branch_id, chapters: ['[图推理] 觉醒仪式 -> 觉醒结果'])
         monkeypatch.setattr(service, '_graph_reasoning_snapshot', lambda branch_id, chapters, question_type='general': (['觉醒仪式 -[advances_to]-> 觉醒结果', '觉醒仪式 -[advances_to]-> 觉醒结果'], ['活跃冲突: 李洛面临觉醒失败风险', '活跃冲突: 李洛面临觉醒失败风险']))
@@ -300,7 +300,7 @@ def test_branch_qa_marks_timeline_questions_conservative_when_single_chapter_onl
         settings = Settings(llm_api_key='test-key')
         service = BranchQAService(session, settings)
         hits = [type('Hit', (), {'chapter_index': 1, 'title': '万相世界', 'summary_text': '李洛准备参加觉醒仪式。', 'score': 1.0, 'keyword_list': ['李洛', '觉醒仪式']})()]
-        monkeypatch.setattr(service.retrieval_service, 'search_branch', lambda branch_id, question, limit: hits)
+        monkeypatch.setattr(service.retrieval_service, 'search_branch', lambda branch_id, question, limit, **kw: hits)
         monkeypatch.setattr(service, '_window_context', lambda branch_id, chapters: [])
         monkeypatch.setattr(service, '_graph_context', lambda branch_id, chapters: [])
         monkeypatch.setattr(service, '_graph_reasoning_snapshot', lambda branch_id, chapters, question_type='general': ([], []))

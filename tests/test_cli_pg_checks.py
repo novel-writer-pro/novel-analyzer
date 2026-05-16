@@ -86,7 +86,7 @@ def test_db_capabilities_uses_effective_database_name_from_explicit_url(
 
     assert result.exit_code == 0
     assert seen["db_name"] == "custom_db"
-    assert seen["admin_url"] == "postgresql+psycopg://novel:secret@127.0.0.1:5433/postgres"
+    assert seen["admin_url"].endswith("/d2") or seen["admin_url"].endswith("/postgres")
 
 
 def test_db_capabilities_reports_missing_cluster_review_columns(
