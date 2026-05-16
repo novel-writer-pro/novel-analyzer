@@ -178,3 +178,95 @@ def test_thresholds_are_consistent() -> None:
     assert COMFORT_NEEDS_REWRITE_THRESHOLD < COMFORT_PASS_THRESHOLD
     assert 0 < COMFORT_NEEDS_REWRITE_THRESHOLD <= 100
     assert 0 < COMFORT_PASS_THRESHOLD <= 100
+
+
+def test_revise_with_panel_feedback_returns_unchanged_when_no_revisions() -> None:
+    from novel_analyzer.domain.schemas import ReaderPanelReport
+
+    svc = ReaderPanelService(_settings())
+    draft = _draft("正文" * 200)
+    empty_report = ReaderPanelReport(
+        source_chapter_index=1,
+        draft_title="t",
+        comfort_score=80,
+        targeted_revisions=[],
+    )
+    out = svc.revise_with_panel_feedback(draft, empty_report)
+    assert out is draft
+
+
+def test_revise_with_panel_feedback_applies_when_llm_returns_valid() -> None:
+    from novel_analyzer.domain.schemas import (
+        ReaderPanelDimensionScore,
+        ReaderPanelReport,
+        ReaderPanelRevisionAction,
+    )
+
+    revised_text = "改后的正文" * 100
+    json_text = (
+        '{"revised_draft_text": "' + revised_text + '",'
+        ' "revision_summary": ["对话生动度: 改完了", "环境描写: 加了感官"]}'
+    )
+    svc = ReaderPanelService(_settings())
+    draft = _draft("原文" * 200)
+    report = ReaderPanelReport(
+        source_chapter_index=1,
+        draft_title="t",
+        comfort_score=55,
+        dimension_scores=[
+            ReaderPanelDimensionScore(dimension="对话生动度", score=40),
+            ReaderPanelDimensionScore(dimension="环境描写", score=45),
+        ],
+        targeted_revisions=[
+            ReaderPanelRevisionAction(dimension="对话生动度", action="改对话", priority=1),
+        ],
+    )
+    with patch("novel_analyzer.services.reader_panel_service.build_chat_model") as mock_build:
+        class _Resp:
+            content = json_text
+        mock_build.return_value.invoke.return_value = _Resp()
+        out = svc.revise_with_panel_feedback(draft, report)
+    assert out.draft_text == revised_text
+    assert any("reader_panel revision" in n for n in out.method_notes)
+    assert any("对话生动度" in n for n in out.method_notes)
+
+
+def test_revise_with_panel_feedback_keeps_original_when_llm_returns_short_text() -> None:
+    from novel_analyzer.domain.schemas import ReaderPanelReport, ReaderPanelRevisionAction
+
+    json_text = '{"revised_draft_text": "太短", "revision_summary": []}'
+    svc = ReaderPanelService(_settings())
+    draft = _draft("原文" * 200)
+    report = ReaderPanelReport(
+        source_chapter_index=1,
+        draft_title="t",
+        comfort_score=55,
+        targeted_revisions=[
+            ReaderPanelRevisionAction(dimension="对话生动度", action="改", priority=1),
+        ],
+    )
+    with patch("novel_analyzer.services.reader_panel_service.build_chat_model") as mock_build:
+        class _Resp:
+            content = json_text
+        mock_build.return_value.invoke.return_value = _Resp()
+        out = svc.revise_with_panel_feedback(draft, report)
+    assert out is draft
+
+
+def test_revise_with_panel_feedback_swallows_llm_exception() -> None:
+    from novel_analyzer.domain.schemas import ReaderPanelReport, ReaderPanelRevisionAction
+
+    svc = ReaderPanelService(_settings())
+    draft = _draft("原文" * 200)
+    report = ReaderPanelReport(
+        source_chapter_index=1,
+        draft_title="t",
+        comfort_score=55,
+        targeted_revisions=[
+            ReaderPanelRevisionAction(dimension="对话生动度", action="改", priority=1),
+        ],
+    )
+    with patch("novel_analyzer.services.reader_panel_service.build_chat_model") as mock_build:
+        mock_build.return_value.invoke.side_effect = RuntimeError("provider down")
+        out = svc.revise_with_panel_feedback(draft, report)
+    assert out is draft
