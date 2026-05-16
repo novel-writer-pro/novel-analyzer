@@ -9040,6 +9040,60 @@ def loom_pairs_stats(
 
 
 @app.command()
+def loom_elo(
+    pairs_file: Path = typer.Option(Path("output/loom-pairs.jsonl"), "--pairs-file"),
+    top_n: int = typer.Option(20, "--top-n", help="Show top N variants by Elo rating."),
+    k_factor: float = typer.Option(32.0, "--k-factor", help="Elo K-factor (default 32)."),
+) -> None:
+    """Compute Elo leaderboard from loom-pairs.jsonl pairwise outcomes."""
+    from novel_analyzer.services.elo_tournament_service import PairOutcome, compute_elo
+
+    if not pairs_file.exists():
+        echo(f"loom_elo: {pairs_file} not found — run loom-collect-pairs first.")
+        raise typer.Exit(code=1)
+
+    outcomes: list[PairOutcome] = []
+    for line in pairs_file.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            r = json.loads(line)
+        except Exception:
+            continue
+        pair_id = str(r.get("pair_id", ""))
+        pref = str(r.get("overall_preference", "tie"))
+        conf = float(r.get("confidence", 1.0))
+        variant_a = f"{r.get('branch_id', '')}#ch{r.get('chapter_index', 0)}@A"
+        variant_b = f"{r.get('branch_id', '')}#ch{r.get('chapter_index', 0)}@B"
+        winner = variant_a if pref == "A" else (variant_b if pref == "B" else "tie")
+        outcomes.append(PairOutcome(
+            variant_a=variant_a,
+            variant_b=variant_b,
+            winner=winner,
+            confidence=conf,
+        ))
+
+    if not outcomes:
+        echo("loom_elo: no valid outcomes found in pairs file.")
+        raise typer.Exit(code=0)
+
+    board = compute_elo(outcomes, k_factor=k_factor)
+    ranked = board.ranked()[:top_n]
+
+    echo(f"loom_elo: {len(outcomes)} outcomes → {len(board.ratings)} variants")
+    echo(f"k_factor={k_factor}  showing top {min(top_n, len(ranked))}")
+    echo("")
+    echo(f"{'rank':<5} {'variant':<60} {'elo':>7} {'W':>4} {'L':>4} {'T':>4}")
+    echo("-" * 85)
+    for rank, (variant, elo) in enumerate(ranked, 1):
+        w = board.win_count.get(variant, 0)
+        l = board.loss_count.get(variant, 0)
+        t = board.tie_count.get(variant, 0)
+        echo(f"{rank:<5} {variant:<60} {elo:>7.1f} {w:>4} {l:>4} {t:>4}")
+
+
+@app.command()
 def loom_ab_compare(
     baseline_dir: Path = typer.Argument(..., help="Baseline output dir (Loom off)."),
     loom_dir: Path = typer.Argument(..., help="Loom-enabled output dir (Loom on)."),
