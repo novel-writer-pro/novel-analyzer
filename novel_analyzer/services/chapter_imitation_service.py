@@ -193,6 +193,7 @@ class ChapterImitationService:
             steering_pack=steering_pack,
         )
         title, source_text = self._source_chapter_text(branch_id, source_chapter_index)
+        title = self._clean_title(title)
 
         previous_summary = ""
         active_characters: list[str] = []
@@ -253,6 +254,11 @@ class ChapterImitationService:
             raise ValueError(f"Unknown chapter_index: {chapter_index}")
         full_text = Path(novel.source_path).read_text(encoding="utf-8", errors="ignore")
         return segment.normalized_title, full_text[segment.start_offset : segment.end_offset].strip()
+
+    @staticmethod
+    def _clean_title(title: str) -> str:
+        import re as _re
+        return _re.sub(r"[（(][^）)]*(?:求收藏|求追读|求月票|加更|本章完|谢谢支持)[^）)]*[）)]", "", title).strip()
 
     def compare_with_source(
         self,
