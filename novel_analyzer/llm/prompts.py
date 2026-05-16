@@ -322,3 +322,58 @@ def build_reader_panel_prompt(
   "verdict": "needs_polish"
 }}
 """.strip()
+
+
+def build_panel_driven_revision_prompt(
+    *,
+    chapter_title: str,
+    draft_text: str,
+    comfort_score: int,
+    weak_dimensions: list[tuple[str, int]],
+    targeted_revisions: list[dict[str, object]],
+) -> str:
+    """Build a revision prompt that uses reader-panel feedback to fix specific weaknesses.
+
+    The LLM gets the full original draft + the panel's diagnosis + a ranked list
+    of paragraph-level revision actions. Output is a rewritten draft_text only,
+    so we can re-run the panel against the same chapter shape.
+    """
+
+    weak_block = "\n".join(
+        f"- {dim}（当前 {score} 分，需要重点修复）"
+        for dim, score in weak_dimensions
+    )
+    revision_block = "\n".join(
+        f"- [P{r.get('priority', 2)}] [{r.get('dimension', '?')}] {r.get('action', '')}"
+        for r in targeted_revisions
+    )
+
+    return f"""
+你刚写完这章草稿，4 位读者评审给了 {comfort_score} 分（满分 100）。
+他们指出了具体的弱点，下面是修改清单。**严格按清单改**，不要重写整章，只针对弱点修订。
+
+章节标题：{chapter_title}
+
+**最弱维度**：
+{weak_block}
+
+**段落级修改清单**（按 priority 顺序）：
+{revision_block}
+
+**修改原则**：
+1. 保留原章节结构、人物、情节推进——不要换骨架。
+2. 只修改清单里指出的段落 / 维度，不要趁机加无关内容。
+3. P1 必须改完，P2 尽量改，P3 视情况。
+4. 改完后整章应该比原来更具体、更有感官细节、对话更生动、悬念更明确。
+5. 不要在 draft_text 中出现"修订"、"修改"、"按清单"等元描述——读者只看到改完后的小说正文。
+6. 不要出现"求收藏 / 求追读 / 本章完"等运营话术。
+
+原章正文：
+{draft_text}
+
+输出严格 JSON（不要 Markdown，不要解释）：
+{{
+  "revised_draft_text": "...",
+  "revision_summary": ["对话生动度: 把卫图的独白改成 3 轮对话", "..."]
+}}
+""".strip()
