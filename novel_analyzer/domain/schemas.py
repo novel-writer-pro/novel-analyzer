@@ -885,6 +885,7 @@ class ChapterImitationHarnessReport(BaseModel):
     stop_reason: str
     chapter_quality_signal: dict[str, object] = Field(default_factory=dict)
     dialogue_signal: dict[str, object] = Field(default_factory=dict)
+    reader_panel_report: ReaderPanelReport | None = Field(default=None)
 
 
 class MultiChapterImitationStep(BaseModel):
@@ -1000,3 +1001,34 @@ class WholeBookImitationRunReport(BaseModel):
     session_loom_signals: dict[str, object] = Field(default_factory=dict)
     session_loom_gate_summary: dict[str, object] = Field(default_factory=dict)
     run_notes: list[str] = Field(default_factory=list)
+
+
+class ReaderPanelPersonaScore(BaseModel):
+    persona: str
+    score: int = Field(ge=0, le=100)
+    feel: str = Field(default="")
+    strengths: list[str] = Field(default_factory=list)
+    weaknesses: list[str] = Field(default_factory=list)
+
+
+class ReaderPanelDimensionScore(BaseModel):
+    dimension: str
+    score: int = Field(ge=0, le=100)
+    note: str = Field(default="")
+
+
+class ReaderPanelRevisionAction(BaseModel):
+    dimension: str
+    action: str
+    priority: int = Field(default=2, ge=1, le=3)
+
+
+class ReaderPanelReport(BaseModel):
+    source_chapter_index: int = Field(ge=1)
+    draft_title: str
+    comfort_score: int = Field(ge=0, le=100)
+    personas: list[ReaderPanelPersonaScore] = Field(default_factory=list)
+    dimension_scores: list[ReaderPanelDimensionScore] = Field(default_factory=list)
+    targeted_revisions: list[ReaderPanelRevisionAction] = Field(default_factory=list)
+    overall_verdict: str = Field(default="needs_polish")
+    rejection_reason: str = Field(default="")
