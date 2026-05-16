@@ -43,6 +43,13 @@ class Settings(BaseSettings):
     llm_fallback_model_name: str = Field(default="gpt-5.4")
     llm_timeout_seconds: float = Field(default=180.0)
     llm_max_retries: int = Field(default=2)
+    # Rate limiting (token-bucket via langchain InMemoryRateLimiter).
+    # Set llm_requests_per_second>0 to enable; 0 disables throttling entirely.
+    # llm_max_concurrent_requests bounds in-flight calls (asyncio.Semaphore wrapper).
+    llm_requests_per_second: float = Field(default=0.0)
+    llm_check_every_n_seconds: float = Field(default=0.1)
+    llm_max_bucket_size: float = Field(default=4.0)
+    llm_max_concurrent_requests: int = Field(default=0)
     chapter_failure_retry_limit: int = Field(default=5)
     chapter_job_stall_timeout_seconds: int = Field(default=600)
     cross_chapter_window: int = Field(default=5)

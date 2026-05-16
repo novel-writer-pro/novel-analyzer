@@ -1,5 +1,23 @@
 ## Unreleased
 
+- feat(llm): claude-haiku-4.5 + 共享 token-bucket 节流。
+
+  Changelist: `CL-llm-haiku-rate-limit-20260516`
+
+  **代码改动**：
+  - `novel_analyzer/config/settings.py` 新增 4 个 settings：`llm_requests_per_second` (默认 0=disabled) / `llm_check_every_n_seconds` / `llm_max_bucket_size` / `llm_max_concurrent_requests`。零默认值保证升级零侵入。
+  - `novel_analyzer/llm/client.py` 用 `langchain_core.rate_limiters.InMemoryRateLimiter` 包 `ChatOpenAI`。`_build_rate_limiter` 用 `lru_cache` 让所有并发 caller 共享同一个 bucket（验证：`test_rate_limiter_singleton_per_config`）。`rps<=0` 时返回 `None` 不打开限流。
+  - `tests/test_llm_client.py` 新增 4 测试：disabled/enabled/singleton/model-override。
+
+  **配置切换**：`.env.local` 主模型 `deepseek-v4-flash` → `claude-haiku-4.5`，fallback 仍 `deepseek-v4-flash`。默认节流 rps=1.5 / bucket=3 / concurrent=2 → 长稳 ~90 req/min，短突发 ≤3。
+
+  **真实验证**：
+  - `chat.invoke('用一句话回答...')` → 3.8s 返回 claude-haiku-4.5 输出 ✅
+  - 5 次 `acquire()` dry-run 间隔 0.7s（rps=1.5 稳态） ✅
+  - 4/4 unit tests pass ✅
+
+- docs(handoff): 新增 `docs/session-handoff-20260516.md` 跟踪本会话进度 + 待办 + 不做项决策记录。
+
 - feat(imitation): 同题材 baseline self-check + scaffold-only in-flight 检测 + mapping flags 全 CLI 接通 + 商用就绪/长跑验证文档。
 
   Changelist: `CL-imitation-baseline-quality-and-commercial-readiness`
