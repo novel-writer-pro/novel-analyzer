@@ -628,17 +628,49 @@ class ChapterImitationService:
 
     @staticmethod
     def _extract_json_payload(raw_content: object) -> dict[str, object]:
+        import ast
+        import re as _re
+
         text = str(raw_content).strip()
         if text.startswith("```"):
-            lines = text.splitlines()
-            if lines and lines[0].startswith("```"):
-                lines = lines[1:]
-            if lines and lines[-1].startswith("```"):
-                lines = lines[:-1]
-            text = "\n".join(lines).strip()
-        import json
+            text = text.removeprefix("```json").removeprefix("```").strip()
+            if text.endswith("```"):
+                text = text[:-3].strip()
 
-        return json.loads(text)
+        start = text.find("{")
+        end = text.rfind("}")
+        if start != -1 and end != -1 and end >= start:
+            text = text[start : end + 1]
+
+        def _try(s: str) -> dict[str, object] | None:
+            try:
+                loaded = json.loads(s)
+                return loaded if isinstance(loaded, dict) else None
+            except json.JSONDecodeError:
+                return None
+
+        result = _try(text)
+        if result is not None:
+            return result
+
+        for candidate in [
+            _re.sub(r",(\s*[}\]])", r"\1", text),
+            text.replace("\u201c", '"').replace("\u201d", '"').replace("\u2019", "'"),
+            _re.sub(r"[\x00-\x1f]", "", text),
+        ]:
+            result = _try(candidate)
+            if result is not None:
+                return result
+
+        pythonish = text.replace("null", "None").replace("true", "True").replace("false", "False")
+        try:
+            loaded = ast.literal_eval(pythonish)
+            if isinstance(loaded, dict):
+                return loaded
+        except Exception:
+            pass
+
+        raise json.JSONDecodeError("no valid JSON object found", text, 0)
 
     @staticmethod
     def _render_skeleton_text(*, title: str, plan: ChapterImitationPlan) -> str:
