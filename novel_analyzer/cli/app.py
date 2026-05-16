@@ -9849,5 +9849,151 @@ def writer_imitate_range_split(
         echo(f"  ... +{len(written) - 5} more")
 
 
+@app.command()
+def reader_panel_stats(
+    output_dir: Path = typer.Argument(..., help="Directory containing writer-imitate-ch*.json"),
+    min_chapters: int = typer.Option(1, "--min-chapters", help="Skip if fewer chapters with panel data."),
+) -> None:
+    """Aggregate reader-panel scores across a batch and print verdict / comfort / dim / lift stats."""
+
+    if not output_dir.exists() or not output_dir.is_dir():
+        raise typer.BadParameter(f"not a directory: {output_dir}")
+
+    files = sorted(output_dir.glob("writer-imitate-ch*.json"))
+    if not files:
+        echo(f"no writer-imitate-ch*.json files in {output_dir}")
+        raise typer.Exit(code=1)
+
+    total = 0
+    pass_count = 0
+    panel_chapters: list[dict[str, object]] = []
+    revised_lifts: list[int] = []
+    dim_score_sum: dict[str, int] = {}
+    dim_score_n: dict[str, int] = {}
+    weakest_dim_count: dict[str, int] = {}
+    revision_dim_count: dict[str, int] = {}
+    p1_revision_count = 0
+    soft_gate_flips = 0
+
+    for f in files:
+        try:
+            d = json.loads(f.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            continue
+        total += 1
+        if d.get("final_verdict") == "pass":
+            pass_count += 1
+        if d.get("stop_reason") == "reader_panel_comfort_below_threshold":
+            soft_gate_flips += 1
+        rpr = d.get("reader_panel_report")
+        if not isinstance(rpr, dict) or rpr.get("comfort_score") is None:
+            continue
+        panel_chapters.append({
+            "ch": d.get("source_chapter_index"),
+            "comfort": rpr.get("comfort_score"),
+            "verdict": rpr.get("overall_verdict"),
+        })
+        ps = d.get("policy_summary") or {}
+        if ps.get("reader_panel_revised") is True:
+            lift = ps.get("reader_panel_comfort_lift")
+            if isinstance(lift, int):
+                revised_lifts.append(lift)
+        dim_scores = rpr.get("dimension_scores") or []
+        if isinstance(dim_scores, list) and dim_scores:
+            sorted_dims = sorted(
+                (d for d in dim_scores if isinstance(d, dict)),
+                key=lambda x: x.get("score", 100),
+            )
+            if sorted_dims:
+                weakest = sorted_dims[0].get("dimension")
+                if weakest:
+                    weakest_dim_count[str(weakest)] = weakest_dim_count.get(str(weakest), 0) + 1
+            for ds in dim_scores:
+                if not isinstance(ds, dict):
+                    continue
+                dim = str(ds.get("dimension", "")).strip()
+                score = ds.get("score")
+                if dim and isinstance(score, int):
+                    dim_score_sum[dim] = dim_score_sum.get(dim, 0) + score
+                    dim_score_n[dim] = dim_score_n.get(dim, 0) + 1
+        revisions = rpr.get("targeted_revisions") or []
+        if isinstance(revisions, list):
+            for r in revisions:
+                if not isinstance(r, dict):
+                    continue
+                dim = str(r.get("dimension", "")).strip()
+                if dim:
+                    revision_dim_count[dim] = revision_dim_count.get(dim, 0) + 1
+                if r.get("priority") == 1:
+                    p1_revision_count += 1
+
+    if len(panel_chapters) < min_chapters:
+        echo(f"only {len(panel_chapters)} chapters have reader_panel data, below --min-chapters={min_chapters}")
+        raise typer.Exit(code=1)
+
+    echo(f"=== reader-panel stats: {output_dir} ===")
+    echo(f"total chapters:         {total}")
+    echo(f"  with panel data:      {len(panel_chapters)}")
+    echo(f"  harness pass:         {pass_count}/{total} ({100 * pass_count / total:.1f}%)")
+    echo(f"  soft-gate flips:      {soft_gate_flips} (harness=pass -> needs_revision via comfort)")
+
+    if panel_chapters:
+        comforts = [int(c["comfort"]) for c in panel_chapters if isinstance(c.get("comfort"), int)]
+        avg_comfort = sum(comforts) / len(comforts)
+        echo("")
+        echo(f"comfort distribution:")
+        echo(f"  avg:    {avg_comfort:.1f}")
+        echo(f"  min:    {min(comforts)}")
+        echo(f"  max:    {max(comforts)}")
+        buckets = {"<50": 0, "50-59": 0, "60-69": 0, "70-79": 0, ">=80": 0}
+        for c in comforts:
+            if c < 50:
+                buckets["<50"] += 1
+            elif c < 60:
+                buckets["50-59"] += 1
+            elif c < 70:
+                buckets["60-69"] += 1
+            elif c < 80:
+                buckets["70-79"] += 1
+            else:
+                buckets[">=80"] += 1
+        for k, v in buckets.items():
+            bar = "#" * v
+            echo(f"  {k:>5}: {v:>3} {bar}")
+
+    if revised_lifts:
+        avg_lift = sum(revised_lifts) / len(revised_lifts)
+        positive = sum(1 for l in revised_lifts if l > 0)
+        echo("")
+        echo(f"panel-driven revisions (Phase B):")
+        echo(f"  applied:        {len(revised_lifts)} chapters")
+        echo(f"  avg comfort lift: {avg_lift:+.1f}")
+        echo(f"  positive lifts:  {positive}/{len(revised_lifts)} ({100 * positive / len(revised_lifts):.0f}%)")
+        echo(f"  max lift:        {max(revised_lifts)}")
+
+    if dim_score_n:
+        echo("")
+        echo("dimension averages (lower = weaker, target the bottom 3):")
+        avg_by_dim = sorted(
+            ((dim, dim_score_sum[dim] / dim_score_n[dim]) for dim in dim_score_n),
+            key=lambda x: x[1],
+        )
+        for dim, avg in avg_by_dim:
+            n = dim_score_n[dim]
+            echo(f"  {dim:<14} avg={avg:>5.1f}  n={n}")
+
+    if weakest_dim_count:
+        echo("")
+        echo("weakest-dimension frequency (which dim was the bottom-scoring most often):")
+        for dim, n in sorted(weakest_dim_count.items(), key=lambda x: -x[1]):
+            echo(f"  {dim:<14} {n:>3}x")
+
+    if revision_dim_count:
+        echo("")
+        echo(f"revision-action frequency (P1 actions: {p1_revision_count} total):")
+        for dim, n in sorted(revision_dim_count.items(), key=lambda x: -x[1])[:7]:
+            echo(f"  {dim:<14} {n:>3}x")
+
+
 if __name__ == "__main__":
     app()
