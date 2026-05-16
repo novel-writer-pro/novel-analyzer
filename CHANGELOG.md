@@ -1,6 +1,70 @@
 ## Unreleased
 
+- fix(imitation): replace bare json.loads with robust JSON parser in chapter_imitation_service.
+
+  Changelist: `CL-json-parser-fix-20260516`
+
+  **背景**：Stage B（30 章 baseline spike，ch31-60）发现 10/30 scaffold 污染（33%），`comparison_notes` 显示 "LLM draft unavailable after 3 attempts -> skeleton fallback: JSONDecodeError"。根因：`chapter_imitation_service._extract_json_payload` 只有 markdown fence 剥离 + 裸 `json.loads`，claude-haiku-4.5 返回含 trailing comma / unicode 引号 / 控制字符的响应时 3 次全失败，fallback 到 skeleton 模板（374 字，`is_scaffold_only=True`）。`analysis_service._extract_json_payload` 已有修复逻辑（trailing comma / unicode 引号 / 控制字符 / `ast.literal_eval` 兜底），本次将同等逻辑移植到 `chapter_imitation_service`。
+
+  **Stage B 结果（修复前）**：pass=20/30 (66%)  scaffold=10/30 (33%)  avg_score=82.7（对比修复前基线：0/30 pass）
+
+  **预期修复后**：scaffold 率降至接近 0%，pass rate ≥80%。
+
 - feat(imitation): 4-persona reader panel with comfort_score soft gate.
+
+  Changelist: `CL-reader-panel-20260516`
+
+  **Stage A 结果**（5 章 spike，ch2-6）：pass=3/5 (60%)，scaffold=2/5（ch3/ch4 `is_scaffold_only=True`，364 字，`stop_reason=critical_action_required`）。prompt 修复有方向性效果（对比修复前：0/5 pass）。
+
+  **代码改动**：
+  - `novel_analyzer/domain/schemas.py` — 新增 `ReaderPanelPersonaScore` / `ReaderPanelDimensionScore` / `ReaderPanelRevisionAction` / `ReaderPanelReport`
+  - `novel_analyzer/llm/prompts.py` — 新增 `READER_PANEL_PERSONAS` (4 视角) / `READER_PANEL_DIMENSIONS` (7 维度) / `build_reader_panel_prompt()` / `build_panel_driven_revision_prompt()`
+  - `novel_analyzer/services/reader_panel_service.py` — `ReaderPanelService.evaluate_draft()` + `revise_with_panel_feedback()`
+  - `novel_analyzer/services/imitation_harness_service.py` — `--reader-panel` flag 接入 harness，comfort_score < threshold 时触发额外修改轮次
+  - `tests/test_reader_panel_service.py` — 13 个测试
+
+- feat(qa): T7 FActScore-lite shadow mode in answer_question.
+
+  Changelist: `CL-factscore-lite-20260516`
+
+  `_shadow_factscore()` 在 `answer_question` 后追加原子事实提取 + 词法 overlap 评分，结果存入 `BranchQAResult.factscore_grounding_rate`（0-1）。Shadow 模式：任何失败都静默返回原始结果，不阻塞问答。
+
+- feat(db): B5 Elo — add loom_pairwise_evaluations table + ORM model + loom-elo CLI.
+
+  Changelist: `CL-b5-elo-20260516`
+
+  新增 `loom_pairwise_evaluations` 表（alembic `20260516_01`）+ `LoomPairwiseEvaluationRecord` ORM + `loom-elo` CLI 命令（从 `loom-pairs.jsonl` 计算 Elo 排行榜）。
+
+- fix(tests): fix 6 pre-existing test failures + retire dead WSGI contract tests.
+
+  Changelist: `CL-test-fixes-wsgi-cleanup-20260516`
+
+  3 个 mock lambda 补 `**kw`，`_FakeHarnessService.run_harness` 补 `mapping_pack` + `enable_reader_panel` 参数，admin_url 断言改为 env-agnostic，删除 2 个 WSGI 合约测试，补 `python-multipart>=0.0.20`。验证：715/718 pass（3 个 pre-existing 环境依赖失败）。
+
+- refactor(api): retire WSGI dispatch; uvicorn FastAPI is the only entrypoint.
+
+  Changelist: `CL-retire-wsgi-fallback-20260516`
+
+  `apps/api/app/main.py` 删除 `application()` + `ThreadingWSGIServer` + `main()`（-291 行）。`Makefile` 删除 `api-wsgi-legacy` target。
+
+- chore(data): relink novel_sources.source_path to /home/user/migrate/novels/.
+
+  Changelist: `CL-relink-novel-sources-20260516`
+
+  新增 `scripts/dev/relink_novel_sources.py`。7 行 relink / 20 行 already-OK / 16 行 SHA256 不匹配（留原 path）。
+
+- feat(llm): claude-haiku-4.5 + 共享 token-bucket 节流 + deepseek max_tokens cap.
+
+  Changelist: `CL-llm-haiku-rate-limit-20260516`
+
+  `config/settings.py` 新增 4 个 rate-limit settings。`llm/client.py` 用 `InMemoryRateLimiter` 包 `ChatOpenAI`（`lru_cache` 共享 bucket）。`.env.local` 切 `claude-haiku-4.5`，rps=1.5 / bucket=3。deepseek-* 模型强制 `max_tokens=4000` 防止 reasoning token 吃光 visible output。
+
+- docs(ops): postgres ops cheatsheet + 2026-05-16 session handoff.
+
+  Changelist: `CL-ops-docs-20260516`
+
+  新增 `docs/runbook/postgres-ops-cheatsheet.md`（14 章 SQL 速查）+ `docs/session-handoff-20260516.md`。
+
 
   Changelist: `CL-reader-panel-20260516`
 
