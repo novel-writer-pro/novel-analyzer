@@ -498,6 +498,7 @@ class BranchQAResult(BaseModel):
     insufficient_context: bool = Field(default=False)
     answer_mode: str = Field(default="normal")
     degraded_reason: str | None = Field(default=None)
+    factscore_grounding_rate: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
 class ChapterNoteRow(BaseModel):

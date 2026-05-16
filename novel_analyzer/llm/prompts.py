@@ -377,3 +377,18 @@ def build_panel_driven_revision_prompt(
   "revision_summary": ["对话生动度: 把卫图的独白改成 3 轮对话", "..."]
 }}
 """.strip()
+
+
+def build_qa_atomic_claim_extraction_prompt(*, answer: str) -> str:
+    return f"""
+你是一个事实分解助手。把下面的回答拆解成独立的原子事实陈述（每条一个具体事实，不含推断）。
+每条陈述必须是完整的中文句子，包含主语。不要合并多个事实到一条。不要输出推断或观点。
+
+回答：
+{answer}
+
+输出严格 JSON（不要 Markdown，不要解释）：
+{{
+  "claims": ["事实1", "事实2", "..."]
+}}
+""".strip()
