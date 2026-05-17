@@ -10064,10 +10064,22 @@ def ip_init(slug: str = typer.Argument(...)) -> None:
 
 @imitate_project_app.command("fingerprint")
 def ip_fingerprint(
-    slug: str = typer.Argument(...),
+    slug: str = typer.Argument(..., help="Project slug"),
     use_llm: bool = typer.Option(False, "--use-llm"),
 ) -> None:
-    echo("TODO: implement in T2-T10")
+    settings = _safe_settings()
+    session_factory = create_session_factory(settings)
+    with session_factory() as session:
+        from novel_analyzer.services.project_style_view_service import (
+            ProjectStyleViewService,
+        )
+        svc = ProjectStyleViewService(session=session)
+        try:
+            result = svc.generate_fingerprint(slug)
+            echo(f"Fingerprint generated for {slug}: {result.get('chapters_analyzed', 0)} chapters")
+        except Exception as exc:
+            echo(f"Failed: {exc}")
+            raise typer.Exit(code=1) from exc
 
 
 @imitate_project_app.command("macro")
@@ -10080,10 +10092,30 @@ def ip_macro(
 
 @imitate_project_app.command("characters")
 def ip_characters(
-    slug: str = typer.Argument(...),
-    use_llm: bool = typer.Option(False, "--use-llm"),
+    slug: str = typer.Argument(..., help="Project slug"),
+    count: int = typer.Option(4, "--count", help="Number of character cards"),
+    inherit_from_source: bool = typer.Option(
+        False, "--inherit-from-source", help="Build personas from source branch"
+    ),
+    inherit_names: list[str] = typer.Option(
+        [], "--inherit-name", help="Character names to inherit"
+    ),
+    use_llm: bool = typer.Option(False, "--use-llm", help="Use LLM (deferred to T9)"),
 ) -> None:
-    echo("TODO: implement in T2-T10")
+    """Generate character cards (T6)."""
+    settings = _safe_settings()
+    session_factory = create_session_factory(settings)
+    with session_factory() as session:
+        from novel_analyzer.services.project_characters_service import ProjectCharactersService
+
+        svc = ProjectCharactersService(session=session)
+        if inherit_from_source and inherit_names:
+            paths = svc.inherit_from_source(slug, list(inherit_names))
+        else:
+            paths = svc.generate_initial_cards(slug, count=count, use_llm=use_llm)
+        echo(f"Generated {len(paths)} character cards")
+        for p in paths:
+            echo(f"  {p}")
 
 
 @imitate_project_app.command("plot")

@@ -1,5 +1,10 @@
 ## Unreleased
 
+### Added (Loom Phase 6 - T4)
+- novel_analyzer/services/project_style_view_service.py: ProjectStyleViewService renders style/rhythm signals to markdown + JSON
+- imitate-project fingerprint <slug> CLI command wired
+- 5 unit tests
+
 ### Added (Loom Phase 6 - T3)
 - novel_analyzer/services/project_compiler_service.py: ProjectCompilerService + CompiledFlags + Beat dataclasses
 - compile_for_chapter(): parses 7-layer markdown into 9 steering flags + 5 Loom env vars
