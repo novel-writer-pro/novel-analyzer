@@ -6,7 +6,7 @@
 
 ## 1. 触发线索
 
-[retrieval-benchmark-report-20260513.md](./retrieval-benchmark-report-20260513.md) 的实测数据显示：同样使用 `jiebacfg` 配置，干净分支（72da24e9）MRR=0.560，噪声分支（2cd9c1ff）MRR=0.060，相差 9 倍。
+[retrieval-benchmark-report-20260513.md](../deprecated/old-arch-docs/retrieval-benchmark-report-20260513.md) 的实测数据显示：同样使用 `jiebacfg` 配置，干净分支（72da24e9）MRR=0.560，噪声分支（2cd9c1ff）MRR=0.060，相差 9 倍。
 
 差距不在检索层——三个分支的 ΔMRR（jiebacfg − simple）均为正，说明 BM25+jieba 本身工作正常。溯源到 `chapter_artifacts.payload_json` 的 `key_entities` 字段，发现部分章节的 entity 列表包含非实体词条，导致 query 本身质量极低，检索无从命中。
 

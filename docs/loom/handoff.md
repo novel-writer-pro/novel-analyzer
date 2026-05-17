@@ -27,7 +27,7 @@ Loom 是 novel-analyzer 的 **跨章节仿写记忆与质量基础设施**，叠
 Loom memory 层      →  carry_over_state 的 "组装器"（新增）
 ```
 
-两者不冲突。详见 [`docs/loom/arch-diff-and-alignment.md`](./arch-diff-and-alignment.md)。
+两者不冲突。详见 [`docs/loom/arch-diff-and-alignment.md`](../deprecated/old-arch-docs/arch-diff-and-alignment.md)。
 
 ### 架构全景
 
@@ -719,7 +719,7 @@ dialogue_signal: conflict_dialogue_density=0.1091
 
 ### 4.1.1 Phase 4/5 规划概览（Phase 3 完成后）
 
-详见 [`docs/loom/gap-analysis-and-evolution.md`](./gap-analysis-and-evolution.md)。
+详见 [`docs/loom/gap-analysis-and-evolution.md`](../deprecated/old-arch-docs/gap-analysis-and-evolution.md)。
 
 | Phase | 目标 | 核心交付 | 前提 |
 |-------|------|---------|------|
@@ -777,8 +777,8 @@ novel-analyzer loom-ab-compare output/baseline/ output/loom/ --output-file outpu
 如果你要继续 Loom 主线，只优先看这 5 份：
 
 1. [`docs/loom/sota-imitation-progression-checklist.md`](./sota-imitation-progression-checklist.md)
-2. [`docs/loom/weitu-real-effect-validation.md`](./weitu-real-effect-validation.md)
-3. [`docs/loom/weitu-validation-log-20260511.md`](./weitu-validation-log-20260511.md)
+2. [`docs/loom/weitu-real-effect-validation.md`](../deprecated/old-arch-docs/weitu-real-effect-validation.md)
+3. [`docs/loom/weitu-validation-log-20260511.md`](../deprecated/old-arch-docs/weitu-validation-log-20260511.md)
 4. [`docs/loom/handoff.md`](./handoff.md)
 5. [`docs/loom/roadmap.md`](./roadmap.md)
 
@@ -786,7 +786,7 @@ novel-analyzer loom-ab-compare output/baseline/ output/loom/ --output-file outpu
 
 ### 架构与设计
 - [`docs/loom/overview.md`](./overview.md) — 架构全景 + SOTA 对比 + 资产盘点
-- [`docs/loom/arch-diff-and-alignment.md`](./arch-diff-and-alignment.md) — Loom vs 0509 对比
+- [`docs/loom/arch-diff-and-alignment.md`](../deprecated/old-arch-docs/arch-diff-and-alignment.md) — Loom vs 0509 对比
 - [`docs/loom/roadmap.md`](./roadmap.md) — Phase 计划与任务清单
 - [`docs/loom/sota-imitation-progression-checklist.md`](./sota-imitation-progression-checklist.md) — 主链路 SOTA 仿写推进 checklist
 - [`docs/loom/tension/README.md`](./tension/README.md) — 张力指标设计文档
@@ -798,8 +798,8 @@ novel-analyzer loom-ab-compare output/baseline/ output/loom/ --output-file outpu
 ### 操作与验证
 - [`docs/cli-operations-manual.md`](../cli-operations-manual.md) — CLI 手册（第 12 节 Loom）
 - [`docs/ops-debug-manual-20260514.md` — 运维调试速查
-- [`docs/loom/weitu-real-effect-validation.md`](./weitu-real-effect-validation.md) — 卫图样例真实效果验证工作流
-- [`docs/loom/weitu-validation-log-20260511.md`](./weitu-validation-log-20260511.md) — 本轮已执行的卫图验证证据日志
+- [`docs/loom/weitu-real-effect-validation.md`](../deprecated/old-arch-docs/weitu-real-effect-validation.md) — 卫图样例真实效果验证工作流
+- [`docs/loom/weitu-validation-log-20260511.md`](../deprecated/old-arch-docs/weitu-validation-log-20260511.md) — 本轮已执行的卫图验证证据日志
 
 ### 变更记录
 - [`CHANGELOG.md`](../../CHANGELOG.md) — 完整变更历史

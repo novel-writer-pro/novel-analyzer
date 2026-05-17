@@ -12,27 +12,27 @@
 
 ### 第一步：了解当前 release 状态
 
-1. [session-handoff-20260517.md](../../session-handoff-20260517.md) — 简版交接说明（先看这个）
-2. [session-handoff-20260517.md](../../session-handoff-20260517.md) — 完整交付说明（边界、风险、已知问题）
+1. [session-handoff-20260517.md](../../handoffs/session-handoff-20260517.md) — 简版交接说明（先看这个）
+2. [session-handoff-20260517.md](../../handoffs/session-handoff-20260517.md) — 完整交付说明（边界、风险、已知问题）
 3. [../CHANGELOG.md](../../../CHANGELOG.md) — 最近几轮改了什么
 
 ### 第二步：了解文档治理结构
 
-4. [strategy/docs-information-architecture-guide.md](../../strategy/docs-information-architecture-guide.md) — 文档分层架构指南（A/B/C/D 层定义）
-5. [strategy/docs-governance-and-handoff-checklist.md](../../strategy/docs-governance-and-handoff-checklist.md) — 文档治理与交接 checklist
-6. [strategy/docs-faq-and-consolidation-guide.md](../../strategy/docs-faq-and-consolidation-guide.md) — 文档 FAQ 与合并指南
+4. [strategy/docs-information-architecture-guide.md](../../deprecated/old-arch-docs/docs-information-architecture-guide.md) — 文档分层架构指南（A/B/C/D 层定义）
+5. [strategy/docs-governance-and-handoff-checklist.md](../../deprecated/old-arch-docs/docs-governance-and-handoff-checklist.md) — 文档治理与交接 checklist
+6. [strategy/docs-faq-and-consolidation-guide.md](../../deprecated/old-arch-docs/docs-faq-and-consolidation-guide.md) — 文档 FAQ 与合并指南
 
 ### 第三步：了解当前能力状态
 
 7. [features/README.md](../../features/README.md) — Feature Checkout 入口（各能力线当前状态）
-8. [features/feature-checkout-template.md](../../features/feature-checkout-template.md) — Feature Checkout 模板
-9. [features/architecture-mainline-checkout-20260504.md](../../features/architecture-mainline-checkout-20260504.md) — 主线架构当前状态
+8. [features/feature-checkout-template.md](../../deprecated/old-arch-docs/feature-checkout-template.md) — Feature Checkout 模板
+9. [features/architecture-mainline-checkout-20260504.md](../../deprecated/old-arch-docs/architecture-mainline-checkout-20260504.md) — 主线架构当前状态
 
 ### 第四步：了解文档真相来源
 
-10. [risk-audit-docs-index.md](../../risk-audit-docs-index.md) — 风险审查文档索引
-11. [risk-audit-doc-source-of-truth-matrix.md](../../risk-audit-doc-source-of-truth-matrix.md) — 文档真相来源矩阵
-12. [risk-audit-doc-consistency-checklist.md](../../risk-audit-doc-consistency-checklist.md) — 文档一致性 checklist
+10. [risk-audit-docs-index.md](../../deprecated/risk-audit-docs-index.md) — 风险审查文档索引
+11. [risk-audit-doc-source-of-truth-matrix.md](../../deprecated/risk-audit-doc-source-of-truth-matrix.md) — 文档真相来源矩阵
+12. [risk-audit-doc-consistency-checklist.md](../../deprecated/risk-audit-doc-consistency-checklist.md) — 文档一致性 checklist
 
 ### 第五步：了解架构与 API
 
@@ -45,10 +45,10 @@
 
 | 问题 | 文档 |
 |------|------|
-| 当前 release 到了什么程度？ | [session-handoff-20260517](../../session-handoff-20260517.md) |
-| 已知风险和问题有哪些？ | [session-handoff-20260517](../../session-handoff-20260517.md) |
-| 文档怎么分层管理？ | [docs-information-architecture-guide](../../strategy/docs-information-architecture-guide.md) |
-| 哪份文档是真相来源？ | [doc-source-of-truth-matrix](../../risk-audit-doc-source-of-truth-matrix.md) |
+| 当前 release 到了什么程度？ | [session-handoff-20260517](../../handoffs/session-handoff-20260517.md) |
+| 已知风险和问题有哪些？ | [session-handoff-20260517](../../handoffs/session-handoff-20260517.md) |
+| 文档怎么分层管理？ | [docs-information-architecture-guide](../../deprecated/old-arch-docs/docs-information-architecture-guide.md) |
+| 哪份文档是真相来源？ | [doc-source-of-truth-matrix](../../deprecated/risk-audit-doc-source-of-truth-matrix.md) |
 | 各能力线当前状态？ | [features/README](../../features/README.md) |
 | 最近改了什么？ | [CHANGELOG](../../../CHANGELOG.md) |
 

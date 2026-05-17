@@ -34,7 +34,7 @@
 - **章节级仿写**（`imitate-chapter` / `iterate-imitation` / `review-imitation`）— 全部支持 `--world-map / --character-map / --power-map / --rule-override` 等映射 flag
 - **整本仿写编排**（`writer-imitate-range`）— per-chapter 增量保存、auto-retry（thin / scaffold / action-queue 三类 contamination 实时拦截）
 - **跨题材改写（mapping_pack）— 已突破**：3 套目标题材验证，**170/171 章 verdict=pass（99.4%）**，mapping accuracy 96-98%（卫图→科幻 102/102，诛仙→科幻 58/59，卫图→都市修真 10/10）
-- 同题材 baseline self-check 已加入 prompt，待长跑验证（[handoff](./docs/baseline-imitation-quality-validation-handoff-20260515.md)）
+- 同题材 baseline self-check 已加入 prompt，待长跑验证（[handoff](./docs/handoffs/baseline-imitation-quality-validation-handoff-20260515.md)）
 - Loom 信号：节奏 / 张力 / 风格对照 / 读者模拟（4 视角）
 - 修复通道 + 长篇连续性诊断
 
@@ -114,21 +114,40 @@ http://127.0.0.1:4173
 
 ## 文档入口
 
+> **三秒答疑**：[`docs/OVERVIEW.md`](./docs/OVERVIEW.md) · [`docs/ROADMAP.md`](./docs/ROADMAP.md) · [`docs/GLOSSARY.md`](./docs/GLOSSARY.md)
+
+### 按角色 / 培训路径
+
 | 我是… | 入口 |
 |-------|------|
-| 产品 / 业务 | [`docs/roles/product/`](./docs/roles/product/README.md) |
-| 后端 / 架构师 | [`docs/roles/backend/`](./docs/roles/backend/README.md) |
-| 接入者（API/前端） | [`docs/roles/integrator/`](./docs/roles/integrator/README.md) |
-| 维护者 / 接手人 | [`docs/roles/maintainer/`](./docs/roles/maintainer/README.md) |
-| 仿写 / 创作 | [`docs/roles/imitation/`](./docs/roles/imitation/README.md) |
-| 直接使用 CLI | [`docs/cli-operations-manual.md`](./docs/cli-operations-manual.md) |
-| **运维调试速查** | [`docs/ops-debug-manual-20260514.md`](./docs/ops-debug-manual-20260514.md) |
-| **跨题材改写商用就绪** | [`docs/cross-genre-imitation-commercial-readiness-20260515.md`](./docs/cross-genre-imitation-commercial-readiness-20260515.md) |
-| **同题材修复长跑验证** | [`docs/baseline-imitation-quality-validation-handoff-20260515.md`](./docs/baseline-imitation-quality-validation-handoff-20260515.md) |
-| **Reader Panel 阅读体验评估** | [`docs/reader-panel-handoff-20260516.md`](./docs/reader-panel-handoff-20260516.md) |
-| 商业化路线图 | [`docs/strategy/writer-studio-roadmap.md`](./docs/strategy/writer-studio-roadmap.md) |
-| 端到端运维 | [`docs/runbook/business-loop.md`](./docs/runbook/business-loop.md) |
-| 全部文档 | [`docs/README.md`](./docs/README.md) |
+| 🆕 第一次接触 | [`docs/OVERVIEW.md`](./docs/OVERVIEW.md) — 一页读懂系统 |
+| 👨‍💻 开发 / 工程师 | [`docs/training/developer.md`](./docs/training/developer.md) — Day 1-3 上手 |
+| ✍️ 使用者 / 作家 | [`docs/training/user.md`](./docs/training/user.md) — 半天上手 |
+| 🛠️ 运维 / 实施 | [`docs/training/operator.md`](./docs/training/operator.md) — 部署 + 故障决策树 |
+| 💼 业务 / 产品 / 销售 | [`docs/training/business.md`](./docs/training/business.md) — 60 分钟客户讲解 |
+
+### 按能力线（4 条核心能力）
+
+| 能力线 | 状态 | 入口 |
+|--------|------|------|
+| **拆书引擎** | ✅ Phase 4.5；R@5 = 0.81/0.84 | [`docs/capabilities/01-deconstruction.md`](./docs/capabilities/01-deconstruction.md) |
+| **风险检查** | ✅ 9 checker mainline | [`docs/capabilities/02-risk-audit.md`](./docs/capabilities/02-risk-audit.md) |
+| **受控仿写** | ✅ 跨题材 99.4%；🔧 同题材验证中 | [`docs/capabilities/03-imitation.md`](./docs/capabilities/03-imitation.md) |
+| **商业化运营** | ⚠️ 4 周可商用 B2B；6 项 SLA gap | [`docs/capabilities/04-commercialization.md`](./docs/capabilities/04-commercialization.md) |
+
+### 高频常用
+
+| 文档 | 用途 |
+|------|------|
+| [`docs/cli-operations-manual.md`](./docs/cli-operations-manual.md) | CLI 命令真相源 |
+| [`docs/api-current-surface.md`](./docs/api-current-surface.md) | 当前 API 端点清单 |
+| [`docs/ops-debug-manual-20260514.md`](./docs/ops-debug-manual-20260514.md) | 故障速查（5 棵决策树） |
+| [`docs/runbook/deployment-and-operations-manual-20260515.md`](./docs/runbook/deployment-and-operations-manual-20260515.md) | 从零部署 + 日常运维总章 |
+| [`docs/runbook/business-loop.md`](./docs/runbook/business-loop.md) | v3 端到端 6 步 smoke |
+| [`docs/handoffs/`](./docs/handoffs/README.md) | 会话交接（接手人优先看最近一棒） |
+| [`docs/cross-genre-imitation-commercial-readiness-20260515.md`](./docs/cross-genre-imitation-commercial-readiness-20260515.md) | 跨题材商用决策表 |
+
+完整文档中心：[`docs/README.md`](./docs/README.md)
 
 ---
 

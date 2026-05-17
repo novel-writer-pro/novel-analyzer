@@ -204,9 +204,9 @@ Week 3: P2-1 (entity cache) + 30 章稳定性验证
 |------|------|
 | [embedding-rerank-dictionary-guide.md](./embedding-rerank-dictionary-guide.md) | Embedding/Rerank 微调 + 分词词典建设全流程 |
 | [pg-jieba-userdict-ops.md](./pg-jieba-userdict-ops.md) | 领域词典接入 pg_jieba 运维指南（含 §5.1 bm25_vector 重建步骤） |
-| [p0-quickstart-and-handoff.md](./p0-quickstart-and-handoff.md) | **P0 闭环 quickstart + 交接文档**（看这一篇就够上手） |
+| [p0-quickstart-and-handoff.md](../deprecated/old-arch-docs/p0-quickstart-and-handoff.md) | **P0 闭环 quickstart + 交接文档**（看这一篇就够上手） |
 | [p0-maintenance-checklist.md](./p0-maintenance-checklist.md) | P0 维护清单（日常刷新 / 健康检查 / 故障定位决策树 / 不要做的事） |
-| [p0-final-benchmark-20260513.md](./p0-final-benchmark-20260513.md) | P0 最终基准报告（5 本小说 587 docs） |
+| [p0-final-benchmark-20260513.md](../deprecated/old-arch-docs/p0-final-benchmark-20260513.md) | P0 最终基准报告（5 本小说 587 docs） |
 | [http-backend-guide.md](./http-backend-guide.md) | HTTP Backend 配置指南 (OpenAI/TEI 协议支持) |
 
 ---
@@ -215,10 +215,10 @@ Week 3: P2-1 (entity cache) + 30 章稳定性验证
 
 | 文档 | 说明 |
 |------|------|
-| [priority-and-roi-research-20260512.md](./priority-and-roi-research-20260512.md) | 底座优化优先级与 ROI 预研(含商业 API / 自研微调 / GitHub 精华对比结论) |
-| [tei-integration-postmortem-20260512.md](./tei-integration-postmortem-20260512.md) | TEI 集成复盘：9 个坑 / 决策回顾 / 性能边界 / SOP |
-| [retrieval-benchmark-report-20260513.md](./retrieval-benchmark-report-20260513.md) | 检索基准首份实测：三分支 simple/jiebacfg/jiebaqry 对比 + 上游瓶颈发现 |
+| [priority-and-roi-research-20260512.md](../deprecated/old-arch-docs/priority-and-roi-research-20260512.md) | 底座优化优先级与 ROI 预研(含商业 API / 自研微调 / GitHub 精华对比结论) |
+| [tei-integration-postmortem-20260512.md](../deprecated/old-arch-docs/tei-integration-postmortem-20260512.md) | TEI 集成复盘：9 个坑 / 决策回顾 / 性能边界 / SOP |
+| [retrieval-benchmark-report-20260513.md](../deprecated/old-arch-docs/retrieval-benchmark-report-20260513.md) | 检索基准首份实测：三分支 simple/jiebacfg/jiebaqry 对比 + 上游瓶颈发现 |
 | [entity-extraction-noise-diagnosis-20260513.md](./entity-extraction-noise-diagnosis-20260513.md) | key_entities 噪声诊断：噪声分类 + 假设根因 + 排查动作清单 |
-| [fallback-isolation-plan-20260513.md](./fallback-isolation-plan-20260513.md) | Fallback 隔离历史设计草稿(已被实际实现覆盖) |
-| [fallback-isolation-handoff-20260513.md](./fallback-isolation-handoff-20260513.md) | Fallback 隔离一页纸交接 + 紧急排查路径 |
+| [fallback-isolation-plan-20260513.md](../deprecated/old-arch-docs/fallback-isolation-plan-20260513.md) | Fallback 隔离历史设计草稿(已被实际实现覆盖) |
+| [fallback-isolation-handoff-20260513.md](../deprecated/old-arch-docs/fallback-isolation-handoff-20260513.md) | Fallback 隔离一页纸交接 + 紧急排查路径 |
 

@@ -161,4 +161,4 @@ Loom 直接复用以下已有能力，**不新建依赖**：
 
 ---
 
-返回 [Loom 入口](./README.md) | [文档中心](../README.md) | [差距分析与演进](./gap-analysis-and-evolution.md)
+返回 [Loom 入口](./README.md) | [文档中心](../README.md) | [差距分析与演进](../deprecated/old-arch-docs/gap-analysis-and-evolution.md)

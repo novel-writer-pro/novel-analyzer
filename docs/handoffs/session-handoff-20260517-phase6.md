@@ -243,13 +243,13 @@ NOVEL_ANALYZER_LLM_MODEL_NAME=minimaxai/minimax-m2.7 \
 
 | 文档 | 说明 |
 |------|------|
-| [docs/loom/phase6/README.md](./loom/phase6/README.md) | Phase 6 定位 + 7 层表 + 快速开始 |
-| [docs/loom/phase6/workflow.md](./loom/phase6/workflow.md) | 5 步工作流 + mermaid 图 + 反馈循环 |
-| [docs/loom/phase6/arch-alignment.md](./loom/phase6/arch-alignment.md) | 边界澄清（vs 0509 / vs Phase 1-5 / vs writer-imitate-range） |
-| [docs/loom/phase6/runbook-template.md](./loom/phase6/runbook-template.md) | 端到端命令清单 |
-| [docs/loom/handoff.md](./loom/handoff.md) | Loom 整体交接（含 Phase 6 完成记录） |
-| [docs/loom/roadmap.md](./loom/roadmap.md) | Phase 1-6 路线图（Phase 6 已 ✅） |
-| [docs/loom/sota-imitation-progression-checklist.md](./loom/sota-imitation-progression-checklist.md) | SOTA 推进 checklist（Section I 全 ✅） |
+| [docs/loom/phase6/README.md](../loom/phase6/README.md) | Phase 6 定位 + 7 层表 + 快速开始 |
+| [docs/loom/phase6/workflow.md](../loom/phase6/workflow.md) | 5 步工作流 + mermaid 图 + 反馈循环 |
+| [docs/loom/phase6/arch-alignment.md](../loom/phase6/arch-alignment.md) | 边界澄清（vs 0509 / vs Phase 1-5 / vs writer-imitate-range） |
+| [docs/loom/phase6/runbook-template.md](../loom/phase6/runbook-template.md) | 端到端命令清单 |
+| [docs/loom/handoff.md](../loom/handoff.md) | Loom 整体交接（含 Phase 6 完成记录） |
+| [docs/loom/roadmap.md](../loom/roadmap.md) | Phase 1-6 路线图（Phase 6 已 ✅） |
+| [docs/loom/sota-imitation-progression-checklist.md](../loom/sota-imitation-progression-checklist.md) | SOTA 推进 checklist（Section I 全 ✅） |
 
 ---
 

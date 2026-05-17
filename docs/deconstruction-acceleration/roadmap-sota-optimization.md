@@ -122,6 +122,204 @@
 
 ---
 
+## Phase 5 - 性能瓶颈专项优化 (Planned)
+
+> **背景**：2026-05-17 对雪中悍刀行 229 章已完成分支（`2cd9c1ff`）做了完整性能剖析。
+> 测试环境：本机 CPU、ONNX embedding/rerank、PostgreSQL 本地、Gemini 2.5 Flash @ 1.5 rps。
+> 详细数据见 [`performance-profiling-20260517.md`](./performance-profiling-20260517.md)。
+
+### 当前单章耗时分解（ch150，已有 150 章数据积累）
+
+| 阶段 | 耗时 | 类型 | 可优化？ |
+|------|------|------|---------|
+| ONNX Embedding（1.6 chunks/章） | **10,000–14,000ms** | Embedding | ✅ P0 |
+| reasoning_snapshot × 3 次（无缓存） | **2,300–5,400ms** | PostgreSQL | ✅ P1 |
+| LLM × 3 calls（含速率等待） | **9,000–24,000ms** | LLM | 部分可优化 |
+| ONNX Rerank（QA 路径） | **4,500–6,700ms** | Rerank | ✅ P0 |
+| Vector 路由（JSON + Python 余弦） | **1,325ms** | PostgreSQL | ✅ P3 |
+| DB materialization（facts/graph） | ~300ms | PostgreSQL | 快，无需优化 |
+| **单章总计** | **~24–39s** | — | — |
+
+---
+
+### 5-Perf-A. 切换 Embedding 到外部 TEI 服务（P0）
+
+**问题**：`embedding_backend=onnx`，BGE-M3 在 CPU 上跑 ONNX 推理，单 chunk（900字符）耗时 **8,413ms**，每章平均 1.6 chunks，合计 **10–14 秒/章**。
+
+**根因**：`OnnxBgeEmbeddingProvider` 同步阻塞，无批处理优化，CPU 推理慢。
+
+**TEI 部署说明**：
+- **CPU 部署**：比 in-process ONNX 快 2–5x（TEI 有批处理优化 + 专用进程），单 chunk 约 1,500–3,000ms，改善有限
+- **GPU 部署**（推荐）：比 CPU ONNX 快 **50–200x**，单 chunk 约 **10–30ms**，是真正的量级提升
+- 结论：**强烈建议 GPU 部署 TEI**；CPU TEI 只是从 8s 降到 2–3s，性价比低
+
+**切换方式（改配置，零代码改动）**：
+```bash
+# .env.local
+NOVEL_ANALYZER_EMBEDDING_BACKEND=http
+NOVEL_ANALYZER_EMBEDDING_API_BASE=http://tei-host:8080   # GPU TEI 地址
+NOVEL_ANALYZER_EMBEDDING_API_FORMAT=tei
+# NOVEL_ANALYZER_EMBEDDING_API_KEY=  # TEI 无鉴权时留空
+```
+
+**TEI GPU 启动参考**：
+```bash
+# BGE-M3，GPU 部署
+docker run --gpus all -p 8080:80 \
+  ghcr.io/huggingface/text-embeddings-inference:1.5 \
+  --model-id BAAI/bge-m3 --port 80
+```
+
+**预期收益**：每章 embedding **10,000ms → 100–300ms**（GPU），节省 **~10 秒/章**。
+
+**验证**：
+```bash
+make smoke-external   # 检查 TEI embed 端点
+.venv/bin/python -m novel_analyzer.cli.app test-embedding
+```
+
+---
+
+### 5-Perf-B. 切换 Rerank 到外部 TEI 服务（P0）
+
+**问题**：`rerank_backend=onnx`，bge-reranker-v2-m3 CPU 推理，5 docs 耗时 **4,471ms**，10 docs **6,652ms**，首次加载 **14,911ms**。影响所有 QA/搜索路径。
+
+**切换方式（改配置，零代码改动）**：
+```bash
+# .env.local
+NOVEL_ANALYZER_RERANK_BACKEND=http
+NOVEL_ANALYZER_RERANK_API_BASE=http://tei-host:8081   # GPU TEI rerank 地址
+NOVEL_ANALYZER_RERANK_API_FORMAT=tei
+```
+
+**TEI GPU 启动参考**：
+```bash
+# bge-reranker-v2-m3，GPU 部署
+docker run --gpus all -p 8081:80 \
+  ghcr.io/huggingface/text-embeddings-inference:1.5 \
+  --model-id BAAI/bge-reranker-v2-m3 --port 80
+```
+
+**预期收益**：QA rerank **4,500ms → 50–200ms**（GPU）。
+
+---
+
+### 5-Perf-C. `reasoning_snapshot` 请求级缓存（P1）
+
+**问题**：`analyze_range` 每章对同一 `upto_chapter` 调用 `reasoning_snapshot` **3 次**，无任何缓存：
+
+```python
+# context_service.py 内，每章触发：
+graph_context_json()         → reasoning_snapshot(node=12, edge=12)   # 第1次
+state_summary_json()         → reasoning_snapshot(node=12, edge=12)   # 第2次（完全重复）
+adaptive_graph_context_json  → reasoning_snapshot(node=32, edge=32)   # 第3次
+```
+
+**实测耗时**（同一章节 3 次合计）：
+```
+ch50:  ~413ms    ch100: ~572ms
+ch150: ~2,279ms  ch200: ~5,677ms   ← 随 graph_edges 数量线性增长
+```
+
+**根因**：`graph_edges` 已有 45,999 条，仅有单列索引 `ix_graph_edges_branch_id`，每次 snapshot 都全表扫描后过滤。
+
+**修复方案**：在 `analyze_range` 章节循环内加请求级 snapshot 缓存：
+
+```python
+# analysis_service.py → analyze_range 内，segment 循环开始处
+_snap_cache: dict[tuple, dict] = {}
+
+def _get_snapshot(branch_id, upto_ch, node_limit, edge_limit):
+    key = (upto_ch, node_limit, edge_limit)
+    if key not in _snap_cache:
+        _snap_cache[key] = graph_service.reasoning_snapshot(
+            branch_id, upto_chapter=upto_ch,
+            node_limit=node_limit, edge_limit=edge_limit
+        )
+    return _snap_cache[key]
+```
+
+**预期收益**：ch150 时 3 次 → 1 次，**2,279ms → ~700ms**，节省 **~1.5 秒/章**。
+
+**Files**：`novel_analyzer/services/analysis_service.py`、`novel_analyzer/services/context_service.py`
+
+---
+
+### 5-Perf-D. `graph_edges` 复合索引（P2）
+
+**问题**：`reasoning_snapshot` 查询 `WHERE branch_id=X AND chapter_first_seen <= N AND is_active=true`，现有索引只有 `ix_graph_edges_branch_id`（单列），每次扫描全部 45,999 行再过滤。
+
+**EXPLAIN ANALYZE 证据**：
+```
+Parallel Bitmap Heap Scan on graph_edges
+  Filter: (is_active AND (chapter_first_seen <= 200))
+  Rows Removed by Filter: 30,666 / 45,999
+```
+
+**修复方案**（一次性 DDL，CONCURRENTLY 不锁表）：
+```sql
+CREATE INDEX CONCURRENTLY ix_graph_edges_branch_chapter_active
+ON graph_edges (branch_id, chapter_first_seen)
+WHERE is_active = true;
+```
+
+**预期收益**：`reasoning_snapshot` 单次从 **1,700ms → 50–100ms**（避免全表扫描）。
+
+**Files**：新增 Alembic migration
+
+---
+
+### 5-Perf-E. `vector_payload` 迁移到 pgvector 原生类型（P3）
+
+**问题**：`chunk_embeddings.vector_payload` 列类型是 **`json`**（非 pgvector `vector` 类型），导致：
+1. 查询时把所有 612 个 embedding（每个 ~22KB JSON）全部拉到 Python 内存
+2. 在 Python 里逐个计算余弦相似度（纯 Python `_cosine_similarity`）
+3. 无法使用 pgvector ANN 索引
+
+**实测**：vector 路由耗时 **1,325ms**（612 chunks，全量拉取 + Python 计算）。
+
+**pgvector 扩展已安装**（v0.8.2），但完全未使用。
+
+**修复方案**：
+```sql
+-- 1. 添加原生 vector 列
+ALTER TABLE chunk_embeddings ADD COLUMN vector_native vector(1024);
+
+-- 2. 迁移数据（一次性）
+UPDATE chunk_embeddings
+SET vector_native = vector_payload::text::vector;
+
+-- 3. 创建 HNSW ANN 索引
+CREATE INDEX ON chunk_embeddings
+USING hnsw (vector_native vector_cosine_ops)
+WITH (m = 16, ef_construction = 64);
+
+-- 4. 更新查询使用 <=> 操作符
+-- retrieval_service._vector_route 改为：
+-- ORDER BY e.vector_native <=> :query_vector LIMIT :limit
+```
+
+**预期收益**：vector 路由 **1,325ms → 5–20ms**（ANN 索引）。
+
+**Files**：新增 Alembic migration、`novel_analyzer/services/retrieval_service.py`
+
+---
+
+### 优化后预期效果汇总
+
+| 优化项 | 当前（ch150） | P0 后（TEI GPU） | P0+P1+P2 后 |
+|--------|-------------|----------------|------------|
+| Embedding/章 | ~12,000ms | ~200ms | ~200ms |
+| reasoning_snapshot×3/章 | ~2,300ms | ~2,300ms | ~150ms（缓存+索引） |
+| QA rerank | ~4,500ms | ~100ms | ~100ms |
+| QA vector路由 | ~1,325ms | ~1,325ms | ~15ms（P3后） |
+| **单章总耗时** | **~24–39s** | **~14–27s** | **~12–15s** |
+
+> LLM 延迟（9–24s）是外部依赖，是剩余耗时的主体，无法在本地消除。
+> 提升 LLM 吞吐的唯一手段是提高 `llm_requests_per_second` 或增大 `llm_max_concurrent_requests`（需 provider 支持）。
+
+---
+
 ## Phase 5 - 未来优化方向 (Planned)
 
 以下为 diminishing returns 区域的优化点，建议在积累 50+ 章真实运行数据后按需启动。

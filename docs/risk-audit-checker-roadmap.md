@@ -259,7 +259,7 @@
 
 更细的下一批设计与实现边界，见：
 
-- [`./risk-audit-next-batch-checkers.md`](./risk-audit-next-batch-checkers.md)
+- [`./risk-audit-next-batch-checkers.md`](deprecated/risk-audit-next-batch-checkers.md)
 
 ---
 

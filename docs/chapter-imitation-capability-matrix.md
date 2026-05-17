@@ -61,7 +61,7 @@
 
 **关键诊断**：同章节（ch71/80/90）mapping pass / baseline fail 时 score、severity、gate_verdict 完全相同，差异 = mapping prompt 多了一个"二次检查"。
 
-**修复**（commit `9704127`）：baseline prompt 加入 5 项 self-check（节奏 / 对话 / 动机 / 关系 / 营销冗余）。验证步骤见 [`./baseline-imitation-quality-validation-handoff-20260515.md`](./baseline-imitation-quality-validation-handoff-20260515.md)。
+**修复**（commit `9704127`）：baseline prompt 加入 5 项 self-check（节奏 / 对话 / 动机 / 关系 / 营销冗余）。验证步骤见 [`./handoffs/baseline-imitation-quality-validation-handoff-20260515.md`](./handoffs/baseline-imitation-quality-validation-handoff-20260515.md)。
 
 **商用就绪**：跨题材路径见 [`./cross-genre-imitation-commercial-readiness-20260515.md`](./cross-genre-imitation-commercial-readiness-20260515.md) — 6 项 SLA gap + 3 条上线路径。
 
@@ -274,6 +274,6 @@
 
 > **沿当前 harness / skill / policy 架构，按能力矩阵逐批补强。**
 
-具体实施路径见 [Loom 差距分析与演进规划](./loom/gap-analysis-and-evolution.md)：
+具体实施路径见 [Loom 差距分析与演进规划](deprecated/old-arch-docs/gap-analysis-and-evolution.md)：
 - Phase 4（文风量化 + 节奏分析 + 对话质量信号）→ 综合评分 5/10 → 7/10
 - Phase 5（读者模拟评审 + 多线调度 + 长书自适应编排）→ 综合评分 7/10 → 8.5/10

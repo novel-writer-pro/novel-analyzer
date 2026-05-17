@@ -5,9 +5,9 @@
 > **目的**：解决"harness gate 通过但内容平白无特色"的盲点。给仿写每章追加一个 0-100 的 `comfort_score` 综合可读性评分 + 段落级具体修改建议。
 >
 > **互补文档**：
-> - [`chapter-imitation-capability-matrix.md`](./chapter-imitation-capability-matrix.md) — 全能力矩阵（reader panel 改写"读者模拟评审"行）
+> - [`chapter-imitation-capability-matrix.md`](../chapter-imitation-capability-matrix.md) — 全能力矩阵（reader panel 改写"读者模拟评审"行）
 > - [`baseline-imitation-quality-validation-handoff-20260515.md`](./baseline-imitation-quality-validation-handoff-20260515.md) — 同题材 prompt 修复验证
-> - [`ops-debug-manual-20260514.md`](./ops-debug-manual-20260514.md) — 故障速查
+> - [`ops-debug-manual-20260514.md`](../ops-debug-manual-20260514.md) — 故障速查
 
 ---
 

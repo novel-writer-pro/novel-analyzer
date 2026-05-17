@@ -45,7 +45,7 @@
 
 ## 相关上游产物
 - `docs/loom/roadmap.md`
-- `docs/imitation-next-dev-handoff.md`
+- `docs/deprecated/session-handoffs/imitation-next-dev-handoff.md`
 - `.omx/plans/prd-book-deconstruction-quick-deep-profiles.md`
 - `.omx/plans/test-spec-book-deconstruction-quick-deep-profiles.md`
 
@@ -59,3 +59,8 @@
 
 - funded-provider 真实对照 runbook
    - `docs/deconstruction-acceleration/funded-benchmark-runbook.md`
+
+- **性能剖析报告（2026-05-17）**
+   - [`performance-profiling-20260517.md`](./performance-profiling-20260517.md)
+   - 雪中悍刀行 229 章实测：Embedding / Rerank / reasoning_snapshot / vector路由 各瓶颈数据
+   - 对应优化规划见 `roadmap-sota-optimization.md` Phase 5-Perf 各节

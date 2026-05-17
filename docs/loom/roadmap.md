@@ -422,4 +422,4 @@ Phase 5 🔄 进行中：读者模拟 + 多线调度 + 自适应编排（7/10 �
 
 ---
 
-返回 [Loom 入口](./README.md) | [架构差异分析](./arch-diff-and-alignment.md) | [差距分析与演进](./gap-analysis-and-evolution.md)
+返回 [Loom 入口](./README.md) | [架构差异分析](../deprecated/old-arch-docs/arch-diff-and-alignment.md) | [差距分析与演进](../deprecated/old-arch-docs/gap-analysis-and-evolution.md)

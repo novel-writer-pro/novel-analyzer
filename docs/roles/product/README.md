@@ -25,7 +25,7 @@
 
 6. [whitepaper/ai-novel-system-whitepaper-v2.md](../../whitepaper/ai-novel-system-whitepaper-v2.md) — 系统白皮书 v2（最新）
 7. [whitepaper/ai-novel-system-whitepaper.md](../../whitepaper/ai-novel-system-whitepaper.md) — 系统白皮书 v1
-7. [strategy/capability-roadmap-and-deliverables.md](../../strategy/capability-roadmap-and-deliverables.md) — 能力路线图与交付物
+7. [strategy/capability-roadmap-and-deliverables.md](../../deprecated/old-arch-docs/capability-roadmap-and-deliverables.md) — 能力路线图与交付物
 
 ### 第四步：了解核心能力线
 
@@ -33,7 +33,7 @@
 9. [risk-audit-system-overview.md](../../risk-audit-system-overview.md) — 风险审查系统总览
 10. [risk-audit-capability.md](../../risk-audit-capability.md) — 风险审查能力说明
 11. [tracks/reader-experience/README.md](../../tracks/reader-experience/README.md) — 读者体验能力线
-12. [reader-panel-handoff-20260516.md](../../reader-panel-handoff-20260516.md) — 读者体验能力规划
+12. [reader-panel-handoff-20260516.md](../../handoffs/reader-panel-handoff-20260516.md) — 读者体验能力规划
 
 ---
 
@@ -45,7 +45,7 @@
 | 当前成熟度如何？ | [能力评分卡](../../product/ai-novel-capability-scorecard.md) |
 | 商业化怎么走？ | [商业化与护城河](../../product/ai-novel-commercialization-and-moat-20260508.md) |
 | 和竞品比如何？ | [系统基准对比](../../strategy/ai-novel-system-benchmark.md) |
-| 下一步做什么？ | [能力路线图](../../strategy/capability-roadmap-and-deliverables.md) |
+| 下一步做什么？ | [能力路线图](../../deprecated/old-arch-docs/capability-roadmap-and-deliverables.md) |
 
 ---
 

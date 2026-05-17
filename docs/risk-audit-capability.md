@@ -367,7 +367,7 @@
    2. `timeline_consistency`
    3. `power_scaling_consistency`
    4. 下一批新增 checker 设计收口见：
-      - [`./risk-audit-next-batch-checkers.md`](./risk-audit-next-batch-checkers.md)
+      - [`./risk-audit-next-batch-checkers.md`](deprecated/risk-audit-next-batch-checkers.md)
 
 3. **交付层优化**
    - 报告里直接写“当前最终审查结论”

@@ -1,7 +1,7 @@
 # Session Handoff — 2026-05-17
 
 > 接手人速读：本文档是 2026-05-16/17 跨夜会话的完整交接。
-> 上一棒：[`session-handoff-20260516.md`](./session-handoff-20260516.md)
+> 上一棒：[`session-handoff-20260516.md`](../deprecated/session-handoffs/session-handoff-20260516.md)
 
 ---
 

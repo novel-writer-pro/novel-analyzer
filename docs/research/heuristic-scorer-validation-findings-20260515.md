@@ -159,7 +159,7 @@ Already-rejected paths:
 
 ## 7. Updated handoff guidance
 
-Update [`session-handoff-20260514-kernel-and-integration.md`](../session-handoff-20260514-kernel-and-integration.md) §10:
+Update [`session-handoff-20260514-kernel-and-integration.md`](../deprecated/session-handoffs/session-handoff-20260514-kernel-and-integration.md) §10:
 
 - B1: **kept as diagnostic, NOT for GateChecker promotion**
 - B4: **kept as diagnostic, defer to non-imitation corpus**

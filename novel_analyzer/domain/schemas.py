@@ -461,6 +461,15 @@ class DimensionResult(BaseModel):
     evidence: list[str] = Field(default_factory=list)
     confidence: float = Field(default=0.0, ge=0.0, le=1.0)
 
+    @field_validator('summary', mode='before')
+    @classmethod
+    def _coerce_summary(cls, value: Any) -> Any:
+        if isinstance(value, dict):
+            return ' '.join(str(v) for v in value.values() if v)
+        if value is None:
+            return ''
+        return str(value)
+
 
 class ChapterAnalysisOutput(BaseModel):
     """Structured chapter output persisted per chapter."""
@@ -720,7 +729,7 @@ class ChapterImitationDraft(BaseModel):
     method_notes: list[str] = Field(default_factory=list)
     comparison_notes: list[str] = Field(default_factory=list)
     risk_gate_notes: list[str] = Field(default_factory=list)
-    action_queue: list["ChapterImitationHarnessAction"] = Field(default_factory=list)
+    action_queue: list[ChapterImitationHarnessAction] = Field(default_factory=list)
     is_scaffold_only: bool = Field(default=False)
 
 

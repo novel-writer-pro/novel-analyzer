@@ -225,7 +225,7 @@
 
 ## 6. 本清单关联文档
 
-- [卫图样例真实效果验证工作流](./weitu-real-effect-validation.md)
+- [卫图样例真实效果验证工作流](../deprecated/old-arch-docs/weitu-real-effect-validation.md)
 - [Loom 开发交接文档](./handoff.md)
 - [Loom 路线图](./roadmap.md)
 - [CLI 操作手册](../cli-operations-manual.md)

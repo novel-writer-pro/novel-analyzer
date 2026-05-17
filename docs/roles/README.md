@@ -16,7 +16,7 @@
 
 参见 [../features/README.md](../features/README.md) 了解各能力线当前状态。
 
-参见 [../strategy/docs-governance-and-handoff-checklist.md](../strategy/docs-governance-and-handoff-checklist.md) 了解文档治理与交接 checklist。
+参见 [../strategy/docs-governance-and-handoff-checklist.md](../deprecated/old-arch-docs/docs-governance-and-handoff-checklist.md) 了解文档治理与交接 checklist。
 
 ---
 

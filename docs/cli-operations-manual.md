@@ -424,10 +424,10 @@ poetry run novel-analyzer repair-branch <branch_id>
 - [`./cli-operations-manual.md`](./cli-operations-manual.md)
 - [`./interface-manifest.md`](./interface-manifest.md)
 - [`./examples/*.sample.json`](./examples/)
-- [`./session-handoff-20260517.md`](./session-handoff-20260517.md)
+- [`./handoffs/session-handoff-20260517.md`](./handoffs/session-handoff-20260517.md)
 - [`./loom/sota-imitation-progression-checklist.md`](./loom/sota-imitation-progression-checklist.md)
-- [`./loom/weitu-real-effect-validation.md`](./loom/weitu-real-effect-validation.md)
-- [`./loom/weitu-validation-log-20260511.md`](./loom/weitu-validation-log-20260511.md)
+- [`./loom/weitu-real-effect-validation.md`](deprecated/old-arch-docs/weitu-real-effect-validation.md)
+- [`./loom/weitu-validation-log-20260511.md`](deprecated/old-arch-docs/weitu-validation-log-20260511.md)
 
 默认阅读顺序建议：
 
@@ -960,7 +960,7 @@ python3 scripts/bootstrap_weitu_validation_workspace.py \
 
 ## 底座优化运维（P0 闭环）
 
-P0 链路：领域词典 → pg_jieba → bm25_vector。完整说明见 [foundation-optimization/p0-quickstart-and-handoff.md](./foundation-optimization/p0-quickstart-and-handoff.md)。
+P0 链路：领域词典 → pg_jieba → bm25_vector。完整说明见 [foundation-optimization/p0-quickstart-and-handoff.md](deprecated/old-arch-docs/p0-quickstart-and-handoff.md)。
 
 ### `domain-dict-rebuild`
 

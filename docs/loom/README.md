@@ -47,8 +47,8 @@ Loom（新增层，叠加在上方）
 如果你要继续 Loom，而不是泛读全部设计稿，固定按这个顺序：
 
 1. [SOTA 仿写能力推进 Checklist](./sota-imitation-progression-checklist.md)
-2. [卫图样例真实效果验证工作流](./weitu-real-effect-validation.md)
-3. [卫图样例验证日志（已执行证据）](./weitu-validation-log-20260511.md)
+2. [卫图样例真实效果验证工作流](../deprecated/old-arch-docs/weitu-real-effect-validation.md)
+3. [卫图样例验证日志（已执行证据）](../deprecated/old-arch-docs/weitu-validation-log-20260511.md)
 4. [Loom 开发交接文档](./handoff.md)
 5. [Loom 路线图](./roadmap.md)
 
@@ -202,7 +202,7 @@ Loom（新增层，叠加在上方）
 | [character/README.md](./character/README.md) | 角色认知基层入口（Phase 4 规划） |
 | [character/character-persona-design.md](./character/character-persona-design.md) | CharacterPersona 构建与一致性检测设计 |
 | [roadmap.md](./roadmap.md) | Phase 1-5 开发路线图 + 验收标准 |
-| [gap-analysis-and-evolution.md](./gap-analysis-and-evolution.md) | 商业水准差距分析 + Phase 4/5 演进规划 |
+| [gap-analysis-and-evolution.md](../deprecated/old-arch-docs/gap-analysis-and-evolution.md) | 商业水准差距分析 + Phase 4/5 演进规划 |
 
 ---
 

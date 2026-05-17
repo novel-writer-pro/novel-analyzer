@@ -91,7 +91,7 @@
 - `docs/interface-manifest.md`
 - `docs/api-current-surface.md`
 - `docs/loom/roadmap.md`
-- `docs/imitation-next-dev-handoff.md`
+- `docs/deprecated/session-handoffs/imitation-next-dev-handoff.md`
 
 ---
 

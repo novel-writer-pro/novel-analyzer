@@ -19,22 +19,22 @@
 
 ### 第二步：了解当前能力状态
 
-5. [features/architecture-mainline-checkout-20260504.md](../../features/architecture-mainline-checkout-20260504.md) — 主线架构当前状态
-6. [features/feature-checkout-template.md](../../features/feature-checkout-template.md) — Feature Checkout 模板
-6. [features/retrieval-checkout-20260504.md](../../features/retrieval-checkout-20260504.md) — 检索能力当前状态
-7. [features/independent-agent-capability-checkout-20260505.md](../../features/independent-agent-capability-checkout-20260505.md) — 独立 Agent 能力状态
-8. [features/risk-semantic-checkout-20260504.md](../../features/risk-semantic-checkout-20260504.md) — 风险语义能力状态
-9. [features/imitation-checkout-20260504.md](../../features/imitation-checkout-20260504.md) — 仿写能力状态
-10. [features/eval-governance-checkout-20260504.md](../../features/eval-governance-checkout-20260504.md) — Eval/Governance 状态
+5. [features/architecture-mainline-checkout-20260504.md](../../deprecated/old-arch-docs/architecture-mainline-checkout-20260504.md) — 主线架构当前状态
+6. [features/feature-checkout-template.md](../../deprecated/old-arch-docs/feature-checkout-template.md) — Feature Checkout 模板
+6. [features/retrieval-checkout-20260504.md](../../deprecated/old-arch-docs/retrieval-checkout-20260504.md) — 检索能力当前状态
+7. [features/independent-agent-capability-checkout-20260505.md](../../deprecated/old-arch-docs/independent-agent-capability-checkout-20260505.md) — 独立 Agent 能力状态
+8. [features/risk-semantic-checkout-20260504.md](../../deprecated/old-arch-docs/risk-semantic-checkout-20260504.md) — 风险语义能力状态
+9. [features/imitation-checkout-20260504.md](../../deprecated/old-arch-docs/imitation-checkout-20260504.md) — 仿写能力状态
+10. [features/eval-governance-checkout-20260504.md](../../deprecated/old-arch-docs/eval-governance-checkout-20260504.md) — Eval/Governance 状态
 
 ### 第三步：深入风险审查体系
 
 11. [tracks/risk-audit/README.md](../../tracks/risk-audit/README.md) — 风险审查能力线入口
 12. [api-current-surface.md](../../api-current-surface.md) — 当前已实现 API surface
 13. [risk-audit-runtime-architecture.md](../../risk-audit-runtime-architecture.md) — 风险审查运行时架构
-14. [skills-vs-risk-checkers-boundary.md](../../skills-vs-risk-checkers-boundary.md) — skills 与 checker 边界
-15. [architecture/risk-audit-semantic-enhancement.md](../../architecture/risk-audit-semantic-enhancement.md) — 语义增强设计
-16. [architecture/risk-audit-embedding-pgvector-implementation-spec.md](../../architecture/risk-audit-embedding-pgvector-implementation-spec.md) — embedding/pgvector 实现规范
+14. [skills-vs-risk-checkers-boundary.md](../../deprecated/skills-vs-risk-checkers-boundary.md) — skills 与 checker 边界
+15. [architecture/risk-audit-semantic-enhancement.md](../../deprecated/old-arch-docs/risk-audit-semantic-enhancement.md) — 语义增强设计
+16. [architecture/risk-audit-embedding-pgvector-implementation-spec.md](../../deprecated/old-arch-docs/risk-audit-embedding-pgvector-implementation-spec.md) — embedding/pgvector 实现规范
 17. [risk-audit-checker-roadmap.md](../../risk-audit-checker-roadmap.md) — checker 路线图
 
 ---
@@ -46,8 +46,8 @@
 | 系统整体架构是什么？ | [系统蓝图](../../architecture/ai-novel-system-blueprint.md) |
 | 当前 API 有哪些？ | [API surface](../../api-current-surface.md) |
 | 风险审查怎么运行？ | [运行时架构](../../risk-audit-runtime-architecture.md) |
-| embedding 怎么落地？ | [pgvector 实现规范](../../architecture/risk-audit-embedding-pgvector-implementation-spec.md) |
-| checker 和 skills 怎么分？ | [边界说明](../../skills-vs-risk-checkers-boundary.md) |
+| embedding 怎么落地？ | [pgvector 实现规范](../../deprecated/old-arch-docs/risk-audit-embedding-pgvector-implementation-spec.md) |
+| checker 和 skills 怎么分？ | [边界说明](../../deprecated/skills-vs-risk-checkers-boundary.md) |
 | 下一批 checker 怎么做？ | [checker 路线图](../../risk-audit-checker-roadmap.md) |
 
 ---
