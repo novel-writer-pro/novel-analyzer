@@ -1,5 +1,12 @@
 ## Unreleased
 
+### Added (Loom Phase 6 - T11)
+- skills_dir/satire-anti-slop-guard/: SKILL.md + schemas/check_input.json + schemas/check_output.json
+- novel_analyzer/services/satire_anti_slop_service.py: SatireAntiSlopChecker (6 patterns: meta_commentary, happy_ending, expletive_abuse, early_deflate, internet_slang_abuse, character_emotional_outburst)
+- novel_analyzer/services/lock_contract_checker_service.py: LockContractChecker (heuristic negation pattern matching against locked artifact assertions)
+- fast_mode support: blockers downgraded to warn for --fast pipeline runs
+- 11 unit tests
+
 ### Added (Loom Phase 6 - T7)
 - novel_analyzer/services/project_plot_service.py: ProjectPlotService
 - generate_plot(): arcs.md + chapter_goals.md + continuity.md (Loom _legacy_compat aligned)
