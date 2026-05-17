@@ -461,6 +461,15 @@ class DimensionResult(BaseModel):
     evidence: list[str] = Field(default_factory=list)
     confidence: float = Field(default=0.0, ge=0.0, le=1.0)
 
+    @field_validator('summary', mode='before')
+    @classmethod
+    def _coerce_summary(cls, value: Any) -> Any:
+        if isinstance(value, dict):
+            return ' '.join(str(v) for v in value.values() if v)
+        if value is None:
+            return ''
+        return str(value)
+
 
 class ChapterAnalysisOutput(BaseModel):
     """Structured chapter output persisted per chapter."""
@@ -498,6 +507,7 @@ class BranchQAResult(BaseModel):
     insufficient_context: bool = Field(default=False)
     answer_mode: str = Field(default="normal")
     degraded_reason: str | None = Field(default=None)
+    factscore_grounding_rate: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
 class ChapterNoteRow(BaseModel):
@@ -719,7 +729,7 @@ class ChapterImitationDraft(BaseModel):
     method_notes: list[str] = Field(default_factory=list)
     comparison_notes: list[str] = Field(default_factory=list)
     risk_gate_notes: list[str] = Field(default_factory=list)
-    action_queue: list["ChapterImitationHarnessAction"] = Field(default_factory=list)
+    action_queue: list[ChapterImitationHarnessAction] = Field(default_factory=list)
     is_scaffold_only: bool = Field(default=False)
 
 
@@ -885,6 +895,7 @@ class ChapterImitationHarnessReport(BaseModel):
     stop_reason: str
     chapter_quality_signal: dict[str, object] = Field(default_factory=dict)
     dialogue_signal: dict[str, object] = Field(default_factory=dict)
+    reader_panel_report: ReaderPanelReport | None = Field(default=None)
 
 
 class MultiChapterImitationStep(BaseModel):
@@ -1000,3 +1011,34 @@ class WholeBookImitationRunReport(BaseModel):
     session_loom_signals: dict[str, object] = Field(default_factory=dict)
     session_loom_gate_summary: dict[str, object] = Field(default_factory=dict)
     run_notes: list[str] = Field(default_factory=list)
+
+
+class ReaderPanelPersonaScore(BaseModel):
+    persona: str
+    score: int = Field(ge=0, le=100)
+    feel: str = Field(default="")
+    strengths: list[str] = Field(default_factory=list)
+    weaknesses: list[str] = Field(default_factory=list)
+
+
+class ReaderPanelDimensionScore(BaseModel):
+    dimension: str
+    score: int = Field(ge=0, le=100)
+    note: str = Field(default="")
+
+
+class ReaderPanelRevisionAction(BaseModel):
+    dimension: str
+    action: str
+    priority: int = Field(default=2, ge=1, le=3)
+
+
+class ReaderPanelReport(BaseModel):
+    source_chapter_index: int = Field(ge=1)
+    draft_title: str
+    comfort_score: int = Field(ge=0, le=100)
+    personas: list[ReaderPanelPersonaScore] = Field(default_factory=list)
+    dimension_scores: list[ReaderPanelDimensionScore] = Field(default_factory=list)
+    targeted_revisions: list[ReaderPanelRevisionAction] = Field(default_factory=list)
+    overall_verdict: str = Field(default="needs_polish")
+    rejection_reason: str = Field(default="")

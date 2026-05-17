@@ -8,7 +8,7 @@
 
 ## 1. 已就绪：技术指标证据
 
-### 1.1 核心质量指标（来自 [whole-book-mapping-scale-20260514.md](./whole-book-mapping-scale-20260514.md)）
+### 1.1 核心质量指标（来自 [whole-book-mapping-scale-20260514.md](./deprecated/whole-book-reports/whole-book-mapping-scale-20260514.md)）
 
 | 测试 | 章数 | 字数 | mapping items | full pass | mapping accuracy |
 |---|---:|---:|---:|---|---|
@@ -34,7 +34,7 @@
 - 100+ 章节后台跑批 + 不阻塞监控
 - 失败恢复：仅重跑缺失章节
 
-### 1.4 已具备的接入契约（[whole-book-imitation-docs-index](./whole-book-imitation-docs-index.md)）
+### 1.4 已具备的接入契约（[whole-book-imitation-docs-index](deprecated/whole-book-reports/whole-book-imitation-docs-index.md)）
 
 - ✅ pre-v1 API contract（CLI / export / HTTP API 三入口对齐）
 - ✅ 6 份 sample（成功 / 失败 / billing 错误 / readiness）
@@ -91,7 +91,7 @@
 
 ### Gap 4：LLM provider 自动 fallback ⚠️
 
-**现状**：[provider-recovery-checklist](./whole-book-imitation-provider-recovery-checklist.md) 是**手动 ops**：
+**现状**：[provider-recovery-checklist](deprecated/whole-book-reports/whole-book-imitation-provider-recovery-checklist.md) 是**手动 ops**：
 - 主用 `nassaapi` 抖动 → 整批阻塞 → 人工切到 sealos
 - circuit breaker 不存在
 - provider 健康度检测：仅启动时一次
@@ -247,7 +247,7 @@
 - [ ] Gap 2：tenant_id 字段 + RLS policy
 - [ ] Gap 3：rate limiter（60 chapters/hour/tenant）
 - [ ] Gap 5：数据安全文档 + 删除 endpoint
-- [ ] [P0 同题材门槛验证 handoff](./baseline-imitation-quality-validation-handoff-20260515.md) Stage A 完成
+- [ ] [P0 同题材门槛验证 handoff](./handoffs/baseline-imitation-quality-validation-handoff-20260515.md) Stage A 完成
 - [ ] 第一份 sample 客户合同（含 SLA + 退款政策）
 
 ### 强烈建议 (P1)
@@ -277,8 +277,8 @@
 ## 9. 互补文档
 
 - [chapter-imitation-capability-matrix.md](./chapter-imitation-capability-matrix.md) — 全能力矩阵（含未就绪能力）
-- [baseline-imitation-quality-validation-handoff-20260515.md](./baseline-imitation-quality-validation-handoff-20260515.md) — 同题材修复后验证步骤
-- [whole-book-mapping-scale-20260514.md](./whole-book-mapping-scale-20260514.md) — mapping 规模化数据
-- [whole-book-imitation-docs-index.md](./whole-book-imitation-docs-index.md) — 接入契约总入口
+- [handoffs/baseline-imitation-quality-validation-handoff-20260515.md](./handoffs/baseline-imitation-quality-validation-handoff-20260515.md) — 同题材修复后验证步骤
+- [whole-book-mapping-scale-20260514.md](./deprecated/whole-book-reports/whole-book-mapping-scale-20260514.md) — mapping 规模化数据
+- [whole-book-imitation-docs-index.md](deprecated/whole-book-reports/whole-book-imitation-docs-index.md) — 接入契约总入口
 - [ops-debug-manual-20260514.md](./ops-debug-manual-20260514.md) — 运维调试速查
-- [whole-book-imitation-provider-recovery-checklist.md](./whole-book-imitation-provider-recovery-checklist.md) — provider failure 手动 ops（即将被 Gap 4 router 替代）
+- [whole-book-imitation-provider-recovery-checklist.md](deprecated/whole-book-reports/whole-book-imitation-provider-recovery-checklist.md) — provider failure 手动 ops（即将被 Gap 4 router 替代）

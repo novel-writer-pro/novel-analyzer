@@ -219,3 +219,176 @@ def build_chapter_imitation_prompt(
 - comparison_notes 必须说明与原章骨架的对应关系。
 - risk_gate_notes 必须明确指出应该重点过哪些风险检查。
 """.strip()
+
+
+READER_PANEL_PERSONAS: dict[str, str] = {
+    "naive_reader": "你是第一次接触本题材的普通读者。你只关心能不能跟上情节、是否容易看懂、节奏会不会让人想跳着读。你不在乎文笔，但很在乎读起来累不累。",
+    "genre_veteran": "你是看过 100 本同类型小说的老书虫。你能立刻识别套路，会对'又一次写主角觉醒功法'感到疲劳。你最关心爽点密度、套路 vs 新意，对模板化处理敏感。",
+    "editor": "你是商业出版编辑。你按节奏、悬念、章末付费点、情绪曲线来判断章节，最关心'读者会不会愿意付费看下一章'。",
+    "prose_critic": "你是文笔老饕。你看比喻是否新鲜、对话是否生动、环境描写是否有感官层次，对平白直述、工具人台词、形容词堆砌零容忍。",
+}
+
+
+READER_PANEL_DIMENSIONS: list[str] = [
+    "对话生动度",
+    "环境描写",
+    "阅读舒适度",
+    "文笔质感",
+    "悬念强度",
+    "支线管理",
+    "特色（抗平白）",
+]
+
+
+def build_reader_panel_prompt(
+    *,
+    chapter_index: int,
+    chapter_title: str,
+    draft_text: str,
+    target_goal: str = "",
+) -> str:
+    """Build the reader-panel scoring prompt: 4 personas × 7 dimensions + comfort_score + targeted_revisions."""
+
+    personas_block = "\n".join(
+        f"- **{name}**：{description}"
+        for name, description in READER_PANEL_PERSONAS.items()
+    )
+    dimensions_list = "、".join(f'"{d}"' for d in READER_PANEL_DIMENSIONS)
+
+    return f"""
+你是一个"读者审稿小组"。你扮演 4 类不同读者，对一段小说章节正文做诚实评分。
+
+**4 个 persona**：
+{personas_block}
+
+**评分要求**：
+1. 每个 persona 单独对整章打 0-100 分（独立判断，不要互相协调）。
+2. `feel`：用一句话写该 persona 读完后的真实感受。**不要客套**，让平白章节得低分就让它得低分。
+3. `strengths` / `weaknesses`：每条具体到可执行段落或现象（如"中段对话像在念目标"），不要空话。
+
+**7 个维度量化**（不分 persona，整章一次打分）：
+{dimensions_list}
+
+每维度 0-100：
+- 对话生动度：对话占比 + 每句台词反映立场/情绪的比例。工具人台词扣分。
+- 环境描写：感官词密度（视/听/嗅/触/味）+ 场景切换流畅度。光秃白描扣分。
+- 阅读舒适度：句长方差、段落节奏、信息密度。又长又密 OR 又短又散都扣分。
+- 文笔质感：比喻 / 通感 / 意象密度。直白叙述扣分。
+- 悬念强度：开放性钩子 + 信息差 + 章末悬置感。一切交代清楚扣分。
+- 支线管理：主线推进 vs 支线埋点比例 + 未回收线索可见度。只有主线扣分。
+- 特色（抗平白）：是否反"目标明确→阻力浮现→主角回应→章尾钩子"模板。模板化扣分严重。
+
+**comfort_score**（0-100）：综合舒适度，由 4 personas + 7 dimensions 聚合，是这章读者读完不会想退订的概率打分。**不是平均分**，要由读者整体感受决定。
+
+**targeted_revisions**：列出 3-6 条**可执行**的具体修改建议，每条对应一个最弱的维度。
+- `dim`：来自 7 维度的名字
+- `action`：具体怎么改（如"在场景 2 加 2 处感官细节：晨雾的湿度、远山的鸟叫"）
+- `priority`：1=必须改 / 2=建议改 / 3=可选
+
+**verdict**：
+- `polished`：comfort_score >= 70 且无 priority=1 的 revision
+- `needs_polish`：comfort_score 60-69 或有 priority=1 revision
+- `needs_rewrite`：comfort_score < 60 或多处 dimension < 50
+
+输入：
+- chapter_index: {chapter_index}
+- chapter_title: {chapter_title}
+- target_goal: {target_goal}
+
+章节正文：
+{draft_text}
+
+输出严格 JSON（不要 Markdown，不要解释）：
+{{
+  "comfort_score": 0,
+  "personas": [
+    {{"persona": "naive_reader", "score": 0, "feel": "...", "strengths": ["..."], "weaknesses": ["..."]}},
+    {{"persona": "genre_veteran", "score": 0, "feel": "...", "strengths": ["..."], "weaknesses": ["..."]}},
+    {{"persona": "editor", "score": 0, "feel": "...", "strengths": ["..."], "weaknesses": ["..."]}},
+    {{"persona": "prose_critic", "score": 0, "feel": "...", "strengths": ["..."], "weaknesses": ["..."]}}
+  ],
+  "dimension_scores": [
+    {{"dimension": "对话生动度", "score": 0, "note": "..."}},
+    {{"dimension": "环境描写", "score": 0, "note": "..."}},
+    {{"dimension": "阅读舒适度", "score": 0, "note": "..."}},
+    {{"dimension": "文笔质感", "score": 0, "note": "..."}},
+    {{"dimension": "悬念强度", "score": 0, "note": "..."}},
+    {{"dimension": "支线管理", "score": 0, "note": "..."}},
+    {{"dimension": "特色（抗平白）", "score": 0, "note": "..."}}
+  ],
+  "targeted_revisions": [
+    {{"dim": "...", "action": "...", "priority": 1}}
+  ],
+  "verdict": "needs_polish"
+}}
+""".strip()
+
+
+def build_panel_driven_revision_prompt(
+    *,
+    chapter_title: str,
+    draft_text: str,
+    comfort_score: int,
+    weak_dimensions: list[tuple[str, int]],
+    targeted_revisions: list[dict[str, object]],
+) -> str:
+    """Build a revision prompt that uses reader-panel feedback to fix specific weaknesses.
+
+    The LLM gets the full original draft + the panel's diagnosis + a ranked list
+    of paragraph-level revision actions. Output is a rewritten draft_text only,
+    so we can re-run the panel against the same chapter shape.
+    """
+
+    weak_block = "\n".join(
+        f"- {dim}（当前 {score} 分，需要重点修复）"
+        for dim, score in weak_dimensions
+    )
+    revision_block = "\n".join(
+        f"- [P{r.get('priority', 2)}] [{r.get('dimension', '?')}] {r.get('action', '')}"
+        for r in targeted_revisions
+    )
+
+    return f"""
+你刚写完这章草稿，4 位读者评审给了 {comfort_score} 分（满分 100）。
+他们指出了具体的弱点，下面是修改清单。**严格按清单改**，不要重写整章，只针对弱点修订。
+
+章节标题：{chapter_title}
+
+**最弱维度**：
+{weak_block}
+
+**段落级修改清单**（按 priority 顺序）：
+{revision_block}
+
+**修改原则**：
+1. 保留原章节结构、人物、情节推进——不要换骨架。
+2. 只修改清单里指出的段落 / 维度，不要趁机加无关内容。
+3. P1 必须改完，P2 尽量改，P3 视情况。
+4. 改完后整章应该比原来更具体、更有感官细节、对话更生动、悬念更明确。
+5. 不要在 draft_text 中出现"修订"、"修改"、"按清单"等元描述——读者只看到改完后的小说正文。
+6. 不要出现"求收藏 / 求追读 / 本章完"等运营话术。
+
+原章正文：
+{draft_text}
+
+输出严格 JSON（不要 Markdown，不要解释）：
+{{
+  "revised_draft_text": "...",
+  "revision_summary": ["对话生动度: 把卫图的独白改成 3 轮对话", "..."]
+}}
+""".strip()
+
+
+def build_qa_atomic_claim_extraction_prompt(*, answer: str) -> str:
+    return f"""
+你是一个事实分解助手。把下面的回答拆解成独立的原子事实陈述（每条一个具体事实，不含推断）。
+每条陈述必须是完整的中文句子，包含主语。不要合并多个事实到一条。不要输出推断或观点。
+
+回答：
+{answer}
+
+输出严格 JSON（不要 Markdown，不要解释）：
+{{
+  "claims": ["事实1", "事实2", "..."]
+}}
+""".strip()

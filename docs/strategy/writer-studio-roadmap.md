@@ -79,6 +79,6 @@ v2 retro 暴露 4 个 gap：
 - `.sisyphus/plans/writer-studio-v3-business-loop.md` — v3 plan
 - `docs/runbook/business-loop.md` — v3 端到端验证 runbook
 - `docs/runbook/v3-pickup-checklist.md` — v3 pickup 步骤清单
-- `docs/process/writer-studio-v3-handoff.md` — session 交接
+- `docs/deprecated/session-handoffs/writer-studio-v3-handoff.md` — session 交接
 - `docs/research/fastgpt-vs-dify.md` — 框架选型决策
 - `docs/observability/helicone-vs-langfuse.md` — observability 评估

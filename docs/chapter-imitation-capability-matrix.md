@@ -39,7 +39,7 @@
 | 逐章场景优化 | 场景推进与结构修复 | 中高 | harness/action queue 已可控制 | P0 |
 | 故事架构 | chapter-level / book-level structure | 中高 | 章级较强，书级正在增强 | P1 |
 | 资料研究 | 世界观 / 历史 / 题材 / 读者体系 | 低 | 目前主要是书内知识，不是真 research lane | P1 |
-| 模拟读者评审 | 小白读者 / 老书虫 / 爽点读者 / 编辑视角 | 低 | 目前只有 system review，不是 reader simulation | P1 |
+| 模拟读者评审 | 小白读者 / 老书虫 / 爽点读者 / 编辑视角 | **中高** | LLM 4-persona × 7-dim panel + comfort_score soft gate + Phase B 闭环重写 + reader-panel-stats CLI（commits `5a0eb94` / `3d78cc6` / `4fb3c97`，2026-05-16） | P1 |
 | 跨题材改写（mapping_pack） | name / world / power / rule 设定替换 | **高** | 已突破，3 题材 170/171 章 pass | **P0** |
 | 同题材整本仿写 | 保持原 setting 的整本仿写 | 中 | prompt self-check 已修复，待长跑验证 | **P0** |
 | 在飞 contamination 拦截 | thin / scaffold / action_queue 三类拦截 | 高 | service 层 in-flight + auto-retry | P0 |
@@ -61,7 +61,7 @@
 
 **关键诊断**：同章节（ch71/80/90）mapping pass / baseline fail 时 score、severity、gate_verdict 完全相同，差异 = mapping prompt 多了一个"二次检查"。
 
-**修复**（commit `9704127`）：baseline prompt 加入 5 项 self-check（节奏 / 对话 / 动机 / 关系 / 营销冗余）。验证步骤见 [`./baseline-imitation-quality-validation-handoff-20260515.md`](./baseline-imitation-quality-validation-handoff-20260515.md)。
+**修复**（commit `9704127`）：baseline prompt 加入 5 项 self-check（节奏 / 对话 / 动机 / 关系 / 营销冗余）。验证步骤见 [`./handoffs/baseline-imitation-quality-validation-handoff-20260515.md`](./handoffs/baseline-imitation-quality-validation-handoff-20260515.md)。
 
 **商用就绪**：跨题材路径见 [`./cross-genre-imitation-commercial-readiness-20260515.md`](./cross-genre-imitation-commercial-readiness-20260515.md) — 6 项 SLA gap + 3 条上线路径。
 
@@ -274,6 +274,6 @@
 
 > **沿当前 harness / skill / policy 架构，按能力矩阵逐批补强。**
 
-具体实施路径见 [Loom 差距分析与演进规划](./loom/gap-analysis-and-evolution.md)：
+具体实施路径见 [Loom 差距分析与演进规划](deprecated/old-arch-docs/gap-analysis-and-evolution.md)：
 - Phase 4（文风量化 + 节奏分析 + 对话质量信号）→ 综合评分 5/10 → 7/10
 - Phase 5（读者模拟评审 + 多线调度 + 长书自适应编排）→ 综合评分 7/10 → 8.5/10

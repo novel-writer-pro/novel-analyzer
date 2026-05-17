@@ -47,8 +47,8 @@ Loom（新增层，叠加在上方）
 如果你要继续 Loom，而不是泛读全部设计稿，固定按这个顺序：
 
 1. [SOTA 仿写能力推进 Checklist](./sota-imitation-progression-checklist.md)
-2. [卫图样例真实效果验证工作流](./weitu-real-effect-validation.md)
-3. [卫图样例验证日志（已执行证据）](./weitu-validation-log-20260511.md)
+2. [卫图样例真实效果验证工作流](../deprecated/old-arch-docs/weitu-real-effect-validation.md)
+3. [卫图样例验证日志（已执行证据）](../deprecated/old-arch-docs/weitu-validation-log-20260511.md)
 4. [Loom 开发交接文档](./handoff.md)
 5. [Loom 路线图](./roadmap.md)
 
@@ -163,6 +163,21 @@ Loom（新增层，叠加在上方）
 
 ---
 
+### F. 作家项目壳（Author Project Shell）✅ Phase 6
+
+**解决的问题**：
+- 9 个 steering flag 需要在终端里背，作家体验差
+- 没有"项目"概念，多次实验产物散落在 output/ 各处
+- 没有分层 lock + 用户编辑语义
+
+**核心思路**：
+7 层可编辑 markdown 项目目录，编译成现有 CLI flag + Loom feature env vars。
+唯一新增生成层是分镜/scene_beats（扩展 imitation-constraint-pack skill input）。
+
+→ [phase6/README.md](./phase6/README.md)
+
+---
+
 ## 快速导航
 
 | 文档 | 说明 |
@@ -187,7 +202,7 @@ Loom（新增层，叠加在上方）
 | [character/README.md](./character/README.md) | 角色认知基层入口（Phase 4 规划） |
 | [character/character-persona-design.md](./character/character-persona-design.md) | CharacterPersona 构建与一致性检测设计 |
 | [roadmap.md](./roadmap.md) | Phase 1-5 开发路线图 + 验收标准 |
-| [gap-analysis-and-evolution.md](./gap-analysis-and-evolution.md) | 商业水准差距分析 + Phase 4/5 演进规划 |
+| [gap-analysis-and-evolution.md](../deprecated/old-arch-docs/gap-analysis-and-evolution.md) | 商业水准差距分析 + Phase 4/5 演进规划 |
 
 ---
 

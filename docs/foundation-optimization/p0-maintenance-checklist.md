@@ -6,7 +6,7 @@
 > - 周期性的健康检查
 > - 出问题时的快速定位
 >
-> 配套读物：[`p0-quickstart-and-handoff.md`](./p0-quickstart-and-handoff.md)（操作手册）、[`pg-jieba-userdict-ops.md`](./pg-jieba-userdict-ops.md)（运维细节）、[`p0-final-benchmark-20260513.md`](./p0-final-benchmark-20260513.md)（基准数据）。
+> 配套读物：[`p0-quickstart-and-handoff.md`](../deprecated/old-arch-docs/p0-quickstart-and-handoff.md)（操作手册）、[`pg-jieba-userdict-ops.md`](./pg-jieba-userdict-ops.md)（运维细节）、[`p0-final-benchmark-20260513.md`](../deprecated/old-arch-docs/p0-final-benchmark-20260513.md)（基准数据）。
 
 ---
 

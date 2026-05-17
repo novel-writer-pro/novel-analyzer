@@ -24,12 +24,18 @@ from novel_analyzer.domain.schemas import (
     ChapterImitationScoreReport,
     ChapterImitationSkillContract,
     ChapterPlanningIntent,
+    ReaderPanelReport,
 )
 from novel_analyzer.skills.assets import render_skill_prompt
 from novel_analyzer.services.chapter_imitation_service import ChapterImitationService
 from novel_analyzer.services import imitation_harness_helpers as _helpers
 from novel_analyzer.services.memory_assembler_service import MemoryAssemblerService
 from novel_analyzer.services.next_chapter_planner_service import PlannerContextWindow
+from novel_analyzer.services.reader_panel_service import (
+    COMFORT_NEEDS_REWRITE_THRESHOLD,
+    COMFORT_PASS_THRESHOLD,
+    ReaderPanelService,
+)
 from novel_analyzer.services.tension_service import TensionService
 
 
@@ -1380,6 +1386,7 @@ class HarnessControllerService:
         strategy_input: dict[str, object] | None = None,
         steering_pack: dict[str, object] | None = None,
         mapping_pack: dict[str, object] | None = None,
+        enable_reader_panel: bool = False,
     ) -> ChapterImitationHarnessReport:
         skill_contracts = self.list_skill_contracts()
 
@@ -1674,6 +1681,58 @@ class HarnessControllerService:
             except Exception:  # noqa: BLE001
                 pass
 
+        reader_panel_report: ReaderPanelReport | None = None
+        if enable_reader_panel and use_llm and not draft.is_scaffold_only:
+            try:
+                panel_svc = ReaderPanelService(self.settings)
+                reader_panel_report = panel_svc.evaluate_draft(
+                    draft,
+                    target_goal=target_goal,
+                    model_name=model_name,
+                )
+                comfort = reader_panel_report.comfort_score
+                final_policy_summary["reader_panel_comfort_score"] = comfort
+                final_policy_summary["reader_panel_verdict"] = reader_panel_report.overall_verdict
+
+                if (
+                    comfort < COMFORT_PASS_THRESHOLD
+                    and reader_panel_report.targeted_revisions
+                ):
+                    revised_draft = panel_svc.revise_with_panel_feedback(
+                        draft,
+                        reader_panel_report,
+                        model_name=model_name,
+                    )
+                    if revised_draft is not draft and revised_draft.draft_text != draft.draft_text:
+                        revised_report = panel_svc.evaluate_draft(
+                            revised_draft,
+                            target_goal=target_goal,
+                            model_name=model_name,
+                        )
+                        if revised_report.comfort_score >= reader_panel_report.comfort_score:
+                            draft = revised_draft
+                            reader_panel_report = revised_report
+                            final_policy_summary["reader_panel_comfort_score"] = revised_report.comfort_score
+                            final_policy_summary["reader_panel_verdict"] = revised_report.overall_verdict
+                            final_policy_summary["reader_panel_revised"] = True
+                            final_policy_summary["reader_panel_comfort_lift"] = (
+                                revised_report.comfort_score - comfort
+                            )
+                            comfort = revised_report.comfort_score
+
+                if final_verdict == "pass" and comfort < COMFORT_NEEDS_REWRITE_THRESHOLD:
+                    final_verdict = "needs_revision"
+                    stop_reason = "reader_panel_comfort_below_threshold"
+                    final_policy_summary["final_verdict"] = final_verdict
+                    final_policy_summary["stop_reason"] = stop_reason
+                if reader_panel_report.targeted_revisions:
+                    p1_actions = [r for r in reader_panel_report.targeted_revisions if r.priority == 1]
+                    final_policy_summary["reader_panel_priority1_count"] = len(p1_actions)
+                if rounds:
+                    rounds[-1].skill_outputs["_reader_panel"] = reader_panel_report.model_dump(mode="json")
+            except Exception:  # noqa: BLE001
+                pass
+
         return ChapterImitationHarnessReport(
             source_chapter_index=source_chapter_index,
             target_goal=target_goal,
@@ -1688,6 +1747,7 @@ class HarnessControllerService:
             stop_reason=stop_reason,
             chapter_quality_signal=chapter_quality_signal,
             dialogue_signal=dialogue_signal,
+            reader_panel_report=reader_panel_report,
         )
 
     @staticmethod

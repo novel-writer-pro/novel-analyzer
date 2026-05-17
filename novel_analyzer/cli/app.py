@@ -19,10 +19,10 @@ from novel_analyzer.database.migrations import upgrade_database
 from novel_analyzer.database.models import (
     AnalysisRun,
     ChapterArtifact,
+    ChapterManifest,
     FactRecord,
     NovelSource,
     RunBranch,
-    ChapterManifest,
     WindowArtifact,
 )
 from novel_analyzer.database.postgres_checks import postgres_capability_report
@@ -31,13 +31,13 @@ from novel_analyzer.database.session import (
     database_healthcheck,
     ensure_database_exists,
 )
-from novel_analyzer.runtime.storage import describe_runtime_storage, migrate_legacy_runtime_dirs
-from novel_analyzer.runtime.provider_health import read_provider_health
 from novel_analyzer.runtime.cluster_review_state import (
     read_cluster_review_history,
     read_cluster_review_state,
     write_cluster_review_state,
 )
+from novel_analyzer.runtime.provider_health import read_provider_health
+from novel_analyzer.runtime.storage import describe_runtime_storage, migrate_legacy_runtime_dirs
 from novel_analyzer.services.steering_library_service import (
     SteeringLibraryService,
     SteeringPack,
@@ -168,7 +168,7 @@ def _loom_write_pairs_jsonl(
 
     pairs_file.parent.mkdir(parents=True, exist_ok=True)
     collected = 0
-    collected_at = _datetime.datetime.now(tz=_datetime.timezone.utc).isoformat()
+    collected_at = _datetime.datetime.now(tz=_datetime.UTC).isoformat()
     with pairs_file.open("a", encoding="utf-8") as fh:
         for pair in pairs_to_eval:
             result = eval_svc.evaluate(
@@ -3274,6 +3274,29 @@ def _write_writer_imitation_outputs(
             lines.append(f"- target_goal: {target_goal}")
             lines.append(f"- final_verdict: {final_verdict}")
             lines.append(f"- stop_reason: {stop_reason}")
+            rpr = item.get("reader_panel_report")
+            if isinstance(rpr, dict) and rpr.get("comfort_score") is not None:
+                comfort = rpr.get("comfort_score")
+                panel_verdict = rpr.get("overall_verdict", "")
+                lines.append(f"- reader_panel: comfort={comfort} verdict={panel_verdict}")
+                dim_scores = rpr.get("dimension_scores") or []
+                if isinstance(dim_scores, list) and dim_scores:
+                    dim_inline = " | ".join(
+                        f"{d.get('dimension', '?')}={d.get('score', '?')}"
+                        for d in dim_scores
+                        if isinstance(d, dict)
+                    )
+                    lines.append(f"  - dimensions: {dim_inline}")
+                revisions = rpr.get("targeted_revisions") or []
+                if isinstance(revisions, list) and revisions:
+                    lines.append("  - targeted_revisions:")
+                    for r in revisions[:5]:
+                        if not isinstance(r, dict):
+                            continue
+                        pri = r.get("priority", "?")
+                        dim = r.get("dimension", "?")
+                        action = str(r.get("action", "")).strip().replace("\n", " ")
+                        lines.append(f"    - P{pri} [{dim}] {action[:160]}")
             final_draft = item.get("final_draft", {})
             if isinstance(final_draft, dict):
                 draft_title = str(final_draft.get("draft_title", "")).strip()
@@ -7774,6 +7797,7 @@ def writer_imitate(
     power_map: list[str] = typer.Option([], "--power-map"),
     rule_override: list[str] = typer.Option([], "--rule-override"),
     forbidden_transformation: list[str] = typer.Option([], "--forbidden-transformation"),
+    reader_panel: bool = typer.Option(False, "--reader-panel", help="Add 4-persona reader panel comfort_score evaluation."),
     database_url: str | None = None,
 ) -> None:
     """Writer-facing imitation entrypoint that writes artifacts into output/."""
@@ -7810,6 +7834,7 @@ def writer_imitate(
             model_name=model_name or None,
             steering_pack=steering,
             mapping_pack=mapping_pack_dict,
+            enable_reader_panel=reader_panel,
         )
         payload = report.model_dump(mode="json")
         payload["steering_pack"] = steering
@@ -7844,6 +7869,7 @@ def writer_imitate_range(
     power_map: list[str] = typer.Option([], "--power-map"),
     rule_override: list[str] = typer.Option([], "--rule-override"),
     forbidden_transformation: list[str] = typer.Option([], "--forbidden-transformation"),
+    reader_panel: bool = typer.Option(False, "--reader-panel", help="Add 4-persona reader panel comfort_score evaluation."),
     database_url: str | None = None,
 ) -> None:
     """Batch writer-facing imitation entrypoint for multiple source chapters."""
@@ -7886,6 +7912,7 @@ def writer_imitate_range(
                 model_name=model_name or None,
                 steering_pack=steering,
                 mapping_pack=mapping_pack_dict,
+                enable_reader_panel=reader_panel,
             )
             payload = report.model_dump(mode="json")
             item = {
@@ -7895,6 +7922,7 @@ def writer_imitate_range(
                 "stop_reason": payload.get("stop_reason"),
                 "final_draft": payload.get("final_draft", {}),
                 "policy_summary": payload.get("policy_summary", {}),
+                "reader_panel_report": payload.get("reader_panel_report"),
             }
             outputs.append(item)
             output_dir.mkdir(parents=True, exist_ok=True)
@@ -7911,9 +7939,13 @@ def writer_imitate_range(
             )
             elapsed = time.perf_counter() - chapter_started_at
             text_len = len(item["final_draft"].get("draft_text", "") or "")
+            comfort_str = ""
+            rpr = item.get("reader_panel_report")
+            if rpr and isinstance(rpr, dict) and rpr.get("comfort_score") is not None:
+                comfort_str = f" comfort={rpr.get('comfort_score')}/{rpr.get('overall_verdict')}"
             echo(
                 f"[{idx}/{len(parsed)}] ch{source_chapter_index} done in {elapsed:.1f}s "
-                f"chars={text_len} verdict={item['final_verdict']} -> {per_chapter_path}"
+                f"chars={text_len} verdict={item['final_verdict']}{comfort_str} -> {per_chapter_path}"
             )
         stem = f"writer-imitate-range-{parsed[0][0]}-{parsed[-1][0]}"
         json_path, md_path = _write_writer_imitation_outputs(
@@ -8648,9 +8680,8 @@ def loom_status(
     database_url: str | None = None,
 ) -> None:
     """Show Loom memory and tension status for a branch."""
-    from novel_analyzer.services.memory_assembler_service import MemoryAssemblerService
-    from novel_analyzer.services.tension_service import TensionService
     from novel_analyzer.database.models import FactRecord, GraphNode
+    from novel_analyzer.services.tension_service import TensionService
 
     settings = _safe_settings(database_url)
     factory = create_session_factory(settings)
@@ -8721,8 +8752,8 @@ def loom_status(
                 echo("alerts:              none")
 
         if latest_chapter and settings.loom_style_enabled:
-            from novel_analyzer.services.style_calibration_service import StyleCalibrationService
             from novel_analyzer.services.rhythm_analysis_service import RhythmAnalysisService
+            from novel_analyzer.services.style_calibration_service import StyleCalibrationService
             style_svc = StyleCalibrationService(session)
             rhythm_svc = RhythmAnalysisService(session)
             style_result = style_svc.compute_style_drift(branch_id, latest_chapter)
@@ -8741,7 +8772,9 @@ def loom_status(
                 echo(f"rhythm_suggestion:   {rhythm_result.suggestion}")
 
             try:
-                from novel_analyzer.services.reader_simulation_service import ReaderSimulationService
+                from novel_analyzer.services.reader_simulation_service import (
+                    ReaderSimulationService,
+                )
                 reader_svc = ReaderSimulationService(session)
                 reader_score = reader_svc.simulate_all_panels(branch_id, latest_chapter)
                 echo("")
@@ -8775,7 +8808,9 @@ def loom_status(
             echo(f"overdue_ratio:       {thread_report.overdue_ratio:.4f}")
             if health.quality_trend == "declining":
                 try:
-                    from novel_analyzer.services.steering_library_service import SteeringLibraryService
+                    from novel_analyzer.services.steering_library_service import (
+                        SteeringLibraryService,
+                    )
                     steering_svc = SteeringLibraryService()
                     payload_result = steering_svc.retrieve_pack(query_text="质量下滑 情节平淡 角色漂移")
                     pack = payload_result.get("steering_pack", {})
@@ -8981,7 +9016,7 @@ def loom_pairs_stats(
 
     chapters = sorted({int(r["chapter_index"]) for r in records if isinstance(r.get("chapter_index"), int)})
 
-    echo(f"=== Loom Pairwise Data Stats ===")
+    echo("=== Loom Pairwise Data Stats ===")
     echo(f"pairs_file:        {pairs_file}")
     echo(f"total_pairs:       {total}")
     echo(f"target:            {TARGET}")
@@ -9005,6 +9040,60 @@ def loom_pairs_stats(
     echo("")
     remaining = max(0, TARGET - total)
     echo(f"remaining_to_target: {remaining}")
+
+
+@app.command()
+def loom_elo(
+    pairs_file: Path = typer.Option(Path("output/loom-pairs.jsonl"), "--pairs-file"),
+    top_n: int = typer.Option(20, "--top-n", help="Show top N variants by Elo rating."),
+    k_factor: float = typer.Option(32.0, "--k-factor", help="Elo K-factor (default 32)."),
+) -> None:
+    """Compute Elo leaderboard from loom-pairs.jsonl pairwise outcomes."""
+    from novel_analyzer.services.elo_tournament_service import PairOutcome, compute_elo
+
+    if not pairs_file.exists():
+        echo(f"loom_elo: {pairs_file} not found — run loom-collect-pairs first.")
+        raise typer.Exit(code=1)
+
+    outcomes: list[PairOutcome] = []
+    for line in pairs_file.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            r = json.loads(line)
+        except Exception:
+            continue
+        pair_id = str(r.get("pair_id", ""))
+        pref = str(r.get("overall_preference", "tie"))
+        conf = float(r.get("confidence", 1.0))
+        variant_a = f"{r.get('branch_id', '')}#ch{r.get('chapter_index', 0)}@A"
+        variant_b = f"{r.get('branch_id', '')}#ch{r.get('chapter_index', 0)}@B"
+        winner = variant_a if pref == "A" else (variant_b if pref == "B" else "tie")
+        outcomes.append(PairOutcome(
+            variant_a=variant_a,
+            variant_b=variant_b,
+            winner=winner,
+            confidence=conf,
+        ))
+
+    if not outcomes:
+        echo("loom_elo: no valid outcomes found in pairs file.")
+        raise typer.Exit(code=0)
+
+    board = compute_elo(outcomes, k_factor=k_factor)
+    ranked = board.ranked()[:top_n]
+
+    echo(f"loom_elo: {len(outcomes)} outcomes → {len(board.ratings)} variants")
+    echo(f"k_factor={k_factor}  showing top {min(top_n, len(ranked))}")
+    echo("")
+    echo(f"{'rank':<5} {'variant':<60} {'elo':>7} {'W':>4} {'L':>4} {'T':>4}")
+    echo("-" * 85)
+    for rank, (variant, elo) in enumerate(ranked, 1):
+        w = board.win_count.get(variant, 0)
+        l = board.loss_count.get(variant, 0)
+        t = board.tie_count.get(variant, 0)
+        echo(f"{rank:<5} {variant:<60} {elo:>7.1f} {w:>4} {l:>4} {t:>4}")
 
 
 @app.command()
@@ -9547,7 +9636,7 @@ def loom_benchmark(
     echo(f"  deconstruction:    {report.deconstruction_score:.4f}")
     echo(f"  imitation:         {report.imitation_score:.4f}")
     echo(f"  risk_check:        {report.risk_check_score:.4f}")
-    echo(f"  ────────────────────────────")
+    echo("  ────────────────────────────")
     echo(f"  composite:         {report.composite_score:.4f}")
     echo("")
     echo("dimensions:")
@@ -9666,8 +9755,9 @@ def bm25_reindex(
         return
 
     settings = _safe_settings(database_url)
-    import psycopg
     import re as _re
+
+    import psycopg
 
     parts = settings.resolved_database_url.replace("postgresql+psycopg://", "postgresql://")
     conn = psycopg.connect(parts)
@@ -9709,9 +9799,10 @@ def rematerialize_retrieval(
     database_url: str | None = None,
 ) -> None:
     """Re-materialize retrieval_chunks + chunk_embeddings for docs missing them."""
-    from novel_analyzer.services.retrieval_service import RetrievalService
-    from novel_analyzer.database.models import ChapterArtifact, RetrievalDocument
     from sqlalchemy import select
+
+    from novel_analyzer.database.models import ChapterArtifact
+    from novel_analyzer.services.retrieval_service import RetrievalService
 
     settings = _safe_settings(database_url)
     factory = create_session_factory(settings)
@@ -9815,6 +9906,521 @@ def writer_imitate_range_split(
         echo(f"  {p}")
     if len(written) > 5:
         echo(f"  ... +{len(written) - 5} more")
+
+
+@app.command()
+def reader_panel_stats(
+    output_dir: Path = typer.Argument(..., help="Directory containing writer-imitate-ch*.json"),
+    min_chapters: int = typer.Option(1, "--min-chapters", help="Skip if fewer chapters with panel data."),
+) -> None:
+    """Aggregate reader-panel scores across a batch and print verdict / comfort / dim / lift stats."""
+
+    if not output_dir.exists() or not output_dir.is_dir():
+        raise typer.BadParameter(f"not a directory: {output_dir}")
+
+    files = sorted(output_dir.glob("writer-imitate-ch*.json"))
+    if not files:
+        echo(f"no writer-imitate-ch*.json files in {output_dir}")
+        raise typer.Exit(code=1)
+
+    total = 0
+    pass_count = 0
+    panel_chapters: list[dict[str, object]] = []
+    revised_lifts: list[int] = []
+    dim_score_sum: dict[str, int] = {}
+    dim_score_n: dict[str, int] = {}
+    weakest_dim_count: dict[str, int] = {}
+    revision_dim_count: dict[str, int] = {}
+    p1_revision_count = 0
+    soft_gate_flips = 0
+
+    for f in files:
+        try:
+            d = json.loads(f.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            continue
+        total += 1
+        if d.get("final_verdict") == "pass":
+            pass_count += 1
+        if d.get("stop_reason") == "reader_panel_comfort_below_threshold":
+            soft_gate_flips += 1
+        rpr = d.get("reader_panel_report")
+        if not isinstance(rpr, dict) or rpr.get("comfort_score") is None:
+            continue
+        panel_chapters.append({
+            "ch": d.get("source_chapter_index"),
+            "comfort": rpr.get("comfort_score"),
+            "verdict": rpr.get("overall_verdict"),
+        })
+        ps = d.get("policy_summary") or {}
+        if ps.get("reader_panel_revised") is True:
+            lift = ps.get("reader_panel_comfort_lift")
+            if isinstance(lift, int):
+                revised_lifts.append(lift)
+        dim_scores = rpr.get("dimension_scores") or []
+        if isinstance(dim_scores, list) and dim_scores:
+            sorted_dims = sorted(
+                (d for d in dim_scores if isinstance(d, dict)),
+                key=lambda x: x.get("score", 100),
+            )
+            if sorted_dims:
+                weakest = sorted_dims[0].get("dimension")
+                if weakest:
+                    weakest_dim_count[str(weakest)] = weakest_dim_count.get(str(weakest), 0) + 1
+            for ds in dim_scores:
+                if not isinstance(ds, dict):
+                    continue
+                dim = str(ds.get("dimension", "")).strip()
+                score = ds.get("score")
+                if dim and isinstance(score, int):
+                    dim_score_sum[dim] = dim_score_sum.get(dim, 0) + score
+                    dim_score_n[dim] = dim_score_n.get(dim, 0) + 1
+        revisions = rpr.get("targeted_revisions") or []
+        if isinstance(revisions, list):
+            for r in revisions:
+                if not isinstance(r, dict):
+                    continue
+                dim = str(r.get("dimension", "")).strip()
+                if dim:
+                    revision_dim_count[dim] = revision_dim_count.get(dim, 0) + 1
+                if r.get("priority") == 1:
+                    p1_revision_count += 1
+
+    if len(panel_chapters) < min_chapters:
+        echo(f"only {len(panel_chapters)} chapters have reader_panel data, below --min-chapters={min_chapters}")
+        raise typer.Exit(code=1)
+
+    echo(f"=== reader-panel stats: {output_dir} ===")
+    echo(f"total chapters:         {total}")
+    echo(f"  with panel data:      {len(panel_chapters)}")
+    echo(f"  harness pass:         {pass_count}/{total} ({100 * pass_count / total:.1f}%)")
+    echo(f"  soft-gate flips:      {soft_gate_flips} (harness=pass -> needs_revision via comfort)")
+
+    if panel_chapters:
+        comforts = [int(c["comfort"]) for c in panel_chapters if isinstance(c.get("comfort"), int)]
+        avg_comfort = sum(comforts) / len(comforts)
+        echo("")
+        echo("comfort distribution:")
+        echo(f"  avg:    {avg_comfort:.1f}")
+        echo(f"  min:    {min(comforts)}")
+        echo(f"  max:    {max(comforts)}")
+        buckets = {"<50": 0, "50-59": 0, "60-69": 0, "70-79": 0, ">=80": 0}
+        for c in comforts:
+            if c < 50:
+                buckets["<50"] += 1
+            elif c < 60:
+                buckets["50-59"] += 1
+            elif c < 70:
+                buckets["60-69"] += 1
+            elif c < 80:
+                buckets["70-79"] += 1
+            else:
+                buckets[">=80"] += 1
+        for k, v in buckets.items():
+            bar = "#" * v
+            echo(f"  {k:>5}: {v:>3} {bar}")
+
+    if revised_lifts:
+        avg_lift = sum(revised_lifts) / len(revised_lifts)
+        positive = sum(1 for l in revised_lifts if l > 0)
+        echo("")
+        echo("panel-driven revisions (Phase B):")
+        echo(f"  applied:        {len(revised_lifts)} chapters")
+        echo(f"  avg comfort lift: {avg_lift:+.1f}")
+        echo(f"  positive lifts:  {positive}/{len(revised_lifts)} ({100 * positive / len(revised_lifts):.0f}%)")
+        echo(f"  max lift:        {max(revised_lifts)}")
+
+    if dim_score_n:
+        echo("")
+        echo("dimension averages (lower = weaker, target the bottom 3):")
+        avg_by_dim = sorted(
+            ((dim, dim_score_sum[dim] / dim_score_n[dim]) for dim in dim_score_n),
+            key=lambda x: x[1],
+        )
+        for dim, avg in avg_by_dim:
+            n = dim_score_n[dim]
+            echo(f"  {dim:<14} avg={avg:>5.1f}  n={n}")
+
+    if weakest_dim_count:
+        echo("")
+        echo("weakest-dimension frequency (which dim was the bottom-scoring most often):")
+        for dim, n in sorted(weakest_dim_count.items(), key=lambda x: -x[1]):
+            echo(f"  {dim:<14} {n:>3}x")
+
+    if revision_dim_count:
+        echo("")
+        echo(f"revision-action frequency (P1 actions: {p1_revision_count} total):")
+        for dim, n in sorted(revision_dim_count.items(), key=lambda x: -x[1])[:7]:
+            echo(f"  {dim:<14} {n:>3}x")
+
+
+imitate_project_app = typer.Typer(
+    name="imitate-project",
+    help="Loom Phase 6 Author Project Shell",
+    no_args_is_help=True,
+)
+app.add_typer(imitate_project_app)
+
+
+@imitate_project_app.command("init")
+def ip_init(
+    slug: str = typer.Argument(...),
+    source_branch_id: str = typer.Option(..., "--source-branch-id", help="Source branch ID"),
+    target_chapters: int = typer.Option(3, "--target-chapters"),
+) -> None:
+    from novel_analyzer.services.project_shell_service import ProjectShellService
+    shell = ProjectShellService()
+    cfg = shell.init(slug, source_branch_id=source_branch_id, target_chapters=target_chapters)
+    echo(f"Project initialized: {cfg.slug} (source={source_branch_id}, chapters={cfg.target_chapters})")
+
+
+@imitate_project_app.command("fingerprint")
+def ip_fingerprint(
+    slug: str = typer.Argument(..., help="Project slug"),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    settings = _safe_settings()
+    session_factory = create_session_factory(settings)
+    with session_factory() as session:
+        from novel_analyzer.services.project_style_view_service import (
+            ProjectStyleViewService,
+        )
+        svc = ProjectStyleViewService(session=session)
+        try:
+            result = svc.generate_fingerprint(slug)
+            echo(f"Fingerprint generated for {slug}: {result.get('chapters_analyzed', 0)} chapters")
+        except Exception as exc:
+            echo(f"Failed: {exc}")
+            raise typer.Exit(code=1) from exc
+
+
+@imitate_project_app.command("macro")
+def imitate_project_macro(
+    slug: str = typer.Argument(..., help="Project slug"),
+    use_llm: bool = typer.Option(False, "--use-llm", help="Use LLM to fill content"),
+) -> None:
+    settings = _safe_settings()
+    session_factory = create_session_factory(settings)
+    with session_factory() as session:
+        from novel_analyzer.services.project_macro_service import ProjectMacroService
+        svc = ProjectMacroService(settings=settings, session=session)
+        premise_path, world_path, rag_path = svc.generate(slug, use_llm=use_llm)
+        echo(f"Generated:\n  {premise_path}\n  {world_path}")
+        if rag_path:
+            echo(f"  RAG entry: {rag_path}")
+
+
+@imitate_project_app.command("characters")
+def ip_characters(
+    slug: str = typer.Argument(..., help="Project slug"),
+    count: int = typer.Option(4, "--count", help="Number of character cards"),
+    inherit_from_source: bool = typer.Option(
+        False, "--inherit-from-source", help="Build personas from source branch"
+    ),
+    inherit_names: list[str] = typer.Option(
+        [], "--inherit-name", help="Character names to inherit"
+    ),
+    use_llm: bool = typer.Option(False, "--use-llm", help="Use LLM (deferred to T9)"),
+) -> None:
+    """Generate character cards (T6)."""
+    settings = _safe_settings()
+    session_factory = create_session_factory(settings)
+    with session_factory() as session:
+        from novel_analyzer.services.project_characters_service import ProjectCharactersService
+
+        svc = ProjectCharactersService(session=session)
+        if inherit_from_source and inherit_names:
+            paths = svc.inherit_from_source(slug, list(inherit_names))
+        else:
+            paths = svc.generate_initial_cards(slug, count=count, use_llm=use_llm)
+        echo(f"Generated {len(paths)} character cards")
+        for p in paths:
+            echo(f"  {p}")
+
+
+@imitate_project_app.command("plot")
+def ip_plot(
+    slug: str = typer.Argument(...),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    settings = _safe_settings()
+    session_factory = create_session_factory(settings)
+    with session_factory() as session:
+        from novel_analyzer.services.project_plot_service import ProjectPlotService
+        svc = ProjectPlotService(settings=settings, session=session)
+        arcs, goals, cont = svc.generate_plot(slug, use_llm=use_llm)
+        echo(f"Plot generated:\n  {arcs}\n  {goals}\n  {cont}")
+
+
+@imitate_project_app.command("conflicts")
+def ip_conflicts(
+    slug: str = typer.Argument(...),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    settings = _safe_settings()
+    session_factory = create_session_factory(settings)
+    with session_factory() as session:
+        from novel_analyzer.services.project_plot_service import ProjectPlotService
+        svc = ProjectPlotService(settings=settings, session=session)
+        axes, innov, taboo, rag = svc.generate_conflicts(slug, use_llm=use_llm)
+        echo(f"Conflicts generated:\n  {axes}\n  {innov}\n  {taboo}")
+        if rag:
+            echo(f"  RAG entry: {rag}")
+
+
+@imitate_project_app.command("outline")
+def imitate_project_outline(
+    slug: str = typer.Argument(...),
+    chapter: int = typer.Option(0, "--chapter", help="Chapter index (0=all)"),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    """Generate chapter outline(s) (T8)."""
+    settings = _safe_settings()
+    session_factory = create_session_factory(settings)
+    with session_factory() as session:
+        from novel_analyzer.services.project_outline_service import ProjectOutlineService
+        svc = ProjectOutlineService(settings=settings, session=session)
+        if chapter > 0:
+            path = svc.generate_outline(slug, chapter, use_llm=use_llm)
+            echo(f"Outline: {path}")
+        else:
+            results = svc.generate_all(slug, use_llm=use_llm)
+            for o, s in results:
+                echo(f"  {o}")
+                echo(f"  {s}")
+
+
+@imitate_project_app.command("storyboard")
+def imitate_project_storyboard(
+    slug: str = typer.Argument(...),
+    chapter: int = typer.Option(0, "--chapter", help="Chapter index (0=all)"),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    """Generate chapter storyboard(s) with scene beats (T8)."""
+    settings = _safe_settings()
+    session_factory = create_session_factory(settings)
+    with session_factory() as session:
+        from novel_analyzer.services.project_outline_service import ProjectOutlineService
+        svc = ProjectOutlineService(settings=settings, session=session)
+        if chapter > 0:
+            path = svc.generate_storyboard(slug, chapter, use_llm=use_llm)
+            echo(f"Storyboard: {path}")
+        else:
+            results = svc.generate_all(slug, use_llm=use_llm)
+            for _, s in results:
+                echo(f"  {s}")
+
+
+@imitate_project_app.command("prose")
+def imitate_project_prose(
+    slug: str = typer.Argument(...),
+    chapter: int = typer.Option(0, "--chapter", help="Chapter index (0=all)"),
+    max_rounds: int = typer.Option(2, "--max-rounds"),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+    fast: bool = typer.Option(False, "--fast", help="Fast mode: anti-slop warns only"),
+) -> None:
+    """Generate prose for chapter(s) via harness-imitation (T9)."""
+    settings = _safe_settings()
+    session_factory = create_session_factory(settings)
+    with session_factory() as session:
+        from novel_analyzer.services.project_prose_service import ProjectProseService
+        svc = ProjectProseService(settings=settings, session=session)
+        if chapter > 0:
+            path = svc.generate_chapter(slug, chapter, max_rounds=max_rounds, use_llm=use_llm, fast_mode=fast)
+            echo(f"Draft: {path}")
+        else:
+            paths = svc.generate_all(slug, max_rounds=max_rounds, use_llm=use_llm, fast_mode=fast)
+            for p in paths:
+                echo(f"  {p}")
+
+
+@imitate_project_app.command("revise")
+def ip_revise(
+    slug: str = typer.Argument(...),
+    stage: str = typer.Argument(
+        ..., help="Stage name: macro, characters, plot, conflicts, outline, storyboard, prose"
+    ),
+    chapter: int = typer.Option(
+        0, "--chapter", help="Chapter index (for outline/storyboard/prose)"
+    ),
+    feedback: str = typer.Option("", "--feedback", help="Revision feedback"),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    """Revise any stage artifact with feedback (T10)."""
+    import difflib  # noqa: F401 — imported for future use
+
+    from novel_analyzer.services.project_shell_service import ProjectShellService
+
+    _STAGE_ARTIFACT: dict[str, tuple[str, str]] = {
+        "macro": ("macro", "premise"),
+        "characters": ("characters", "protagonist"),
+        "plot": ("plot", "arcs"),
+        "conflicts": ("conflicts", "axes"),
+        "outline": ("chapters", f"ch{chapter:03d}.outline"),
+        "storyboard": ("chapters", f"ch{chapter:03d}.storyboard"),
+        "prose": ("chapters", f"ch{chapter:03d}.draft"),
+    }
+    if stage not in _STAGE_ARTIFACT:
+        echo(f"Unknown stage: {stage}. Valid: {list(_STAGE_ARTIFACT.keys())}")
+        raise typer.Exit(code=1)
+    artifact_stage, artifact_name = _STAGE_ARTIFACT[stage]
+    shell = ProjectShellService()
+    try:
+        fm, body = shell.read_artifact_with_frontmatter(slug, artifact_stage, artifact_name)
+    except FileNotFoundError:
+        echo(f"Artifact not found: {artifact_stage}/{artifact_name}.md")
+        raise typer.Exit(code=1)
+    revised_body = f"<!-- REVISION FEEDBACK: {feedback} -->\n\n{body}" if feedback else body
+    old_version = int(fm.get("version", 1) or 1)
+    path = shell.write_artifact(
+        slug,
+        artifact_stage,
+        artifact_name,
+        revised_body,
+        parents=[f"{artifact_stage}/{artifact_name}.md@v{old_version}"],
+    )
+    echo(f"Revised: {path} (v{old_version + 1})")
+
+
+@imitate_project_app.command("lock")
+def ip_lock(
+    slug: str = typer.Argument(...),
+    file_glob: str = typer.Argument(..., help="File glob to lock, e.g. 'macro/*.md'"),
+) -> None:
+    """Lock artifacts so downstream stages must adapt (T10)."""
+    from novel_analyzer.services.project_shell_service import ProjectShellService
+
+    shell = ProjectShellService()
+    locked = shell.lock(slug, file_glob)
+    if locked:
+        echo(f"Locked {len(locked)} file(s):")
+        for f in locked:
+            echo(f"  {f}")
+    else:
+        echo(f"No files matched: {file_glob}")
+
+
+@imitate_project_app.command("diff")
+def ip_diff(
+    slug: str = typer.Argument(...),
+    stage: str = typer.Argument(..., help="Stage name, e.g. macro, plot, conflicts"),
+    from_version: int = typer.Option(0, "--from", help="From version (0=latest archived)"),
+    to_version: int = typer.Option(0, "--to", help="To version (0=current)"),
+) -> None:
+    """Show unified diff between versions of a stage artifact (T10)."""
+    import difflib
+
+    from novel_analyzer.services.project_shell_service import ProjectShellService
+
+    _STAGE_ARTIFACT: dict[str, tuple[str, str]] = {
+        "macro": ("macro", "premise"),
+        "plot": ("plot", "arcs"),
+        "conflicts": ("conflicts", "axes"),
+    }
+    if stage in _STAGE_ARTIFACT:
+        artifact_stage, artifact_name = _STAGE_ARTIFACT[stage]
+    else:
+        artifact_stage, artifact_name = stage, stage
+
+    shell = ProjectShellService()
+    try:
+        _, current = shell.read_artifact_with_frontmatter(slug, artifact_stage, artifact_name)
+    except FileNotFoundError:
+        echo(f"No current artifact for {stage}")
+        raise typer.Exit(code=1)
+
+    versions = shell.list_versions(slug, artifact_stage, artifact_name)
+    if not versions:
+        echo("No previous versions found")
+        return
+
+    prev_text = versions[-1].path.read_text(encoding="utf-8")
+    diff = difflib.unified_diff(
+        prev_text.splitlines(keepends=True),
+        current.splitlines(keepends=True),
+        fromfile=f"{stage} v{versions[-1].version}",
+        tofile=f"{stage} current",
+    )
+    result = "".join(diff)
+    echo(result if result else "No differences")
+
+
+@imitate_project_app.command("status")
+def ip_status(slug: str = typer.Argument(...)) -> None:
+    """Show project status: each stage version, locked, last updated (T10)."""
+    from novel_analyzer.domain.project_config import load_book_config
+    from novel_analyzer.services.project_shell_service import ProjectShellService
+
+    shell = ProjectShellService()
+    cfg = load_book_config(slug)
+    echo(f"\nProject: {cfg.name} ({slug})")
+    echo(f"Source branch: {cfg.source_branch_id}")
+    echo(f"Gates: {cfg.gates}")
+    echo(f"\n{'Stage':<20} {'Version':<10} {'Locked':<10} {'Updated'}")
+    echo("-" * 70)
+    _STAGE_ARTIFACTS = [
+        ("style", "fingerprint"),
+        ("macro", "premise"),
+        ("macro", "world"),
+        ("plot", "arcs"),
+        ("plot", "chapter_goals"),
+        ("conflicts", "axes"),
+    ]
+    for stage, name in _STAGE_ARTIFACTS:
+        try:
+            fm, _ = shell.read_artifact_with_frontmatter(slug, stage, name)
+            version = fm.get("version", "?")
+            locked_marker = "locked" if fm.get("locked") else ""
+            updated = str(fm.get("generated_at", ""))[:19]
+            echo(f"{stage}/{name:<18} v{version!s:<9} {locked_marker:<10} {updated}")
+        except FileNotFoundError:
+            echo(f"{stage}/{name:<18} {'—':<10} {'—':<10} not generated")
+
+
+@imitate_project_app.command("run")
+def ip_run(
+    slug: str = typer.Argument(...),
+    until: str = typer.Option("prose", "--until", help="Run until this stage (inclusive)"),
+    fast: bool = typer.Option(False, "--fast", help="Skip gate stops"),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    """Run all stages up to --until, stopping at gates unless --fast (T10)."""
+    from novel_analyzer.domain.project_config import load_book_config
+
+    _STAGE_ORDER = [
+        "style",
+        "macro",
+        "characters",
+        "plot",
+        "conflicts",
+        "outline",
+        "storyboard",
+        "prose",
+    ]
+    if until not in _STAGE_ORDER:
+        echo(f"Unknown stage: {until}. Valid: {_STAGE_ORDER}")
+        raise typer.Exit(code=1)
+
+    cfg = load_book_config(slug)
+    stop_idx = _STAGE_ORDER.index(until)
+    stages_to_run = _STAGE_ORDER[: stop_idx + 1]
+
+    for stage in stages_to_run:
+        is_gate = stage in cfg.gates
+        if is_gate and not fast:
+            echo(
+                f"\n⏸  Gate: {stage} — review output/projects/{slug}/{stage}/"
+                " then press Enter to continue (or Ctrl+C to stop)"
+            )
+            try:
+                input()
+            except (EOFError, KeyboardInterrupt):
+                echo("Stopped at gate.")
+                raise typer.Exit(code=0)
+        echo(f"▶  Running stage: {stage}")
+        echo(f"   → imitate-project {stage} {slug} {'--use-llm' if use_llm else ''}")
+
+    echo(f"\n✅ Completed up to: {until}")
 
 
 if __name__ == "__main__":

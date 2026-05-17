@@ -90,8 +90,8 @@
 ### 文档 / 对外合同
 - `docs/interface-manifest.md`
 - `docs/api-current-surface.md`
-- `docs/whole-book-imitation-integration-quickstart.md`
-- `docs/imitation-next-dev-handoff.md`
+- `docs/loom/roadmap.md`
+- `docs/deprecated/session-handoffs/imitation-next-dev-handoff.md`
 
 ---
 

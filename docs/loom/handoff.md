@@ -27,7 +27,7 @@ Loom 是 novel-analyzer 的 **跨章节仿写记忆与质量基础设施**，叠
 Loom memory 层      →  carry_over_state 的 "组装器"（新增）
 ```
 
-两者不冲突。详见 [`docs/loom/arch-diff-and-alignment.md`](./arch-diff-and-alignment.md)。
+两者不冲突。详见 [`docs/loom/arch-diff-and-alignment.md`](../deprecated/old-arch-docs/arch-diff-and-alignment.md)。
 
 ### 架构全景
 
@@ -36,6 +36,37 @@ Loom memory 层      →  carry_over_state 的 "组装器"（新增）
 ---
 
 ## 2. 当前工作状态
+
+### Phase 6 ✅ 完成（2026-05-17）
+
+**Changelist marker**: `CL-loom-phase6-author-shell-01`
+
+已完成：T1-T14 全部（项目骨架 + 7 层生成器 + ops + anti-slop + MVP + 文档 + 全量测试）
+
+**MVP 验证结果**：
+- `imitate-project run meiqian-new-story --until prose` 跑通 3 章正文 ✅
+- `loom-reference-eval` fidelity = 0.62（ch2，enhanced vs baseline 4.3x）✅
+- Loom Phase 1-5 测试 132 pass，零回归 ✅
+- 89 个 Phase 6 测试全绿 ✅
+
+**新增文件**（17 commits，91ca858..4c06c18）：
+- `novel_analyzer/domain/project_config.py` — ProjectConfig + LoomFlagsConfig
+- `novel_analyzer/services/project_shell_service.py` — 文件系统 artifact 管理
+- `novel_analyzer/services/project_compiler_service.py` — 7 层 → 9 steering flag + 5 Loom env var
+- `novel_analyzer/services/project_style_view_service.py` — 复用 Phase 4 style/rhythm 服务
+- `novel_analyzer/services/project_macro_service.py` — L1 大观生成
+- `novel_analyzer/services/project_characters_service.py` — L2 角色 + CharacterPersona 双向桥
+- `novel_analyzer/services/project_plot_service.py` — L3 剧情 + L4 冲突
+- `novel_analyzer/services/project_outline_service.py` — L5 章纲 + L6 分镜
+- `novel_analyzer/services/project_prose_service.py` — L7 正文编排（复用 harness-imitation）
+- `novel_analyzer/services/satire_anti_slop_service.py` — 6 类讽刺文反 AI slop 检测
+- `novel_analyzer/services/lock_contract_checker_service.py` — 锁定约束检查
+- `skills_dir/satire-anti-slop-guard/` — 新 skill（已注册到 list-skills）
+- `docs/loom/phase6/` — README + workflow + arch-alignment + runbook
+
+详见 [docs/loom/phase6/README.md](./phase6/README.md)
+
+---
 
 ### 2.1 已完成的提交历史
 
@@ -108,7 +139,7 @@ Loom memory 层      →  carry_over_state 的 "组装器"（新增）
 | `docs/loom/style/README.md` | 文风/节奏/对话层设计（Phase 4） |
 | `docs/loom/character/README.md` | 角色认知基层设计（Phase 4） |
 | `docs/cli-operations-manual.md` | CLI 手册（第 12 节 Loom） |
-| `docs/real-run-checklist.md` | 试跑清单（第 8 节 Loom） |
+| `docs/ops-debug-manual-20260514.md` — 运维调试速查 |
 | `CHANGELOG.md` | 变更记录 |
 
 ### 2.3 生产环境真实数据（PostgreSQL）
@@ -688,7 +719,7 @@ dialogue_signal: conflict_dialogue_density=0.1091
 
 ### 4.1.1 Phase 4/5 规划概览（Phase 3 完成后）
 
-详见 [`docs/loom/gap-analysis-and-evolution.md`](./gap-analysis-and-evolution.md)。
+详见 [`docs/loom/gap-analysis-and-evolution.md`](../deprecated/old-arch-docs/gap-analysis-and-evolution.md)。
 
 | Phase | 目标 | 核心交付 | 前提 |
 |-------|------|---------|------|
@@ -746,8 +777,8 @@ novel-analyzer loom-ab-compare output/baseline/ output/loom/ --output-file outpu
 如果你要继续 Loom 主线，只优先看这 5 份：
 
 1. [`docs/loom/sota-imitation-progression-checklist.md`](./sota-imitation-progression-checklist.md)
-2. [`docs/loom/weitu-real-effect-validation.md`](./weitu-real-effect-validation.md)
-3. [`docs/loom/weitu-validation-log-20260511.md`](./weitu-validation-log-20260511.md)
+2. [`docs/loom/weitu-real-effect-validation.md`](../deprecated/old-arch-docs/weitu-real-effect-validation.md)
+3. [`docs/loom/weitu-validation-log-20260511.md`](../deprecated/old-arch-docs/weitu-validation-log-20260511.md)
 4. [`docs/loom/handoff.md`](./handoff.md)
 5. [`docs/loom/roadmap.md`](./roadmap.md)
 
@@ -755,7 +786,7 @@ novel-analyzer loom-ab-compare output/baseline/ output/loom/ --output-file outpu
 
 ### 架构与设计
 - [`docs/loom/overview.md`](./overview.md) — 架构全景 + SOTA 对比 + 资产盘点
-- [`docs/loom/arch-diff-and-alignment.md`](./arch-diff-and-alignment.md) — Loom vs 0509 对比
+- [`docs/loom/arch-diff-and-alignment.md`](../deprecated/old-arch-docs/arch-diff-and-alignment.md) — Loom vs 0509 对比
 - [`docs/loom/roadmap.md`](./roadmap.md) — Phase 计划与任务清单
 - [`docs/loom/sota-imitation-progression-checklist.md`](./sota-imitation-progression-checklist.md) — 主链路 SOTA 仿写推进 checklist
 - [`docs/loom/tension/README.md`](./tension/README.md) — 张力指标设计文档
@@ -766,9 +797,9 @@ novel-analyzer loom-ab-compare output/baseline/ output/loom/ --output-file outpu
 
 ### 操作与验证
 - [`docs/cli-operations-manual.md`](../cli-operations-manual.md) — CLI 手册（第 12 节 Loom）
-- [`docs/real-run-checklist.md`](../real-run-checklist.md) — 试跑清单（第 8 节 Loom）
-- [`docs/loom/weitu-real-effect-validation.md`](./weitu-real-effect-validation.md) — 卫图样例真实效果验证工作流
-- [`docs/loom/weitu-validation-log-20260511.md`](./weitu-validation-log-20260511.md) — 本轮已执行的卫图验证证据日志
+- [`docs/ops-debug-manual-20260514.md` — 运维调试速查
+- [`docs/loom/weitu-real-effect-validation.md`](../deprecated/old-arch-docs/weitu-real-effect-validation.md) — 卫图样例真实效果验证工作流
+- [`docs/loom/weitu-validation-log-20260511.md`](../deprecated/old-arch-docs/weitu-validation-log-20260511.md) — 本轮已执行的卫图验证证据日志
 
 ### 变更记录
 - [`CHANGELOG.md`](../../CHANGELOG.md) — 完整变更历史

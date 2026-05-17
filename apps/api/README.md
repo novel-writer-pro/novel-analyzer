@@ -6,13 +6,12 @@
 
 | 服务 | 文件 | 端口 | 说明 |
 |------|------|------|------|
-| **FastAPI（主用）** | `app/fastapi_app.py` | 8011 | 模块化后端，默认启动 |
-| WSGI（legacy 兜底） | `app/main.py` | 8011 | v5 cutover 回退用，正常请勿使用 |
+| FastAPI | `app/fastapi_app.py` | 8011 | 模块化后端，主入口 |
+| 共享 helpers | `app/main.py` | — | 路由复用的 payload 构造器（不是独立服务） |
 
 ## 启动 FastAPI 后端
 
 ```bash
-# 推荐
 make api-dev
 # 等价于：
 .venv/bin/uvicorn apps.api.app.fastapi_app:app --host 127.0.0.1 --port 8011 --reload
@@ -20,14 +19,12 @@ make api-dev
 
 API 文档：`http://127.0.0.1:8011/docs`
 
-> WSGI 兜底（仅 v5 cutover 回退场景）：`make api-wsgi-legacy`
-
 ## 路由模块
 
 ```
 app/
 ├── fastapi_app.py          # FastAPI 应用入口
-├── main.py                 # 旧 WSGI 后端（保留兼容）
+├── main.py                 # 共享 helpers（被 routers/ 复用，无独立入口）
 └── routers/
     ├── __init__.py         # 共享工具（get_db_session, resolve_settings）
     ├── loom.py             # Loom 信号（status/assemble/signals/reference-eval）
@@ -134,7 +131,7 @@ data: {"type": "error", "content": "..."}
 - 问答接口当前分为两层：
   - `POST /api/ask-branch`：返回完整 JSON 结果
   - `POST /api/ask-branch-stream`：返回 `text/event-stream`，适合前端聊天式流式展示
-- 当前本地 WSGI 服务已改为**并发处理请求**，因此某个长拆书 / 问答请求运行时，其他读取型请求不再必然一起被卡死
+- 后端默认按 uvicorn 并发处理请求，长拆书 / 问答请求运行时不会阻塞读取型请求
 - `GET /api/meta` 当前除了兼容字段 `available_endpoints` 外，还返回 `available_endpoint_specs`（`{method, path}` 清单），自动接入或契约校验建议优先消费该字段。
 - `POST /api/whole-book-imitation-run` 当前返回显式版本标记：
   - `contract_version=whole-book-imitation.v1`
@@ -197,7 +194,7 @@ curl -X POST "http://127.0.0.1:8000/api/whole-book-imitation-run" \
 - `POST /api/pipeline/start-range`：以后台异步方式启动一段连续拆书任务（当前最小版本要求从 `next_chapter` 开始）
 - `GET /api/pipeline/status?pipeline_run_id=...`：查看某个后台 pipeline run 状态
 - `GET /api/pipeline/runs?branch_id=...`：查看某个 branch 最近的后台 pipeline run 历史
-- 后台 pipeline run 的 pause / resume / cancel 控制能力仍属于后续增量 productization 范围，当前 WSGI 原型未单独暴露对应 HTTP 路由。
+- 后台 pipeline run 的 pause / resume / cancel 控制能力仍属于后续增量 productization 范围，当前后端原型未单独暴露对应 HTTP 路由。
 - `GET /api/chapter-jobs?branch_id=...&limit=200`：返回章节级任务表，用于 pipeline 控制台展示当前 stage / 进度 / 尝试次数 / 心跳 / 失败分类
 - 当前后端会在若干读取路径中顺手扫描长时间无 heartbeat 的 running job，并将其标记为 `failure_class=stalled`，避免控制台长期看到“假 running”
 - `GET /api/chapter-job-events?branch_id=...&chapter_index=...&limit=100`：返回单章任务事件链，适合 pipeline 控制台详情抽屉查看

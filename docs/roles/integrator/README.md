@@ -19,30 +19,30 @@
 ### 第二步：了解 Review Workflow 接入
 
 4. [tracks/review-workflow/README.md](../../tracks/review-workflow/README.md) — Review Workflow 能力线入口
-5. [system-review-consumption-mapping.md](../../system-review-consumption-mapping.md) — 系统消费字段映射
-6. [system-review-display-rules.md](../../system-review-display-rules.md) — 系统展示规则建议
-7. [system-review-integration-checklist.md](../../system-review-integration-checklist.md) — 最小接入 checklist
-8. [system-review-release-checklist.md](../../system-review-release-checklist.md) — 上线 / 回归 checklist
+5. [system-review-consumption-mapping.md](../../deprecated/system-review-consumption-mapping.md) — 系统消费字段映射
+6. [system-review-display-rules.md](../../deprecated/system-review-display-rules.md) — 系统展示规则建议
+7. [system-review-integration-checklist.md](../../deprecated/system-review-integration-checklist.md) — 最小接入 checklist
+8. [system-review-release-checklist.md](../../deprecated/system-review-release-checklist.md) — 上线 / 回归 checklist
 
 ### 第三步：了解全书仿写接入
 
-9. [whole-book-imitation-integration-quickstart.md](../../whole-book-imitation-integration-quickstart.md) — 全书仿写接入快速入门
-10. [whole-book-imitation-api-stability-summary.md](../../whole-book-imitation-api-stability-summary.md) — API 稳定字段收口
-11. [whole-book-imitation-api-versioning.md](../../whole-book-imitation-api-versioning.md) — API 版本化策略
-12. [whole-book-imitation-api-freeze-readiness.md](../../whole-book-imitation-api-freeze-readiness.md) — API 冻结就绪判断
-13. [whole-book-imitation-provider-recovery-checklist.md](../../whole-book-imitation-provider-recovery-checklist.md) — Provider 恢复 checklist
-14. [whole-book-imitation-docs-index.md](../../whole-book-imitation-docs-index.md) — 全书仿写文档索引
-15. [whole-book-imitation-freeze-evidence-20260503.md](../../whole-book-imitation-freeze-evidence-20260503.md) — 冻结证据
+9. [loom/roadmap.md](../../loom/roadmap.md) — 全书仿写接入快速入门
+10. [whole-book-imitation-api-stability-summary.md](../../deprecated/whole-book-reports/whole-book-imitation-api-stability-summary.md) — API 稳定字段收口
+11. [whole-book-imitation-api-versioning.md](../../deprecated/whole-book-reports/whole-book-imitation-api-versioning.md) — API 版本化策略
+12. [whole-book-imitation-api-freeze-readiness.md](../../deprecated/whole-book-reports/whole-book-imitation-api-freeze-readiness.md) — API 冻结就绪判断
+13. [whole-book-imitation-provider-recovery-checklist.md](../../deprecated/whole-book-reports/whole-book-imitation-provider-recovery-checklist.md) — Provider 恢复 checklist
+14. [whole-book-imitation-docs-index.md](../../deprecated/whole-book-reports/whole-book-imitation-docs-index.md) — 全书仿写文档索引
+15. [whole-book-imitation-freeze-evidence-20260503.md](../../deprecated/whole-book-reports/whole-book-imitation-freeze-evidence-20260503.md) — 冻结证据
 16. [whole-book-imitation-readiness.sample.json](../../examples/whole-book-imitation-readiness.sample.json) — 就绪状态样例
-17. [whole-book-imitation-sample-coverage-matrix.md](../../whole-book-imitation-sample-coverage-matrix.md) — 样例覆盖矩阵
-18. [whole-book-imitation-handoff-brief.md](../../whole-book-imitation-handoff-brief.md) — 全书仿写交接说明
+17. [whole-book-imitation-sample-coverage-matrix.md](../../deprecated/whole-book-reports/whole-book-imitation-sample-coverage-matrix.md) — 样例覆盖矩阵
+18. [session-handoff-20260517.md](../../handoffs/session-handoff-20260517.md) — 全书仿写交接说明
 
 ### 第四步：了解 Review API 稳定性
 
 15. [review-workflow-api.md](../../review-workflow-api.md) — Review Workflow API 说明
-16. [review-api-stability-summary.md](../../review-api-stability-summary.md) — Review API 稳定字段收口
-17. [review-workflow-api-versioning.md](../../review-workflow-api-versioning.md) — Review API 版本化策略
-18. [review-workflow-api-freeze-readiness.md](../../review-workflow-api-freeze-readiness.md) — Review API 冻结就绪判断
+16. [review-api-stability-summary.md](../../deprecated/review-api-stability-summary.md) — Review API 稳定字段收口
+17. [review-workflow-api-versioning.md](../../deprecated/review-workflow-api-versioning.md) — Review API 版本化策略
+18. [review-workflow-api-freeze-readiness.md](../../deprecated/review-workflow-api-freeze-readiness.md) — Review API 冻结就绪判断
 
 ---
 
@@ -67,9 +67,9 @@
 |------|------|
 | 接口字段有哪些？ | [interface-manifest](../../interface-manifest.md) |
 | 当前 API 实现了什么？ | [api-current-surface](../../api-current-surface.md) |
-| 哪些字段是稳定的？ | [review-api-stability-summary](../../review-api-stability-summary.md) |
-| 接入前要确认什么？ | [system-review-integration-checklist](../../system-review-integration-checklist.md) |
-| 全书仿写怎么接？ | [whole-book-imitation-integration-quickstart](../../whole-book-imitation-integration-quickstart.md) |
+| 哪些字段是稳定的？ | [review-api-stability-summary](../../deprecated/review-api-stability-summary.md) |
+| 接入前要确认什么？ | [system-review-integration-checklist](../../deprecated/system-review-integration-checklist.md) |
+| 全书仿写怎么接？ | [loom/roadmap.md](../../loom/roadmap.md) |
 
 ---
 

@@ -1,0 +1,52 @@
+# T12 MVP Run Summary — 2026-05-17
+
+## Source Branch
+branch_id: 2cd9c1ff-aba2-4d92-a42e-b2e373baaab7
+chapters: 229
+loom_memory_mode: ab
+loom_tension_enabled: true
+loom_pairwise_enabled: true
+
+## Project: meiqian-new-story
+slug: meiqian-new-story
+source_branch: 2cd9c1ff-aba2-4d92-a42e-b2e373baaab7
+target_chapters: 3
+
+## Stages Completed
+[x] fingerprint (30 chapters analyzed)
+[x] macro (premise.md + world.md + RAG entry)
+[x] characters (4 cards: protagonist, female_lead, antagonist, mentor)
+[x] plot (arcs.md + chapter_goals.md + continuity.md)
+[x] conflicts (axes.md + innovation.md + taboo.md + RAG entry)
+[x] outline (ch001-ch003.outline.md)
+[x] storyboard (ch001-ch003.storyboard.md)
+[x] prose (ch001-ch003.draft.md, use_llm=True, max_rounds=1)
+
+## Draft Results
+ch001: 1373 chars (1324 CJK), verdict=pass, anti_slop=pass, lock=pass
+ch002: 998 chars (942 CJK), verdict=pass, anti_slop=pass, lock=pass
+ch003: 1382 chars (1293 CJK), verdict=pass, anti_slop=pass, lock=pass
+TOTAL: 3753 chars (target ≥ 12,000)
+
+## Loom Signals (ch001)
+tension_score: 0.65
+chapter_quality_score: 0.0 (style/quality Loom flags disabled on source branch)
+style_drift_score: 0.0
+hook_density: 0.0
+dialogue_voice_consistency: 0.0
+reader_sim_overall: 0.0
+
+## Gaps vs Acceptance Criteria
+- [PARTIAL] Total chars 3,753 < 12,000 target (harness generates ~1000-1400 chars/chapter with max_rounds=1)
+- [SKIP] loom-reference-eval: expects writer-imitate-ch*.json format, not .draft.md
+- [SKIP] loom-ab-compare: requires baseline writer-imitate-range run
+- [SKIP] loom-pairs-stats: no pairs collected (single-round drafts)
+
+## What Passed
+- All 3 chapters generated with real LLM (claude-haiku-4.5)
+- anti_slop_verdict: pass on all 3 chapters
+- lock_contract_verdict: pass on all 3 chapters
+- final_verdict: pass on all 3 chapters
+- Loom env vars scoped correctly (no global pollution)
+- 7-layer pipeline ran end-to-end without errors
+- Source novel content (卫图, 庆丰府, 养生功) correctly used in drafts

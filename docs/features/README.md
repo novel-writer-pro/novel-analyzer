@@ -10,14 +10,14 @@
 6. 还需要哪些闭环与优化
 
 推荐阅读顺序：
-1. [`./feature-checkout-template.md`](./feature-checkout-template.md)
-2. [`./architecture-mainline-checkout-20260504.md`](./architecture-mainline-checkout-20260504.md)
-3. [`./retrieval-checkout-20260504.md`](./retrieval-checkout-20260504.md)
-4. [`./risk-semantic-checkout-20260504.md`](./risk-semantic-checkout-20260504.md)
-5. [`./imitation-checkout-20260504.md`](./imitation-checkout-20260504.md)
-6. [`./eval-governance-checkout-20260504.md`](./eval-governance-checkout-20260504.md)
-7. [`./independent-agent-capability-checkout-20260505.md`](./independent-agent-capability-checkout-20260505.md)
-8. [`./novel-assistant-control-checkout-20260505.md`](./novel-assistant-control-checkout-20260505.md)
+1. [`./feature-checkout-template.md`](../deprecated/old-arch-docs/feature-checkout-template.md)
+2. [`./architecture-mainline-checkout-20260504.md`](../deprecated/old-arch-docs/architecture-mainline-checkout-20260504.md)
+3. [`./retrieval-checkout-20260504.md`](../deprecated/old-arch-docs/retrieval-checkout-20260504.md)
+4. [`./risk-semantic-checkout-20260504.md`](../deprecated/old-arch-docs/risk-semantic-checkout-20260504.md)
+5. [`./imitation-checkout-20260504.md`](../deprecated/old-arch-docs/imitation-checkout-20260504.md)
+6. [`./eval-governance-checkout-20260504.md`](../deprecated/old-arch-docs/eval-governance-checkout-20260504.md)
+7. [`./independent-agent-capability-checkout-20260505.md`](../deprecated/old-arch-docs/independent-agent-capability-checkout-20260505.md)
+8. [`./novel-assistant-control-checkout-20260505.md`](../deprecated/old-arch-docs/novel-assistant-control-checkout-20260505.md)
 
 维护规则：
 - 每次跨能力线推进（retrieval / risk / imitation / eval / docs IA）都应该补一份 checkout。

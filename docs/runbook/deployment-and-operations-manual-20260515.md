@@ -981,7 +981,7 @@ For more involved diagnostics, see:
 - [.sisyphus/reports/bm25-reindex-validation-findings-20260515.md](../../.sisyphus/reports/bm25-reindex-validation-findings-20260515.md) — T1.5 +20-30% claim falsified
 
 ### 12.3 Session handoff
-- [docs/session-handoff-20260514-kernel-and-integration.md](../session-handoff-20260514-kernel-and-integration.md) — current state of all open items, including which ones are genuinely external-blocked
+- [docs/session-handoff-20260514-kernel-and-integration.md](../deprecated/session-handoffs/session-handoff-20260514-kernel-and-integration.md) — current state of all open items, including which ones are genuinely external-blocked
 
 ### 12.4 Specialized runbooks
 - [docs/runbook/bm25-jieba-reindex.md](./bm25-jieba-reindex.md) — BM25 dict refresh procedure

@@ -193,6 +193,8 @@ class ChapterImitationService:
             steering_pack=steering_pack,
         )
         title, source_text = self._source_chapter_text(branch_id, source_chapter_index)
+        title = self._clean_title(title)
+        source_text = self._clean_source_text_heading(source_text)
 
         previous_summary = ""
         active_characters: list[str] = []
@@ -253,6 +255,19 @@ class ChapterImitationService:
             raise ValueError(f"Unknown chapter_index: {chapter_index}")
         full_text = Path(novel.source_path).read_text(encoding="utf-8", errors="ignore")
         return segment.normalized_title, full_text[segment.start_offset : segment.end_offset].strip()
+
+    @staticmethod
+    def _clean_title(title: str) -> str:
+        import re as _re
+        return _re.sub(r"[（(][^）)]*(?:求收藏|求追读|求月票|加更|本章完|谢谢支持)[^）)]*[）)]", "", title).strip()
+
+    @staticmethod
+    def _clean_source_text_heading(source_text: str) -> str:
+        import re as _re
+        lines = source_text.split("\n", 1)
+        if lines:
+            lines[0] = _re.sub(r"[（(][^）)]*(?:求收藏|求追读|求月票|加更|本章完|谢谢支持)[^）)]*[）)]", "", lines[0]).strip()
+        return "\n".join(lines)
 
     def compare_with_source(
         self,
@@ -628,17 +643,50 @@ class ChapterImitationService:
 
     @staticmethod
     def _extract_json_payload(raw_content: object) -> dict[str, object]:
+        import ast
+        import json as _json
+        import re as _re
+
         text = str(raw_content).strip()
         if text.startswith("```"):
-            lines = text.splitlines()
-            if lines and lines[0].startswith("```"):
-                lines = lines[1:]
-            if lines and lines[-1].startswith("```"):
-                lines = lines[:-1]
-            text = "\n".join(lines).strip()
-        import json
+            text = text.removeprefix("```json").removeprefix("```").strip()
+            if text.endswith("```"):
+                text = text[:-3].strip()
 
-        return json.loads(text)
+        start = text.find("{")
+        end = text.rfind("}")
+        if start != -1 and end != -1 and end >= start:
+            text = text[start : end + 1]
+
+        def _try(s: str) -> dict[str, object] | None:
+            try:
+                loaded = _json.loads(s)
+                return loaded if isinstance(loaded, dict) else None
+            except _json.JSONDecodeError:
+                return None
+
+        result = _try(text)
+        if result is not None:
+            return result
+
+        for candidate in [
+            _re.sub(r",(\s*[}\]])", r"\1", text),
+            text.replace("\u201c", '"').replace("\u201d", '"').replace("\u2019", "'"),
+            _re.sub(r"[\x00-\x1f]", "", text),
+        ]:
+            result = _try(candidate)
+            if result is not None:
+                return result
+
+        pythonish = text.replace("null", "None").replace("true", "True").replace("false", "False")
+        try:
+            loaded = ast.literal_eval(pythonish)
+            if isinstance(loaded, dict):
+                return loaded
+        except Exception:
+            pass
+
+        raise _json.JSONDecodeError("no valid JSON object found", text, 0)
 
     @staticmethod
     def _render_skeleton_text(*, title: str, plan: ChapterImitationPlan) -> str:

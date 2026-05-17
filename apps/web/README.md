@@ -50,9 +50,6 @@ npm run dev
 make api-dev
 # 等价于：
 .venv/bin/uvicorn apps.api.app.fastapi_app:app --host 127.0.0.1 --port 8011 --reload
-
-# v5 cutover 回退用（一般不需要）：
-make api-wsgi-legacy
 ```
 
 ## 页面结构

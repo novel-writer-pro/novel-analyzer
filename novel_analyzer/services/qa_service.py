@@ -11,7 +11,8 @@ from novel_analyzer.config.settings import Settings, get_settings
 from novel_analyzer.database.models import GraphEdge, GraphNode, WindowArtifact
 from novel_analyzer.domain.schemas import BranchQAResult
 from novel_analyzer.llm.client import build_chat_model
-from novel_analyzer.llm.prompts import build_branch_qa_prompt
+from novel_analyzer.llm.prompts import build_branch_qa_prompt, build_qa_atomic_claim_extraction_prompt
+from novel_analyzer.services.factscore_lite_service import score_grounding
 from novel_analyzer.runtime.provider_health import record_provider_health
 from novel_analyzer.services.analysis_service import AnalysisService
 from novel_analyzer.services.causal_graph_service import CausalGraphService, CAUSAL_EDGE_TYPES
@@ -464,7 +465,23 @@ class BranchQAService:
         )
         if calibrated_confidence != result.confidence:
             result = result.model_copy(update={'confidence': calibrated_confidence})
+        result = self._shadow_factscore(result, retrieval_context)
         return result
+
+    def _shadow_factscore(self, result: BranchQAResult, retrieval_context: str) -> BranchQAResult:
+        try:
+            claim_prompt = build_qa_atomic_claim_extraction_prompt(answer=result.answer)
+            claim_model = build_chat_model(self.settings, model_name=self.settings.llm_qa_model_name)
+            claim_response = claim_model.invoke(claim_prompt)
+            raw = AnalysisService._extract_json_payload(claim_response)
+            claims = raw.get("claims", []) if isinstance(raw, dict) else []
+            if not claims:
+                return result
+            chunks = [line.strip() for line in retrieval_context.split("\n") if line.strip()]
+            fs_result = score_grounding(claims, chunks)
+            return result.model_copy(update={"factscore_grounding_rate": fs_result.overall_grounding_rate})
+        except Exception:
+            return result
 
     @classmethod
     def _calibrate_qa_confidence(

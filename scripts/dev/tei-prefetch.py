@@ -85,7 +85,8 @@ def prefetch_model(model_id: str, cache_dir: Path, hf_endpoint: str, require_onn
 
 
 def main() -> int:
-    embed_model = os.getenv("TEI_EMBED_MODEL", "BAAI/bge-m3")
+    # embed_model = os.getenv("TEI_EMBED_MODEL", "BAAI/bge-m3")
+    embed_model = os.getenv("TEI_EMBED_MODEL", "Qwen/Qwen3-Embedding-0.6B")
     rerank_model = os.getenv("TEI_RERANK_MODEL", "BAAI/bge-reranker-v2-m3")
     cache_dir = Path(os.getenv("TEI_CACHE_DIR", ".cache/tei"))
     hf_endpoint = os.getenv("HF_ENDPOINT", "https://hf-mirror.com")

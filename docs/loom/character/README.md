@@ -92,4 +92,4 @@ Character 层 → Reward 层：
 
 ---
 
-返回 [Loom 入口](../README.md) | [差距分析与演进](../gap-analysis-and-evolution.md)
+返回 [Loom 入口](../README.md) | [差距分析与演进](../../deprecated/old-arch-docs/gap-analysis-and-evolution.md)

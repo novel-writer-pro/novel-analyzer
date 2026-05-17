@@ -5,9 +5,9 @@
 > **预期工时**：5-章 spike ~10 min；30-章对比 ~60-90 min；100-章重跑 ~3-5 h（取决于 LLM 速度）。
 >
 > **互补文档**：
-> - [ops-debug-manual-20260514.md](./ops-debug-manual-20260514.md) — 环境自检 + 命令速查
-> - [chapter-imitation-capability-matrix.md](./chapter-imitation-capability-matrix.md) — 能力总表
-> - [whole-book-mapping-scale-20260514.md](./whole-book-mapping-scale-20260514.md) — 跨题材验证基线
+> - [ops-debug-manual-20260514.md](../ops-debug-manual-20260514.md) — 环境自检 + 命令速查
+> - [chapter-imitation-capability-matrix.md](../chapter-imitation-capability-matrix.md) — 能力总表
+> - [whole-book-mapping-scale-20260514.md](../deprecated/whole-book-reports/whole-book-mapping-scale-20260514.md) — 跨题材验证基线
 
 ---
 
@@ -45,7 +45,7 @@ curl -s -m 15 -X POST "$NOVEL_ANALYZER_LLM_BASE_URL/chat/completions" \
   | python3 -c "import sys,json;d=json.load(sys.stdin);print('LLM ok:', d['choices'][0]['message']['content'][:30])"
 ```
 
-如果上面任一步报错，进 [ops-debug-manual §4](./ops-debug-manual-20260514.md#4-故障定位决策树) 故障定位。
+如果上面任一步报错，进 [ops-debug-manual §4](../ops-debug-manual-20260514.md) 故障定位。
 
 ---
 
@@ -300,8 +300,8 @@ PY
 
 ### 如果 pass-rate ≥ 70%（修复成功）
 
-1. 更新 [chapter-imitation-capability-matrix.md](./chapter-imitation-capability-matrix.md) 的"已较强利用的能力"，把"同题材仿写"加入。
-2. 更新 [ops-debug-manual-20260514.md §6 锁定基线](./ops-debug-manual-20260514.md#6-锁定的回归基线) baseline 数字。
+1. 更新 [chapter-imitation-capability-matrix.md](../chapter-imitation-capability-matrix.md) 的"已较强利用的能力"，把"同题材仿写"加入。
+2. 更新 [ops-debug-manual-20260514.md §6 锁定基线](../ops-debug-manual-20260514.md) baseline 数字。
 3. CHANGELOG 加入：`feat(imitation): 同题材 baseline pass-rate 突破到 N%（N/100）`。
 4. 移除 [whole-book-mapping-scale-20260514.md] 里"baseline 0/307 不能商用"的注释。
 5. 准备公关物料："同题材 AI 仿写"已具备生产级质量。
@@ -343,7 +343,7 @@ PY
 
 | Risk | Mitigation |
 |---|---|
-| LLM provider 抖动卡住整批 | `nassaapi` 切到 `https://ykhelsrdmyua.usw-1.sealos.app/v1` + `claude-haiku-4.5`（见 [ops-debug §8](./ops-debug-manual-20260514.md#8-llm-endpoints当前可用--已知失效)） |
+| LLM provider 抖动卡住整批 | `nassaapi` 切到 `https://ykhelsrdmyua.usw-1.sealos.app/v1` + `claude-haiku-4.5`（见 [ops-debug §8](../ops-debug-manual-20260514.md)） |
 | Stage C 过半时 LLM 鉴权过期 | 写 cron-style 监控：每 30 min 看 progress 是否前进 |
 | scaffold contamination 漏网 | 现已在 service 层 in-flight 检测（commit `4358658`），只在 LLM 一直返回劣化输出时才会持续 fallback |
 | 修复 + scaffold 检测共同导致更多 retry → 整体变慢 | 接受。retry 次数应 <10%，详见日志 `recovered on attempt` 计数 |
@@ -352,7 +352,7 @@ PY
 
 ## 10. 历史对照（修复前的真相）
 
-来自 [chapter-imitation-capability-matrix.md](./chapter-imitation-capability-matrix.md) 当前数据：
+来自 [chapter-imitation-capability-matrix.md](../chapter-imitation-capability-matrix.md) 当前数据：
 
 | 测试 | 章数 | full pass | 修复前 prompt |
 |---|---:|---:|---|

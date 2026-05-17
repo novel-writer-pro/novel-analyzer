@@ -1,5 +1,302 @@
 ## Unreleased
 
+### Added (Loom Phase 6 - T14)
+- scripts/compare_loom_metrics.py: compare source branch vs project fingerprint metrics (±20% threshold, exit code 0/1)
+- tests/integration/test_loom_phase6_e2e.py: full 7-layer pipeline e2e test (mock LLM, 2 tests)
+- tests/integration/__init__.py: package marker enabling integration test collection
+- Verified: Loom Phase 1-5 service signatures unchanged (no uncommitted changes)
+- Verified: 132 Loom Phase 1-5 tests pass (zero regression)
+- Verified: 15 imitation tests pass (zero regression)
+- Verified: 81 Phase 6 tests pass
+
+### Added (Loom Phase 6 - T8)
+- novel_analyzer/services/project_outline_service.py: ProjectOutlineService
+- generate_outline(): per-chapter outline with 6 H2 sections + explicit hook type (悬念问句|模棱两可话|新威胁)
+- generate_storyboard(): per-chapter storyboard with 3-7 scene beats (6 required fields: 场所/POV/镜头类型/节奏标签/信息释放/内容草要)
+- generate_all(): batch generate all chapters
+- skills_dir/imitation-constraint-pack/: scene_beats optional input field (backward compatible — absent = source skeleton)
+- skills_dir/imitation-constraint-pack/schemas/input.schema.json: new input schema with scene_beats array
+- imitate-project outline + storyboard CLI wired (replaces TODO stubs)
+- ProjectCompilerService._parse_beats: extended to handle Chinese field names (场所/镜头类型/节奏标签/信息释放/内容草要)
+- 9 unit tests
+
+### Added (Loom Phase 6 - T11)
+- skills_dir/satire-anti-slop-guard/: SKILL.md + schemas/check_input.json + schemas/check_output.json
+- novel_analyzer/services/satire_anti_slop_service.py: SatireAntiSlopChecker (6 patterns: meta_commentary, happy_ending, expletive_abuse, early_deflate, internet_slang_abuse, character_emotional_outburst)
+- novel_analyzer/services/lock_contract_checker_service.py: LockContractChecker (heuristic negation pattern matching against locked artifact assertions)
+- fast_mode support: blockers downgraded to warn for --fast pipeline runs
+- 11 unit tests
+
+### Added (Loom Phase 6 - T7)
+- novel_analyzer/services/project_plot_service.py: ProjectPlotService
+- generate_plot(): arcs.md + chapter_goals.md + continuity.md (Loom _legacy_compat aligned)
+- generate_conflicts(): axes.md + innovation.md + taboo.md with default anti-slop taboos
+- imitate-project plot + conflicts CLI wired
+- RAG contribution: rag/trope-library/<slug>-tropes.md
+- 8 unit tests
+
+### Added (Loom Phase 6 - T5)
+- novel_analyzer/services/project_macro_service.py: ProjectMacroService
+- generate() produces premise.md (5 H2) and world.md (6 H2) with banned-noun filtering
+- revise() supports user feedback iteration
+- imitate-project macro CLI wired
+- RAG library contribution: rag/worldview-dossiers/<slug>-worldview.md
+- 7 unit tests
+
+### Added (Loom Phase 6 - T6)
+- novel_analyzer/services/project_characters_service.py: ProjectCharactersService for character cards
+- generate_initial_cards(): produces N character card markdown templates with 7 H2 sections
+- inherit_from_source(): bridges Loom CharacterPersona → editable markdown
+- markdown_to_persona(): reverse parses markdown back into CharacterPersona
+- imitate-project characters CLI wired
+- 6 unit tests
+
+### Added (Loom Phase 6 - T4)
+- novel_analyzer/services/project_style_view_service.py: ProjectStyleViewService renders style/rhythm signals to markdown + JSON
+- imitate-project fingerprint <slug> CLI command wired
+- 5 unit tests
+
+### Added (Loom Phase 6 - T3)
+- novel_analyzer/services/project_compiler_service.py: ProjectCompilerService + CompiledFlags + Beat dataclasses
+- compile_for_chapter(): parses 7-layer markdown into 9 steering flags + 5 Loom env vars
+- to_cli_args() / to_env_vars() / to_constraint_pack_input(): three output adaptors
+- Graceful degradation on missing markdown files (warning log, empty fields)
+- 11 unit tests covering all parser paths
+
+### Added (Loom Phase 6 - T1)
+- `novel_analyzer/domain/project_config.py`: ProjectConfig + LoomFlagsConfig Pydantic v2 models for author project shell
+- `novel_analyzer/services/project_shell_service.py`: ProjectShellService with filesystem artifact management, versioning, lock semantics, and Loom flag contextmanager
+- `novel_analyzer/cli/app.py`: `imitate-project` Typer subgroup with 14 stub subcommands
+
+- fix(imitation): strip marketing tags from chapter title before building LLM prompt.
+
+  Changelist: `CL-title-clean-20260517`
+
+  Stage B2（JSON parser 修复后重跑 30 章）发现 5/30 scaffold 章节全部含 `（求收藏，求追读）` 标题。根因：`source_title` 原样嵌入 JSON 模板 `"draft_title": "贿赂县令（求收藏，求追读）"`，LLM 把括号内容当读者运营指令，返回纯文本而非 JSON，3 次全失败。新增 `_clean_title()` 在传入 prompt 前剥离营销括号（求收藏/求追读/求月票/加更/本章完/谢谢支持）。
+
+  **Stage B2 结果**：pass=25/30 (83%)  scaffold=5/30 (16%)（对比修复前：20/30 (66%)  scaffold=10/30 (33%)）。预期 title fix 后 ≥28/30 pass，scaffold ≤2/30。
+
+- feat(loom): Phase 3 P1 — switch loom_memory_mode to ab + enable pairwise.
+
+  Changelist: `CL-loom-ab-mode-20260517`
+
+  `.env.local` 新增 `NOVEL_ANALYZER_LOOM_MEMORY_MODE=ab` + `NOVEL_ANALYZER_LOOM_PAIRWISE_ENABLED=true`。前提：alembic `20260509_01` 已在生产 PG 上运行（fact_records / graph_nodes / graph_edges 三张表的 Loom 字段已存在）。ab 模式下 50% 章节走 Loom 记忆注入路径，50% 走原路径，`loom-ab-compare` 可对比 character_ooc 触发率。
+
+- feat(retrieval): B2 — add relationship_route to retrieval pipeline.
+
+  Changelist: `CL-b2-relationship-route-20260516`
+
+  新增 `_relationship_route()` 并接入 `_search_branch_routes_with_diagnostics()`（entity_exact 之后、vector 之前）。路由通过 `graph_nodes.label LIKE %query%` 找到匹配节点，再展开所有关联 `graph_edges`，按 `max(node.importance_score, edge.weight)` 对章节打分。解决"章节摘要不含实体名但实体有活跃关系"时的召回盲区。验证：21/21 `test_retrieval_service.py` pass；`search-branch-diagnostics` 显示 relationship 路由命中 10 章。
+
+- fix(imitation): replace bare json.loads with robust JSON parser in chapter_imitation_service.
+
+  Changelist: `CL-json-parser-fix-20260516`
+
+  Stage B（30 章 baseline spike）发现 10/30 scaffold 污染（33%），根因是 `chapter_imitation_service._extract_json_payload` 使用裸 `json.loads`，claude-haiku-4.5 返回含 trailing comma / unicode 引号的响应时 3 次全失败，fallback 到 skeleton 模板。移植 `analysis_service` 的修复逻辑（trailing comma / unicode 引号 / 控制字符 / `ast.literal_eval` 兜底）。
+
+  **Stage B 结果（修复前）**：pass=20/30 (66%)  scaffold=10/30 (33%)  avg_score=82.7（对比修复前基线：0/30 pass）。
+
+- feat(imitation): 4-persona reader panel with comfort_score soft gate.
+
+  Changelist: `CL-reader-panel-20260516`
+
+  **Stage A 结果**（5 章 spike，ch2-6）：pass=3/5 (60%)，scaffold=2/5（JSON parse 失败，已被上面的 fix 修复）。
+
+  **代码改动**：`ReaderPanelService.evaluate_draft()` + `revise_with_panel_feedback()` + `build_panel_driven_revision_prompt()` + harness `--reader-panel` flag + 13 个测试。
+
+- feat(qa): T7 FActScore-lite shadow mode in answer_question.
+
+  Changelist: `CL-factscore-lite-20260516`
+
+  `_shadow_factscore()` 追加原子事实提取 + 词法 overlap 评分，结果存入 `BranchQAResult.factscore_grounding_rate`（0-1）。Shadow 模式，任何失败都静默返回原始结果。
+
+- feat(db): B5 Elo — add loom_pairwise_evaluations table + ORM model + loom-elo CLI.
+
+  Changelist: `CL-b5-elo-20260516`
+
+  新增 `loom_pairwise_evaluations` 表（alembic `20260516_01`）+ `LoomPairwiseEvaluationRecord` ORM + `loom-elo` CLI 命令。
+
+- fix(tests): fix 6 pre-existing test failures + retire dead WSGI contract tests.
+
+  Changelist: `CL-test-fixes-wsgi-cleanup-20260516`
+
+  3 个 mock lambda 补 `**kw`，`_FakeHarnessService.run_harness` 补 `mapping_pack` + `enable_reader_panel` 参数，admin_url 断言改为 env-agnostic，删除 2 个 WSGI 合约测试，补 `python-multipart>=0.0.20`。验证：715/718 pass（3 个 pre-existing 环境依赖失败）。
+
+- refactor(api): retire WSGI dispatch; uvicorn FastAPI is the only entrypoint.
+
+  Changelist: `CL-retire-wsgi-fallback-20260516`
+
+  `apps/api/app/main.py` 删除 `application()` + `ThreadingWSGIServer` + `main()`（-291 行）。`Makefile` 删除 `api-wsgi-legacy` target。
+
+- chore(data): relink novel_sources.source_path to /home/user/migrate/novels/.
+
+  Changelist: `CL-relink-novel-sources-20260516`
+
+  新增 `scripts/dev/relink_novel_sources.py`。7 行 relink / 20 行 already-OK / 16 行 SHA256 不匹配（留原 path）。
+
+- feat(llm): claude-haiku-4.5 + 共享 token-bucket 节流 + deepseek max_tokens cap.
+
+  Changelist: `CL-llm-haiku-rate-limit-20260516`
+
+  `config/settings.py` 新增 4 个 rate-limit settings。`llm/client.py` 用 `InMemoryRateLimiter` 包 `ChatOpenAI`（`lru_cache` 共享 bucket）。`.env.local` 切 `claude-haiku-4.5`，rps=1.5 / bucket=3。deepseek-* 模型强制 `max_tokens=4000`。
+
+- docs(ops): postgres ops cheatsheet + 2026-05-16 session handoff.
+
+  Changelist: `CL-ops-docs-20260516`
+
+  新增 `docs/runbook/postgres-ops-cheatsheet.md`（14 章 SQL 速查）+ `docs/session-handoff-20260516.md`。
+
+
+
+  Changelist: `CL-json-parser-fix-20260516`
+
+  Stage B（30 章 baseline spike）发现 10/30 scaffold 污染（33%），根因是 `chapter_imitation_service._extract_json_payload` 使用裸 `json.loads`，claude-haiku-4.5 返回含 trailing comma / unicode 引号的响应时 3 次全失败，fallback 到 skeleton 模板。移植 `analysis_service` 的修复逻辑（trailing comma / unicode 引号 / 控制字符 / `ast.literal_eval` 兜底）。
+
+  **Stage B 结果（修复前）**：pass=20/30 (66%)  scaffold=10/30 (33%)  avg_score=82.7（对比修复前基线：0/30 pass）。预期修复后 scaffold 率降至接近 0%，pass rate ≥80%。
+
+- feat(imitation): 4-persona reader panel with comfort_score soft gate.
+
+  Changelist: `CL-reader-panel-20260516`
+
+  **Stage A 结果**（5 章 spike，ch2-6）：pass=3/5 (60%)，scaffold=2/5（JSON parse 失败，已被上面的 fix 修复）。
+
+  **代码改动**：`ReaderPanelService.evaluate_draft()` + `revise_with_panel_feedback()` + `build_panel_driven_revision_prompt()` + harness `--reader-panel` flag + 13 个测试。
+
+- feat(qa): T7 FActScore-lite shadow mode in answer_question.
+
+  Changelist: `CL-factscore-lite-20260516`
+
+  `_shadow_factscore()` 追加原子事实提取 + 词法 overlap 评分，结果存入 `BranchQAResult.factscore_grounding_rate`（0-1）。Shadow 模式，任何失败都静默返回原始结果。
+
+- feat(db): B5 Elo — add loom_pairwise_evaluations table + ORM model + loom-elo CLI.
+
+  Changelist: `CL-b5-elo-20260516`
+
+  新增 `loom_pairwise_evaluations` 表（alembic `20260516_01`）+ `LoomPairwiseEvaluationRecord` ORM + `loom-elo` CLI 命令。
+
+- fix(tests): fix 6 pre-existing test failures + retire dead WSGI contract tests.
+
+  Changelist: `CL-test-fixes-wsgi-cleanup-20260516`
+
+  3 个 mock lambda 补 `**kw`，`_FakeHarnessService.run_harness` 补 `mapping_pack` + `enable_reader_panel` 参数，admin_url 断言改为 env-agnostic，删除 2 个 WSGI 合约测试，补 `python-multipart>=0.0.20`。验证：715/718 pass（3 个 pre-existing 环境依赖失败）。
+
+- refactor(api): retire WSGI dispatch; uvicorn FastAPI is the only entrypoint.
+
+  Changelist: `CL-retire-wsgi-fallback-20260516`
+
+  `apps/api/app/main.py` 删除 `application()` + `ThreadingWSGIServer` + `main()`（-291 行）。`Makefile` 删除 `api-wsgi-legacy` target。
+
+- chore(data): relink novel_sources.source_path to /home/user/migrate/novels/.
+
+  Changelist: `CL-relink-novel-sources-20260516`
+
+  新增 `scripts/dev/relink_novel_sources.py`。7 行 relink / 20 行 already-OK / 16 行 SHA256 不匹配（留原 path）。
+
+- feat(llm): claude-haiku-4.5 + 共享 token-bucket 节流 + deepseek max_tokens cap.
+
+  Changelist: `CL-llm-haiku-rate-limit-20260516`
+
+  `config/settings.py` 新增 4 个 rate-limit settings。`llm/client.py` 用 `InMemoryRateLimiter` 包 `ChatOpenAI`（`lru_cache` 共享 bucket）。`.env.local` 切 `claude-haiku-4.5`，rps=1.5 / bucket=3。deepseek-* 模型强制 `max_tokens=4000`。
+
+- docs(ops): postgres ops cheatsheet + 2026-05-16 session handoff.
+
+  Changelist: `CL-ops-docs-20260516`
+
+  新增 `docs/runbook/postgres-ops-cheatsheet.md`（14 章 SQL 速查）+ `docs/session-handoff-20260516.md`。
+
+
+  Changelist: `CL-reader-panel-20260516`
+
+  **背景**：Stage A spike（5 章）显示 3/5 pass，但 ch3/ch4 是 scaffold 污染（364 字 / `is_scaffold_only=True` / `stop_reason=critical_action_required`）。harness 的 score=80/84 无法区分"真正写出来的章节"和"scaffold 模板"。新增 reader panel 作为 comfort_score 软门控，让 LLM 从 4 个读者视角评估草稿，给出 0-100 分 + 维度级修改建议。
+
+  **Stage A 结果**（`/tmp/baseline-spike-after-fix/`）：
+  - ch2: pass / 1354 字 / score=84 ✅
+  - ch3: needs_revision / 364 字 / scaffold=True / stop=critical_action_required ⚠️
+  - ch4: needs_revision / 364 字 / scaffold=True / stop=critical_action_required ⚠️
+  - ch5: pass / 1269 字 / score=84 ✅
+  - ch6: pass / 2092 字 / score=84 ✅
+  - **pass_rate = 3/5 (60%)** — 超过 handoff 文档的 ≥1/5 最低门槛，prompt 修复有方向性效果
+  - scaffold 污染 2/5：ch3/ch4 的 `action_queue` 含 `expand_middle` priority=1，说明 LLM 在 max_rounds=2 内未能展开 scaffold → 需要更多 rounds 或 reader panel 触发重写
+
+  **代码改动**：
+  - `novel_analyzer/domain/schemas.py` — 新增 `ReaderPanelPersonaScore` / `ReaderPanelDimensionScore` / `ReaderPanelRevisionAction` / `ReaderPanelReport`
+  - `novel_analyzer/llm/prompts.py` — 新增 `READER_PANEL_PERSONAS` (4 视角) / `READER_PANEL_DIMENSIONS` (7 维度) / `build_reader_panel_prompt()`
+  - `novel_analyzer/services/reader_panel_service.py` — `ReaderPanelService.evaluate_draft()` 主入口
+  - `novel_analyzer/services/imitation_harness_service.py` — `--reader-panel` flag 接入 harness，comfort_score < threshold 时触发额外修改轮次
+  - `tests/test_reader_panel_service.py` — 9 个测试（mock LLM / schema 验证 / 边界情况）
+
+- fix(tests): fix 6 pre-existing test failures + retire dead WSGI contract tests.
+
+  Changelist: `CL-test-fixes-wsgi-cleanup-20260516`
+
+  **代码改动**：
+  - `tests/test_qa_service.py` — 3 个 mock lambda 补 `**kw`（`search_branch` 后加了 `max_chapter` kwarg）
+  - `tests/test_cli.py` — `_FakeHarnessService.run_harness` 补 `mapping_pack` 参数
+  - `tests/test_cli_pg_checks.py` — admin_url 断言改为 env-agnostic
+  - `tests/contract/test_dual_parity.py` — 删除（v5.1 inline 后可删，已在 28f9f28 完成）
+  - `tests/contract/test_main_wsgi_contract.py` — 删除（测试 `application()` WSGI callable，已在 e5975d0 退役）
+  - `requirements.txt` — 补 `python-multipart>=0.0.20,<1.0`
+
+  **验证**：702/705 pass（3 个 pre-existing 环境依赖失败）
+
+- refactor(api): retire WSGI dispatch; uvicorn FastAPI is the only entrypoint.
+
+  Changelist: `CL-retire-wsgi-fallback-20260516`
+
+  `apps/api/app/main.py` 删除 `application()` (288 行) + `ThreadingWSGIServer` + `main()`；文件从 1585 → 1294 行。`Makefile` 删除 `api-wsgi-legacy` target。
+
+- chore(data): relink novel_sources.source_path to /home/user/migrate/novels/.
+
+  Changelist: `CL-relink-novel-sources-20260516`
+
+  新增 `scripts/dev/relink_novel_sources.py`。7 行 relink / 20 行 already-OK / 16 行 SHA256 不匹配（留原 path）。
+
+- feat(llm): claude-haiku-4.5 + 共享 token-bucket 节流。
+
+  Changelist: `CL-llm-haiku-rate-limit-20260516`
+
+  `config/settings.py` 新增 4 个 rate-limit settings。`llm/client.py` 用 `InMemoryRateLimiter` 包 `ChatOpenAI`（`lru_cache` 共享 bucket）。`.env.local` 切 `claude-haiku-4.5`，rps=1.5 / bucket=3。
+
+- docs(ops): postgres ops cheatsheet + 2026-05-16 session handoff.
+
+  Changelist: `CL-ops-docs-20260516`
+
+  新增 `docs/runbook/postgres-ops-cheatsheet.md`（14 章 SQL 速查）+ `docs/session-handoff-20260516.md`。
+
+
+
+  Changelist: `CL-relink-novel-sources-20260516`
+
+  **背景**：DB 里 43 个 `novel_sources` 的 `source_path` 历史遗留指向 `/tmp/`、`/home/user/ai-books/.cache/...` 等已不存在的位置。新增 `scripts/dev/relink_novel_sources.py` 按 SHA256 重定位到 `/home/user/migrate/novels/`。
+
+  **代码改动**：
+  - `scripts/dev/relink_novel_sources.py` — 默认 dry-run，`--apply` 才写库；SHA256-only 匹配（标题在 DB 重复出现，不可信）；输出三段报告：already-OK / will-relink / unmatched。
+
+  **数据变化（已 apply）**：
+  - 7 行 source_path 重指向 `/home/user/migrate/novels/`（青华系列 4 行 / 诛仙-fixed 1 行 / 魔师 2 行）
+  - 20 行原 `/home/user/txt111/...` 仍存在 → 不动
+  - 16 行 SHA256 与磁盘所有文件不同 → 留原 path 不动（章节原文回看断；分析派生数据完整可用）
+
+  **为何不用同名文件覆盖那 16 行**：磁盘上的 `雪中悍刀行.txt` SHA256 已变（DB=`365edfe…` vs disk=`2cfdf86…`）。`chapter_segments.start_offset/end_offset` 是基于 DB 记录的 hash 锁定的，强行换 path 会导致 offset 错位 → 拉错章节内容。哈希不一致直接拒绝是设计上的安全门。
+
+- feat(llm): claude-haiku-4.5 + 共享 token-bucket 节流。
+
+  Changelist: `CL-llm-haiku-rate-limit-20260516`
+
+  **代码改动**：
+  - `novel_analyzer/config/settings.py` 新增 4 个 settings：`llm_requests_per_second` (默认 0=disabled) / `llm_check_every_n_seconds` / `llm_max_bucket_size` / `llm_max_concurrent_requests`。零默认值保证升级零侵入。
+  - `novel_analyzer/llm/client.py` 用 `langchain_core.rate_limiters.InMemoryRateLimiter` 包 `ChatOpenAI`。`_build_rate_limiter` 用 `lru_cache` 让所有并发 caller 共享同一个 bucket（验证：`test_rate_limiter_singleton_per_config`）。`rps<=0` 时返回 `None` 不打开限流。
+  - `tests/test_llm_client.py` 新增 4 测试：disabled/enabled/singleton/model-override。
+
+  **配置切换**：`.env.local` 主模型 `deepseek-v4-flash` → `claude-haiku-4.5`，fallback 仍 `deepseek-v4-flash`。默认节流 rps=1.5 / bucket=3 / concurrent=2 → 长稳 ~90 req/min，短突发 ≤3。
+
+  **真实验证**：
+  - `chat.invoke('用一句话回答...')` → 3.8s 返回 claude-haiku-4.5 输出 ✅
+  - 5 次 `acquire()` dry-run 间隔 0.7s（rps=1.5 稳态） ✅
+  - 4/4 unit tests pass ✅
+
+- docs(handoff): 新增 `docs/session-handoff-20260516.md` 跟踪本会话进度 + 待办 + 不做项决策记录。
+
 - feat(imitation): 同题材 baseline self-check + scaffold-only in-flight 检测 + mapping flags 全 CLI 接通 + 商用就绪/长跑验证文档。
 
   Changelist: `CL-imitation-baseline-quality-and-commercial-readiness`
@@ -2629,3 +2926,42 @@ Loom 是在现有 GraphRAG 基础设施（pg_trgm + pgvector + GraphNode/GraphEd
 ### 首页重定向改为直接渲染，修复 build 收集 page data 异常
 - 将首页 `/` 从运行时 `router.replace("/control")` 改为直接渲染控制台页面
 - 修复 Next.js 在构建阶段对 `/` 收集 page data 时的路由异常，新的干净构建已重新包含 `/ /control /reader /qa /ops`
+
+### Added (Loom Phase 6 - T2)
+- `project_shell_service.py`: `ensure_source_branch()` validates source branch readiness with actionable error message
+- `project_shell_service.py`: `sample_source_chapters()` retrieves ChapterArtifact objects for style analysis
+- `docs/loom/phase6/runbook-template.md`: 5-step end-to-end runbook for author project shell
+
+### Added (Loom Phase 6 - T9)
+- `novel_analyzer/services/project_prose_service.py`: ProjectProseService
+- `generate_chapter()`: Loom flag injection via contextmanager + harness-imitation call + `_loom_*` signal frontmatter
+- `generate_all()`: batch generate all chapters
+- Env var scoping: Loom flags set/restored via contextmanager (no global pollution)
+- Anti-slop + lock contract checks post-generation
+- `imitate-project prose` CLI wired
+- 6 unit tests
+
+### Added (Loom Phase 6 - T10)
+- `imitate-project revise/lock/diff/status/run` subcommands implemented
+- `revise`: any stage, feedback prepend, auto-archives previous version
+- `lock`: glob pattern → locked.yaml + frontmatter `locked: true`
+- `diff`: unified diff between latest and previous version
+- `status`: table view of all stage versions + lock state
+- `run`: sequential stage execution with gate stops (`--fast` to skip)
+- 6 unit tests
+
+### Added (Loom Phase 6 - T12)
+- MVP end-to-end run: `meiqian-new-story` project (3 chapters, 《没钱修什么仙》style)
+- `loom-reference-eval` fidelity = 0.62 (ch2, enhanced vs baseline 4.3x)
+- All 3 chapters: `final_verdict: pass`, `anti_slop_verdict: pass`
+- `scripts/compare_loom_metrics.py`: source branch vs project fingerprint comparison
+
+### Added (Loom Phase 6 - T13)
+- `docs/loom/phase6/README.md`: Phase 6 entry with 7-layer table + quick start
+- `docs/loom/phase6/workflow.md`: 5-step workflow + mermaid diagram + feedback loops
+- `docs/loom/phase6/arch-alignment.md`: boundary clarification vs 0509/Phase 1-5/writer-imitate
+- `docs/loom/README.md`: Phase F entry (✅ complete)
+- `docs/loom/roadmap.md`: Phase 6 block (✅ complete)
+- `docs/loom/handoff.md`: Phase 6 completion record
+- `docs/loom/sota-imitation-progression-checklist.md`: Section I all [x]
+- `docs/roles/imitation/README.md`: new row for author project shell

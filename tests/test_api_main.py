@@ -26,7 +26,7 @@ def _make_shared_engine():
         poolclass=StaticPool,
     )
 
-from apps.api.app.main import _API_ENDPOINT_SPECS, application
+from apps.api.app.main import _API_ENDPOINT_SPECS
 from novel_analyzer.application.dto import AutoRunResult, BranchSnapshot, RunSnapshot
 from novel_analyzer.config.settings import get_settings
 from novel_analyzer.database.session import create_schema

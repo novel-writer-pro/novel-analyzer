@@ -510,3 +510,22 @@ class RiskSignalClusterRecord(TimestampSoftDeleteMixin, Base):
     summary_text: Mapped[str] = mapped_column(Text(), default="")
     signal_ids_json: Mapped[list[str]] = mapped_column(JSON, default=list)
     metadata_json: Mapped[dict[str, object]] = mapped_column(JSON, default=dict)
+
+
+class LoomPairwiseEvaluationRecord(TimestampSoftDeleteMixin, Base):
+    __tablename__ = "loom_pairwise_evaluations"
+
+    branch_id: Mapped[str] = mapped_column(ForeignKey("run_branches.id"), index=True)
+    chapter_index: Mapped[int] = mapped_column(Integer, default=0)
+    pair_id: Mapped[str] = mapped_column(String(128), index=True)
+    variant_a_id: Mapped[str] = mapped_column(String(128), default="")
+    variant_b_id: Mapped[str] = mapped_column(String(128), default="")
+    overall_preference: Mapped[str] = mapped_column(String(8), default="tie")
+    overall_reason: Mapped[str] = mapped_column(Text(), default="")
+    confidence: Mapped[float] = mapped_column(Float, default=0.0)
+    evaluation_method: Mapped[str] = mapped_column(String(32), default="llm_judge")
+    elo_rating_a_before: Mapped[float | None] = mapped_column(Float, nullable=True)
+    elo_rating_b_before: Mapped[float | None] = mapped_column(Float, nullable=True)
+    elo_rating_a_after: Mapped[float | None] = mapped_column(Float, nullable=True)
+    elo_rating_b_after: Mapped[float | None] = mapped_column(Float, nullable=True)
+    metadata_json: Mapped[dict[str, object]] = mapped_column(JSON, default=dict)
