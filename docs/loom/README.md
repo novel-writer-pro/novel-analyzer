@@ -163,6 +163,21 @@ Loom（新增层，叠加在上方）
 
 ---
 
+### F. 作家项目壳（Author Project Shell）🔲 Phase 6
+
+**解决的问题**：
+- 9 个 steering flag 需要在终端里背，作家体验差
+- 没有"项目"概念，多次实验产物散落在 output/ 各处
+- 没有分层 lock + 用户编辑语义
+
+**核心思路**：
+7 层可编辑 markdown 项目目录，编译成现有 CLI flag + Loom feature env vars。
+唯一新增生成层是分镜/scene_beats（扩展 imitation-constraint-pack skill input）。
+
+→ [phase6/README.md](./phase6/README.md)
+
+---
+
 ## 快速导航
 
 | 文档 | 说明 |

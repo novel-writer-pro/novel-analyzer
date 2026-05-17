@@ -20,6 +20,7 @@
 | 看哪些能力已落地 | [architecture/imitation-control-plane-implementation-status-map-20260509.md](../../architecture/imitation-control-plane-implementation-status-map-20260509.md) |
 | 看不懂英文术语 | [imitation-control-plane-glossary.md](../../imitation-control-plane-glossary.md) |
 | 接手/继续开发 | [imitation-next-dev-handoff.md](../../imitation-next-dev-handoff.md) |
+| 新故事原创仿写（项目壳） | [docs/loom/phase6/workflow.md](../../loom/phase6/workflow.md) |
 
 ---
 

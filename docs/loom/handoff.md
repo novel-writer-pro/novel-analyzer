@@ -37,6 +37,17 @@ Loom memory 层      →  carry_over_state 的 "组装器"（新增）
 
 ## 2. 当前工作状态
 
+### Phase 6 进行中（2026-05-17）
+
+**Changelist marker**: `CL-loom-phase6-author-shell-01`
+
+已完成：T1-T11（项目骨架 + 7 层生成器 + ops + anti-slop）
+待完成：T12 MVP 验证 + T13 文档 + T14 全量测试
+
+详见 [docs/loom/phase6/README.md](./phase6/README.md)
+
+---
+
 ### 2.1 已完成的提交历史
 
 | Commit | 描述 |

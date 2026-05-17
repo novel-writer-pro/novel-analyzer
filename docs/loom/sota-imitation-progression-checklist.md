@@ -214,6 +214,15 @@
 
 ---
 
+## I. 作家 UX 层（Author Project Shell）
+
+- [ ] 7 层 markdown 项目目录可跑通
+- [ ] imitate-project run --until prose 产出 3 章正文
+- [ ] loom-reference-eval fidelity ≥ 0.5
+- [ ] 作家可在任意层 revise/lock/diff
+
+---
+
 ## 6. 本清单关联文档
 
 - [卫图样例真实效果验证工作流](./weitu-real-effect-validation.md)
