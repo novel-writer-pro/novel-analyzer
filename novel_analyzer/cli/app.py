@@ -19,10 +19,10 @@ from novel_analyzer.database.migrations import upgrade_database
 from novel_analyzer.database.models import (
     AnalysisRun,
     ChapterArtifact,
+    ChapterManifest,
     FactRecord,
     NovelSource,
     RunBranch,
-    ChapterManifest,
     WindowArtifact,
 )
 from novel_analyzer.database.postgres_checks import postgres_capability_report
@@ -31,13 +31,13 @@ from novel_analyzer.database.session import (
     database_healthcheck,
     ensure_database_exists,
 )
-from novel_analyzer.runtime.storage import describe_runtime_storage, migrate_legacy_runtime_dirs
-from novel_analyzer.runtime.provider_health import read_provider_health
 from novel_analyzer.runtime.cluster_review_state import (
     read_cluster_review_history,
     read_cluster_review_state,
     write_cluster_review_state,
 )
+from novel_analyzer.runtime.provider_health import read_provider_health
+from novel_analyzer.runtime.storage import describe_runtime_storage, migrate_legacy_runtime_dirs
 from novel_analyzer.services.steering_library_service import (
     SteeringLibraryService,
     SteeringPack,
@@ -168,7 +168,7 @@ def _loom_write_pairs_jsonl(
 
     pairs_file.parent.mkdir(parents=True, exist_ok=True)
     collected = 0
-    collected_at = _datetime.datetime.now(tz=_datetime.timezone.utc).isoformat()
+    collected_at = _datetime.datetime.now(tz=_datetime.UTC).isoformat()
     with pairs_file.open("a", encoding="utf-8") as fh:
         for pair in pairs_to_eval:
             result = eval_svc.evaluate(
@@ -8680,9 +8680,8 @@ def loom_status(
     database_url: str | None = None,
 ) -> None:
     """Show Loom memory and tension status for a branch."""
-    from novel_analyzer.services.memory_assembler_service import MemoryAssemblerService
-    from novel_analyzer.services.tension_service import TensionService
     from novel_analyzer.database.models import FactRecord, GraphNode
+    from novel_analyzer.services.tension_service import TensionService
 
     settings = _safe_settings(database_url)
     factory = create_session_factory(settings)
@@ -8753,8 +8752,8 @@ def loom_status(
                 echo("alerts:              none")
 
         if latest_chapter and settings.loom_style_enabled:
-            from novel_analyzer.services.style_calibration_service import StyleCalibrationService
             from novel_analyzer.services.rhythm_analysis_service import RhythmAnalysisService
+            from novel_analyzer.services.style_calibration_service import StyleCalibrationService
             style_svc = StyleCalibrationService(session)
             rhythm_svc = RhythmAnalysisService(session)
             style_result = style_svc.compute_style_drift(branch_id, latest_chapter)
@@ -8773,7 +8772,9 @@ def loom_status(
                 echo(f"rhythm_suggestion:   {rhythm_result.suggestion}")
 
             try:
-                from novel_analyzer.services.reader_simulation_service import ReaderSimulationService
+                from novel_analyzer.services.reader_simulation_service import (
+                    ReaderSimulationService,
+                )
                 reader_svc = ReaderSimulationService(session)
                 reader_score = reader_svc.simulate_all_panels(branch_id, latest_chapter)
                 echo("")
@@ -8807,7 +8808,9 @@ def loom_status(
             echo(f"overdue_ratio:       {thread_report.overdue_ratio:.4f}")
             if health.quality_trend == "declining":
                 try:
-                    from novel_analyzer.services.steering_library_service import SteeringLibraryService
+                    from novel_analyzer.services.steering_library_service import (
+                        SteeringLibraryService,
+                    )
                     steering_svc = SteeringLibraryService()
                     payload_result = steering_svc.retrieve_pack(query_text="质量下滑 情节平淡 角色漂移")
                     pack = payload_result.get("steering_pack", {})
@@ -9013,7 +9016,7 @@ def loom_pairs_stats(
 
     chapters = sorted({int(r["chapter_index"]) for r in records if isinstance(r.get("chapter_index"), int)})
 
-    echo(f"=== Loom Pairwise Data Stats ===")
+    echo("=== Loom Pairwise Data Stats ===")
     echo(f"pairs_file:        {pairs_file}")
     echo(f"total_pairs:       {total}")
     echo(f"target:            {TARGET}")
@@ -9633,7 +9636,7 @@ def loom_benchmark(
     echo(f"  deconstruction:    {report.deconstruction_score:.4f}")
     echo(f"  imitation:         {report.imitation_score:.4f}")
     echo(f"  risk_check:        {report.risk_check_score:.4f}")
-    echo(f"  ────────────────────────────")
+    echo("  ────────────────────────────")
     echo(f"  composite:         {report.composite_score:.4f}")
     echo("")
     echo("dimensions:")
@@ -9752,8 +9755,9 @@ def bm25_reindex(
         return
 
     settings = _safe_settings(database_url)
-    import psycopg
     import re as _re
+
+    import psycopg
 
     parts = settings.resolved_database_url.replace("postgresql+psycopg://", "postgresql://")
     conn = psycopg.connect(parts)
@@ -9795,9 +9799,10 @@ def rematerialize_retrieval(
     database_url: str | None = None,
 ) -> None:
     """Re-materialize retrieval_chunks + chunk_embeddings for docs missing them."""
-    from novel_analyzer.services.retrieval_service import RetrievalService
-    from novel_analyzer.database.models import ChapterArtifact, RetrievalDocument
     from sqlalchemy import select
+
+    from novel_analyzer.database.models import ChapterArtifact
+    from novel_analyzer.services.retrieval_service import RetrievalService
 
     settings = _safe_settings(database_url)
     factory = create_session_factory(settings)
@@ -9995,7 +10000,7 @@ def reader_panel_stats(
         comforts = [int(c["comfort"]) for c in panel_chapters if isinstance(c.get("comfort"), int)]
         avg_comfort = sum(comforts) / len(comforts)
         echo("")
-        echo(f"comfort distribution:")
+        echo("comfort distribution:")
         echo(f"  avg:    {avg_comfort:.1f}")
         echo(f"  min:    {min(comforts)}")
         echo(f"  max:    {max(comforts)}")
@@ -10019,7 +10024,7 @@ def reader_panel_stats(
         avg_lift = sum(revised_lifts) / len(revised_lifts)
         positive = sum(1 for l in revised_lifts if l > 0)
         echo("")
-        echo(f"panel-driven revisions (Phase B):")
+        echo("panel-driven revisions (Phase B):")
         echo(f"  applied:        {len(revised_lifts)} chapters")
         echo(f"  avg comfort lift: {avg_lift:+.1f}")
         echo(f"  positive lifts:  {positive}/{len(revised_lifts)} ({100 * positive / len(revised_lifts):.0f}%)")
@@ -10157,27 +10162,46 @@ def ip_conflicts(
 
 
 @imitate_project_app.command("outline")
-def ip_outline(
+def imitate_project_outline(
     slug: str = typer.Argument(...),
+    chapter: int = typer.Option(0, "--chapter", help="Chapter index (0=all)"),
     use_llm: bool = typer.Option(False, "--use-llm"),
 ) -> None:
-    echo("TODO: implement in T2-T10")
+    """Generate chapter outline(s) (T8)."""
+    settings = _safe_settings()
+    session_factory = create_session_factory(settings)
+    with session_factory() as session:
+        from novel_analyzer.services.project_outline_service import ProjectOutlineService
+        svc = ProjectOutlineService(settings=settings, session=session)
+        if chapter > 0:
+            path = svc.generate_outline(slug, chapter, use_llm=use_llm)
+            echo(f"Outline: {path}")
+        else:
+            results = svc.generate_all(slug, use_llm=use_llm)
+            for o, s in results:
+                echo(f"  {o}")
+                echo(f"  {s}")
 
 
 @imitate_project_app.command("storyboard")
-def ip_storyboard(
+def imitate_project_storyboard(
     slug: str = typer.Argument(...),
+    chapter: int = typer.Option(0, "--chapter", help="Chapter index (0=all)"),
     use_llm: bool = typer.Option(False, "--use-llm"),
 ) -> None:
-    echo("TODO: implement in T2-T10")
-
-
-@imitate_project_app.command("prose")
-def ip_prose(
-    slug: str = typer.Argument(...),
-    use_llm: bool = typer.Option(False, "--use-llm"),
-) -> None:
-    echo("TODO: implement in T2-T10")
+    """Generate chapter storyboard(s) with scene beats (T8)."""
+    settings = _safe_settings()
+    session_factory = create_session_factory(settings)
+    with session_factory() as session:
+        from novel_analyzer.services.project_outline_service import ProjectOutlineService
+        svc = ProjectOutlineService(settings=settings, session=session)
+        if chapter > 0:
+            path = svc.generate_storyboard(slug, chapter, use_llm=use_llm)
+            echo(f"Storyboard: {path}")
+        else:
+            results = svc.generate_all(slug, use_llm=use_llm)
+            for _, s in results:
+                echo(f"  {s}")
 
 
 @imitate_project_app.command("revise")

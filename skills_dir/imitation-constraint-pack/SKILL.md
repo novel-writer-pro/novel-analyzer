@@ -12,6 +12,9 @@ Use this skill before any imitation draft is generated.
 - Branch context / state summary
 - Optional mapping pack
 - Optional previous carry-over state
+- `scene_beats` (optional): list of scene beat objects from storyboard.md. Each beat has: index, title, location, pov, lens_type, rhythm_tag, info_reveal, summary. When provided, use these beats to structure the draft chapter. When absent, fall back to source-chapter-skeleton extraction.
+
+Note: If scene_beats is empty or absent, use source chapter skeleton as before.
 
 ## Outputs
 - Hard constraints

@@ -277,19 +277,30 @@ class ProjectCompilerService:
             beat = Beat(index=idx, title=title)
             for line in block.splitlines():
                 line = line.strip()
-                if line.lower().startswith("location:"):
+                ll = line.lower()
+                if ll.startswith("location:") or line.startswith("场所:"):
                     beat.location = line.split(":", 1)[1].strip()
-                elif line.lower().startswith("pov:"):
+                elif ll.startswith("pov:"):
                     beat.pov = line.split(":", 1)[1].strip()
-                elif line.lower().startswith("lens:") or line.lower().startswith("lens_type:"):
+                elif (
+                    ll.startswith("lens:")
+                    or ll.startswith("lens_type:")
+                    or line.startswith("镜头类型:")
+                ):
                     beat.lens_type = line.split(":", 1)[1].strip()
-                elif line.lower().startswith("rhythm:") or line.lower().startswith("rhythm_tag:"):
+                elif (
+                    ll.startswith("rhythm:")
+                    or ll.startswith("rhythm_tag:")
+                    or line.startswith("节奏标签:")
+                ):
                     beat.rhythm_tag = line.split(":", 1)[1].strip()
-                elif line.lower().startswith("info_reveal:") or line.lower().startswith(
-                    "info reveal:"
+                elif (
+                    ll.startswith("info_reveal:")
+                    or ll.startswith("info reveal:")
+                    or line.startswith("信息释放:")
                 ):
                     beat.info_reveal = line.split(":", 1)[1].strip()
-                elif line.lower().startswith("summary:"):
+                elif ll.startswith("summary:") or line.startswith("内容草要:"):
                     beat.summary = line.split(":", 1)[1].strip()
             beats.append(beat)
         return beats

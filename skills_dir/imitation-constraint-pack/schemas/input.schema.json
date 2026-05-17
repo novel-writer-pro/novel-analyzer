@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ImitationConstraintPackInput",
+  "type": "object",
+  "properties": {
+    "worldview_note": {
+      "type": "string"
+    },
+    "rule_overrides": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "world_map": {
+      "type": "object",
+      "additionalProperties": {"type": "string"}
+    },
+    "character_map": {
+      "type": "object",
+      "additionalProperties": {"type": "string"}
+    },
+    "power_map": {
+      "type": "object",
+      "additionalProperties": {"type": "string"}
+    },
+    "target_goal": {
+      "type": "string"
+    },
+    "lock_assertions": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "trope_axes": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "innovation_directives": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "taboo_innovations": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "knowledge_refs": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "scene_beats": {
+      "type": "array",
+      "description": "Optional scene beats from storyboard.md. When absent, fall back to source-chapter-skeleton extraction.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "index": {"type": "integer"},
+          "title": {"type": "string"},
+          "location": {"type": "string"},
+          "pov": {"type": "string"},
+          "lens_type": {"type": "string"},
+          "rhythm_tag": {"type": "string"},
+          "info_reveal": {"type": "string"},
+          "summary": {"type": "string"}
+        },
+        "required": ["index", "title"]
+      }
+    }
+  }
+}
