@@ -389,21 +389,21 @@ Phase 5 🔄 进行中：读者模拟 + 多线调度 + 自适应编排（7/10 �
 
 ---
 
-## Phase 6 🔲：作家项目壳（Author Project Shell）
+## Phase 6 ✅：作家项目壳（Author Project Shell）
 
 ### 前提条件
 1. Phase 1-5 服务稳定运行
 
 ### 任务清单
 ✅ T1-T11: 项目骨架 + 7 层生成器 + ops 命令 + anti-slop checker
-🔲 T12: MVP 端到端验证（3 章正文 + loom-reference-eval）
-🔲 T13: 文档接入 Loom canonical 结构
-🔲 T14: 全量测试 + 零回归验证
+✅ T12: MVP 端到端验证（3 章正文 + loom-reference-eval fidelity=0.62）
+✅ T13: 文档接入 Loom canonical 结构（docs/loom/phase6/）
+✅ T14: 全量测试 + 零回归验证（89 Phase6 + 132 Loom1-5 全绿）
 
 ### 验收标准
-- [ ] imitate-project run <slug> --until prose 跑通 3 章
-- [ ] loom-reference-eval fidelity ≥ 0.5
-- [ ] 现有 Loom Phase 1-5 测试 100% pass（零回归）
+- [x] imitate-project run <slug> --until prose 跑通 3 章
+- [x] loom-reference-eval fidelity ≥ 0.5（实测 0.62）
+- [x] 现有 Loom Phase 1-5 测试 100% pass（零回归）
 
 ---
 

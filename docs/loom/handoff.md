@@ -37,12 +37,32 @@ Loom memory 层      →  carry_over_state 的 "组装器"（新增）
 
 ## 2. 当前工作状态
 
-### Phase 6 进行中（2026-05-17）
+### Phase 6 ✅ 完成（2026-05-17）
 
 **Changelist marker**: `CL-loom-phase6-author-shell-01`
 
-已完成：T1-T11（项目骨架 + 7 层生成器 + ops + anti-slop）
-待完成：T12 MVP 验证 + T13 文档 + T14 全量测试
+已完成：T1-T14 全部（项目骨架 + 7 层生成器 + ops + anti-slop + MVP + 文档 + 全量测试）
+
+**MVP 验证结果**：
+- `imitate-project run meiqian-new-story --until prose` 跑通 3 章正文 ✅
+- `loom-reference-eval` fidelity = 0.62（ch2，enhanced vs baseline 4.3x）✅
+- Loom Phase 1-5 测试 132 pass，零回归 ✅
+- 89 个 Phase 6 测试全绿 ✅
+
+**新增文件**（17 commits，91ca858..4c06c18）：
+- `novel_analyzer/domain/project_config.py` — ProjectConfig + LoomFlagsConfig
+- `novel_analyzer/services/project_shell_service.py` — 文件系统 artifact 管理
+- `novel_analyzer/services/project_compiler_service.py` — 7 层 → 9 steering flag + 5 Loom env var
+- `novel_analyzer/services/project_style_view_service.py` — 复用 Phase 4 style/rhythm 服务
+- `novel_analyzer/services/project_macro_service.py` — L1 大观生成
+- `novel_analyzer/services/project_characters_service.py` — L2 角色 + CharacterPersona 双向桥
+- `novel_analyzer/services/project_plot_service.py` — L3 剧情 + L4 冲突
+- `novel_analyzer/services/project_outline_service.py` — L5 章纲 + L6 分镜
+- `novel_analyzer/services/project_prose_service.py` — L7 正文编排（复用 harness-imitation）
+- `novel_analyzer/services/satire_anti_slop_service.py` — 6 类讽刺文反 AI slop 检测
+- `novel_analyzer/services/lock_contract_checker_service.py` — 锁定约束检查
+- `skills_dir/satire-anti-slop-guard/` — 新 skill（已注册到 list-skills）
+- `docs/loom/phase6/` — README + workflow + arch-alignment + runbook
 
 详见 [docs/loom/phase6/README.md](./phase6/README.md)
 

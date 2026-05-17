@@ -216,10 +216,10 @@
 
 ## I. 作家 UX 层（Author Project Shell）
 
-- [ ] 7 层 markdown 项目目录可跑通
-- [ ] imitate-project run --until prose 产出 3 章正文
-- [ ] loom-reference-eval fidelity ≥ 0.5
-- [ ] 作家可在任意层 revise/lock/diff
+- [x] 7 层 markdown 项目目录可跑通（output/projects/<slug>/）
+- [x] imitate-project run --until prose 产出 3 章正文（MVP: meiqian-new-story）
+- [x] loom-reference-eval fidelity ≥ 0.5（实测 0.62，enhanced vs baseline 4.3x）
+- [x] 作家可在任意层 revise/lock/diff（ops 命令全部实现）
 
 ---
 
