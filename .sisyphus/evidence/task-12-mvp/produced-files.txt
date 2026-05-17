@@ -1,0 +1,29 @@
+output/projects/meiqian-new-story/book.config.yaml
+output/projects/meiqian-new-story/chapters/ch001.draft.md
+output/projects/meiqian-new-story/chapters/ch001.outline.md
+output/projects/meiqian-new-story/chapters/ch001.storyboard.md
+output/projects/meiqian-new-story/chapters/ch002.draft.md
+output/projects/meiqian-new-story/chapters/ch002.outline.md
+output/projects/meiqian-new-story/chapters/ch002.storyboard.md
+output/projects/meiqian-new-story/chapters/ch003.draft.md
+output/projects/meiqian-new-story/chapters/ch003.outline.md
+output/projects/meiqian-new-story/chapters/ch003.storyboard.md
+output/projects/meiqian-new-story/characters/antagonist.md
+output/projects/meiqian-new-story/characters/female_lead.md
+output/projects/meiqian-new-story/characters/mentor.md
+output/projects/meiqian-new-story/characters/protagonist.md
+output/projects/meiqian-new-story/conflicts/axes.md
+output/projects/meiqian-new-story/conflicts/innovation.md
+output/projects/meiqian-new-story/conflicts/taboo.md
+output/projects/meiqian-new-story/locked.yaml
+output/projects/meiqian-new-story/macro/premise.md
+output/projects/meiqian-new-story/macro/world.md
+output/projects/meiqian-new-story/plot/arcs.md
+output/projects/meiqian-new-story/plot/chapter_goals.md
+output/projects/meiqian-new-story/plot/continuity.md
+output/projects/meiqian-new-story/style/fingerprint.md
+output/projects/meiqian-new-story/style/heuristics.json
+ 1851 output/projects/meiqian-new-story/chapters/ch001.draft.md
+ 1478 output/projects/meiqian-new-story/chapters/ch002.draft.md
+ 1861 output/projects/meiqian-new-story/chapters/ch003.draft.md
+ 5190 total

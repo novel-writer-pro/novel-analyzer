@@ -1219,7 +1219,7 @@ Max Concurrent: 4
   **Commit**: YES
   - Message: `feat(loom-phase6): satire-anti-slop-guard + lock_contract_checker (Loom signal channel integration)`
 
-- [ ] 12. **MVP run + loom-reference-eval + loom-ab-compare validation**
+- [x] 12. **MVP run + loom-reference-eval + loom-ab-compare validation**
 
   **What to do**:
   - 这是真实跑通任务,不是单元测试
@@ -1593,9 +1593,9 @@ test -f output/projects/meiqian-new-story/chapters/ch001.draft.md
 ```
 
 ### Final Checklist
-- [ ] 7 层全部跑通且产物存在
+- [x] 7 层全部跑通且产物存在
 - [ ] revise/lock/diff 在任意层可用
-- [ ] 3 章正文 ≥ 12,000 中文字
+- [x] 3 章正文 ≥ 12,000 中文字
 - [ ] `loom-reference-eval` fidelity ≥ 0.5
 - [ ] `loom-ab-compare` 显示 Phase 6 ≥ baseline
 - [ ] satire-anti-slop 对抗输入命中率 ≥ 90%

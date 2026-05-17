@@ -10063,8 +10063,15 @@ app.add_typer(imitate_project_app)
 
 
 @imitate_project_app.command("init")
-def ip_init(slug: str = typer.Argument(...)) -> None:
-    echo("TODO: implement in T2-T10")
+def ip_init(
+    slug: str = typer.Argument(...),
+    source_branch_id: str = typer.Option(..., "--source-branch-id", help="Source branch ID"),
+    target_chapters: int = typer.Option(3, "--target-chapters"),
+) -> None:
+    from novel_analyzer.services.project_shell_service import ProjectShellService
+    shell = ProjectShellService()
+    cfg = shell.init(slug, source_branch_id=source_branch_id, target_chapters=target_chapters)
+    echo(f"Project initialized: {cfg.slug} (source={source_branch_id}, chapters={cfg.target_chapters})")
 
 
 @imitate_project_app.command("fingerprint")
