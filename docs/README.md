@@ -83,7 +83,7 @@
 Level 0 (本文件)
   │
   ├── Level 1: 核心文档 (6 份，必读)
-  │     cli-operations-manual / direct-usage-guide / api-current-surface
+  │     cli-operations-manual / api-current-surface / interface-manifest
   │     interface-manifest / roadmap-sota / handoff-sota
   │
   ├── Level 2: 能力线文档 (按需深入)

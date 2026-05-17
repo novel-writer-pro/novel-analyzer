@@ -7,7 +7,7 @@
 > **互补文档**：
 > - [ops-debug-manual-20260514.md](./ops-debug-manual-20260514.md) — 环境自检 + 命令速查
 > - [chapter-imitation-capability-matrix.md](./chapter-imitation-capability-matrix.md) — 能力总表
-> - [whole-book-mapping-scale-20260514.md](./whole-book-mapping-scale-20260514.md) — 跨题材验证基线
+> - [whole-book-mapping-scale-20260514.md](./deprecated/whole-book-reports/whole-book-mapping-scale-20260514.md) — 跨题材验证基线
 
 ---
 

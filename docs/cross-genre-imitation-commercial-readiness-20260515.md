@@ -8,7 +8,7 @@
 
 ## 1. 已就绪：技术指标证据
 
-### 1.1 核心质量指标（来自 [whole-book-mapping-scale-20260514.md](./whole-book-mapping-scale-20260514.md)）
+### 1.1 核心质量指标（来自 [whole-book-mapping-scale-20260514.md](./deprecated/whole-book-reports/whole-book-mapping-scale-20260514.md)）
 
 | 测试 | 章数 | 字数 | mapping items | full pass | mapping accuracy |
 |---|---:|---:|---:|---|---|
@@ -278,7 +278,7 @@
 
 - [chapter-imitation-capability-matrix.md](./chapter-imitation-capability-matrix.md) — 全能力矩阵（含未就绪能力）
 - [baseline-imitation-quality-validation-handoff-20260515.md](./baseline-imitation-quality-validation-handoff-20260515.md) — 同题材修复后验证步骤
-- [whole-book-mapping-scale-20260514.md](./whole-book-mapping-scale-20260514.md) — mapping 规模化数据
+- [whole-book-mapping-scale-20260514.md](./deprecated/whole-book-reports/whole-book-mapping-scale-20260514.md) — mapping 规模化数据
 - [whole-book-imitation-docs-index.md](./whole-book-imitation-docs-index.md) — 接入契约总入口
 - [ops-debug-manual-20260514.md](./ops-debug-manual-20260514.md) — 运维调试速查
 - [whole-book-imitation-provider-recovery-checklist.md](./whole-book-imitation-provider-recovery-checklist.md) — provider failure 手动 ops（即将被 Gap 4 router 替代）
