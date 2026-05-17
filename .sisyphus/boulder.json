@@ -50,11 +50,24 @@
       "status": "completed",
       "ended_at": "2026-05-17T02:41:18.006Z",
       "elapsed_ms": 196533
+    },
+    "todo:11": {
+      "task_key": "todo:11",
+      "task_label": "11",
+      "task_title": "**satire-anti-slop-guard skill + checker + lock_contract_checker**",
+      "session_id": "current",
+      "agent": "Sisyphus-Junior",
+      "category": "artistry",
+      "updated_at": "2026-05-17T03:30:00.000Z",
+      "started_at": "2026-05-17T03:20:00.000Z",
+      "status": "completed",
+      "ended_at": "2026-05-17T03:30:00.000Z",
+      "elapsed_ms": 600000
     }
   },
   "active_work_id": "loom-phase-6-author-shell-c456c7b9",
-  "status": "active",
-  "updated_at": "2026-05-17T02:41:18.006Z",
+  "status": "completed",
+  "updated_at": "2026-05-17T04:23:22.366Z",
   "schema_version": 2,
   "works": {
     "v5-fastapi-cutover-legacy": {
@@ -71,9 +84,9 @@
       "work_id": "loom-phase-6-author-shell-c456c7b9",
       "active_plan": "/home/user/novel-analyzer/.sisyphus/plans/loom-phase-6-author-shell.md",
       "plan_name": "loom-phase-6-author-shell",
-      "status": "active",
+      "status": "completed",
       "started_at": "2026-05-17T01:47:35.683Z",
-      "updated_at": "2026-05-17T02:41:18.006Z",
+      "updated_at": "2026-05-17T04:23:22.366Z",
       "session_ids": [
         "ses_1ccc68bacffevjKAzMF8AN7ZTb"
       ],
@@ -134,7 +147,11 @@
           "ended_at": "2026-05-17T03:30:00.000Z",
           "elapsed_ms": 600000
         }
-      }
+      },
+      "ended_at": "2026-05-17T04:23:22.366Z",
+      "elapsed_ms": 9346683
     }
-  }
+  },
+  "ended_at": "2026-05-17T04:23:22.366Z",
+  "elapsed_ms": 9346683
 }

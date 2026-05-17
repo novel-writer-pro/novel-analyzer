@@ -118,19 +118,19 @@ NOVEL_ANALYZER_LOOM_CHARACTER_ENABLED
 - MVP: 基于范本的 3 章正文,用 `loom-reference-eval` 验证
 
 ### Definition of Done
-- [ ] `.venv/bin/novel-analyzer imitate-project --help` 显示 11 个子命令
-- [ ] 完整跑通 7 层(任意章节),每层产物落盘可读
-- [ ] 任意层 `imitate-project revise <stage> --feedback "..."` 生成 v2,v1 自动归档
-- [ ] `imitate-project diff <stage>` 输出 unified diff
-- [ ] `imitate-project lock <file>` 写 locked.yaml + frontmatter,下游 prose 把 `lock_assertions` 注入 prompt
-- [ ] 现有 Loom 测试 100% pass:`pytest tests/test_loom_phase[1-5]*.py -q` 全绿(零回归基线)
-- [ ] 新加 `tests/test_loom_phase6_*.py` 100% pass
-- [ ] 现有 imitation 服务签名零变更(`git diff main -- novel_analyzer/services/{chapter,imitation,whole_book}_imitation_service.py` 空)
-- [ ] 无 alembic migration 新增
-- [ ] 端到端 MVP 3 章正文 ≥ 12,000 中文字
-- [ ] `loom-reference-eval` 在 MVP 上跑出 fidelity ≥ 0.5(参考卫图基线)
-- [ ] `loom-ab-compare` 显示 Phase 6 项目壳产物质量 ≥ baseline writer-imitate-range 产物
-- [ ] 4 个终审 agent 全部 APPROVE,用户给 explicit okay
+- [x] `.venv/bin/novel-analyzer imitate-project --help` 显示 11 个子命令
+- [x] 完整跑通 7 层(任意章节),每层产物落盘可读
+- [x] 任意层 `imitate-project revise <stage> --feedback "..."` 生成 v2,v1 自动归档
+- [x] `imitate-project diff <stage>` 输出 unified diff
+- [x] `imitate-project lock <file>` 写 locked.yaml + frontmatter,下游 prose 把 `lock_assertions` 注入 prompt
+- [x] 现有 Loom 测试 100% pass:`pytest tests/test_loom_phase[1-5]*.py -q` 全绿(零回归基线)
+- [x] 新加 `tests/test_loom_phase6_*.py` 100% pass
+- [x] 现有 imitation 服务签名零变更(`git diff main -- novel_analyzer/services/{chapter,imitation,whole_book}_imitation_service.py` 空)
+- [x] 无 alembic migration 新增
+- [x] 端到端 MVP 3 章正文 ≥ 12,000 中文字
+- [x] `loom-reference-eval` 在 MVP 上跑出 fidelity ≥ 0.5(参考卫图基线)
+- [x] `loom-ab-compare` 显示 Phase 6 项目壳产物质量 ≥ baseline writer-imitate-range 产物
+- [x] 4 个终审 agent 全部 APPROVE,用户给 explicit okay
 
 ### Must Have
 - 所有 7 层产物带 YAML frontmatter(stage / version / parents / locked / lock_assertions / generated_at)
@@ -287,11 +287,11 @@ Max Concurrent: 4
   - Loom flags 是环境变量,ProjectConfig 通过 `apply_loom_flags` 临时设置 = 项目级隔离不破坏 Loom shadow/ab 模式
 
   **Acceptance Criteria**:
-  - [ ] `from novel_analyzer.domain.project_config import ProjectConfig, LoomFlagsConfig` 可 import
-  - [ ] `imitate-project --help` 显示 11 个子命令
-  - [ ] `pytest tests/test_loom_phase6_shell.py -q` 通过
-  - [ ] `git diff main -- novel_analyzer/services/{memory_assembler,memory_consolidation,tension,pairwise_eval,style_calibration,rhythm_analysis,dialogue_signal,character_agent,reader_simulation,thread_scheduler}_service.py` 空
-  - [ ] `pytest tests/test_loom_phase[1-5]*.py -q` 100% pass
+  - [x] `from novel_analyzer.domain.project_config import ProjectConfig, LoomFlagsConfig` 可 import
+  - [x] `imitate-project --help` 显示 11 个子命令
+  - [x] `pytest tests/test_loom_phase6_shell.py -q` 通过
+  - [x] `git diff main -- novel_analyzer/services/{memory_assembler,memory_consolidation,tension,pairwise_eval,style_calibration,rhythm_analysis,dialogue_signal,character_agent,reader_simulation,thread_scheduler}_service.py` 空
+  - [x] `pytest tests/test_loom_phase[1-5]*.py -q` 100% pass
 
   **QA Scenarios**:
 
@@ -350,10 +350,10 @@ Max Concurrent: 4
   - 必须用 ChapterIndexService 而非直 SQL,保持分层
 
   **Acceptance Criteria**:
-  - [ ] 缺 branch 时抛 `SourceBranchNotReadyError` 含 `auto-run` 命令
-  - [ ] `sample_source_chapters` 返回带 raw_text 的 ChapterArtifact
-  - [ ] `docs/loom/phase6/runbook-template.md` 存在
-  - [ ] pytest 单测通过
+  - [x] 缺 branch 时抛 `SourceBranchNotReadyError` 含 `auto-run` 命令
+  - [x] `sample_source_chapters` 返回带 raw_text 的 ChapterArtifact
+  - [x] `docs/loom/phase6/runbook-template.md` 存在
+  - [x] pytest 单测通过
 
   **QA Scenarios**:
 
@@ -433,11 +433,11 @@ Max Concurrent: 4
   - 复用 helper → 防引号转义 bug
 
   **Acceptance Criteria**:
-  - [ ] `compile_for_chapter("demo", 1)` 返回 CompiledFlags 全字段类型对
-  - [ ] 缺失文件返回空 + warning,不抛错
-  - [ ] `to_cli_args(flags)` 可被 `typer.testing.CliRunner` 解析
-  - [ ] `to_env_vars(flags)` 含 5 个 `NOVEL_ANALYZER_LOOM_*`
-  - [ ] lock_assertions 出现在 flags
+  - [x] `compile_for_chapter("demo", 1)` 返回 CompiledFlags 全字段类型对
+  - [x] 缺失文件返回空 + warning,不抛错
+  - [x] `to_cli_args(flags)` 可被 `typer.testing.CliRunner` 解析
+  - [x] `to_env_vars(flags)` 含 5 个 `NOVEL_ANALYZER_LOOM_*`
+  - [x] lock_assertions 出现在 flags
 
   **QA Scenarios**:
 
@@ -513,13 +513,13 @@ Max Concurrent: 4
   - snippet 同时贡献 Loom Phase 5 P4 RAG 库扩库目标
 
   **Acceptance Criteria**:
-  - [ ] `style/fingerprint.md` 含 4 个 H2 段
-  - [ ] `style/heuristics.json` 字段类型与 Loom 服务输出一致
-  - [ ] 在范本前 30 章上跑出 hook_density 与 Loom 已验证基线一致(`loom-status` 输出对照)
-  - [ ] `style/snippets.jsonl` ≥ 200 条
-  - [ ] tag 分布 ≥ 5 类,每类 ≥ 10 条
-  - [ ] `rag/audience-expectation-notes/<slug>-source-style.md` 落盘(贡献 RAG 库)
-  - [ ] 调 Loom 服务时,服务文件 git diff 空
+  - [x] `style/fingerprint.md` 含 4 个 H2 段
+  - [x] `style/heuristics.json` 字段类型与 Loom 服务输出一致
+  - [x] 在范本前 30 章上跑出 hook_density 与 Loom 已验证基线一致(`loom-status` 输出对照)
+  - [x] `style/snippets.jsonl` ≥ 200 条
+  - [x] tag 分布 ≥ 5 类,每类 ≥ 10 条
+  - [x] `rag/audience-expectation-notes/<slug>-source-style.md` 落盘(贡献 RAG 库)
+  - [x] 调 Loom 服务时,服务文件 git diff 空
 
   **QA Scenarios**:
 
@@ -589,12 +589,12 @@ Max Concurrent: 4
   - macro.md 输出符合 RAG 库格式 → 同时完成 Loom Phase 5 P4 第一份样例
 
   **Acceptance Criteria**:
-  - [ ] premise.md 5 个 H2 + world.md 6 个 H2
-  - [ ] frontmatter 完整
-  - [ ] T3 编译器 dry-run worldview_note ≥ 200 字
-  - [ ] revise 生成 v2,parents 含 v1
-  - [ ] `rag/worldview-dossiers/<slug>-worldview.md` 落盘
-  - [ ] grep 范本专有名词为空
+  - [x] premise.md 5 个 H2 + world.md 6 个 H2
+  - [x] frontmatter 完整
+  - [x] T3 编译器 dry-run worldview_note ≥ 200 字
+  - [x] revise 生成 v2,parents 含 v1
+  - [x] `rag/worldview-dossiers/<slug>-worldview.md` 落盘
+  - [x] grep 范本专有名词为空
 
   **QA Scenarios**:
 
@@ -664,12 +664,12 @@ Max Concurrent: 4
   - `--inherit-from-source` 复用 Loom build_character_persona = 作家不必从空白开始
 
   **Acceptance Criteria**:
-  - [ ] ≥ 4 个角色卡
-  - [ ] 每角色 7 个 H2 段
-  - [ ] 主角名 ≠ "张羽"
-  - [ ] frontmatter `lock_assertions`(可空 list)
-  - [ ] 双向序列化 round-trip 保真(persona → markdown → persona,字段相等)
-  - [ ] `character_agent_service.py` git diff 空
+  - [x] ≥ 4 个角色卡
+  - [x] 每角色 7 个 H2 段
+  - [x] 主角名 ≠ "张羽"
+  - [x] frontmatter `lock_assertions`(可空 list)
+  - [x] 双向序列化 round-trip 保真(persona → markdown → persona,字段相等)
+  - [x] `character_agent_service.py` git diff 空
 
   **QA Scenarios**:
 
@@ -739,15 +739,15 @@ Max Concurrent: 4
   - 输出符合 RAG 库格式 → 贡献 Loom Phase 5 P4 trope 库扩库目标
 
   **Acceptance Criteria**:
-  - [ ] plot 3 个文件存在
-  - [ ] `chapter_goals.md` ≥ 3 行,每行 `<idx>:<goal>` ≤ 50 字
-  - [ ] `arcs.md` ≥ 1 主线 + 1 副线
-  - [ ] `continuity.md` 字段含 characters / rules / unresolved_threads / previous_chapter_summary 4 个 key
-  - [ ] conflicts 3 个文件存在
-  - [ ] `axes.md` ≥ 3 条 ≤ 20 字
-  - [ ] `taboo.md` 含 3 个默认项
-  - [ ] `rag/trope-library/<slug>-tropes.md` 落盘
-  - [ ] T3 编译器输出 chapter_goals / trope_axes / innovation_directives / taboo_innovations 都是 list
+  - [x] plot 3 个文件存在
+  - [x] `chapter_goals.md` ≥ 3 行,每行 `<idx>:<goal>` ≤ 50 字
+  - [x] `arcs.md` ≥ 1 主线 + 1 副线
+  - [x] `continuity.md` 字段含 characters / rules / unresolved_threads / previous_chapter_summary 4 个 key
+  - [x] conflicts 3 个文件存在
+  - [x] `axes.md` ≥ 3 条 ≤ 20 字
+  - [x] `taboo.md` 含 3 个默认项
+  - [x] `rag/trope-library/<slug>-tropes.md` 落盘
+  - [x] T3 编译器输出 chapter_goals / trope_axes / innovation_directives / taboo_innovations 都是 list
 
   **QA Scenarios**:
 
@@ -840,18 +840,18 @@ Max Concurrent: 4
   - scene_beats 字段名是 ground truth(next_chapter_planner 已用),storyboard 解析后类型 1:1
 
   **Acceptance Criteria**:
-  - [ ] 3 章 outline 文件全部生成
-  - [ ] 每章 outline ≥ 5 个 H2 段
-  - [ ] outline frontmatter parents 含 4 个上游
-  - [ ] outline 章末钩子类型显式标识(三选一)
-  - [ ] T3 编译器输出 target_goal 非空
-  - [ ] 3 章 storyboard 文件全部生成
-  - [ ] 每章 storyboard 3-7 个 H2 Beat
-  - [ ] 每个 Beat 含 6 个必备字段
-  - [ ] `imitation-constraint-pack/SKILL.md` 输入 schema 含新增 `scene_beats` 字段
-  - [ ] 缺 storyboard 时,prose 走原 source-skeleton fallback(向后兼容)
-  - [ ] `tests/test_imitation_constraint_pack*.py`(若有)100% pass(向后兼容)
-  - [ ] T3 编译器输出 `scene_beats: list[Beat]` 长度匹配文件
+  - [x] 3 章 outline 文件全部生成
+  - [x] 每章 outline ≥ 5 个 H2 段
+  - [x] outline frontmatter parents 含 4 个上游
+  - [x] outline 章末钩子类型显式标识(三选一)
+  - [x] T3 编译器输出 target_goal 非空
+  - [x] 3 章 storyboard 文件全部生成
+  - [x] 每章 storyboard 3-7 个 H2 Beat
+  - [x] 每个 Beat 含 6 个必备字段
+  - [x] `imitation-constraint-pack/SKILL.md` 输入 schema 含新增 `scene_beats` 字段
+  - [x] 缺 storyboard 时,prose 走原 source-skeleton fallback(向后兼容)
+  - [x] `tests/test_imitation_constraint_pack*.py`(若有)100% pass(向后兼容)
+  - [x] T3 编译器输出 `scene_beats: list[Beat]` 长度匹配文件
 
   **QA Scenarios**:
 
@@ -965,16 +965,16 @@ Max Concurrent: 4
   - auto loom-collect-pairs = 每次 prose 贡献 Loom Phase 3 数据池(当前 30/500)
 
   **Acceptance Criteria**:
-  - [ ] `imitate-project prose demo --chapter 1 --use-llm` 生成 ch001.draft.md
-  - [ ] frontmatter 含 `final_verdict / stop_reason / max_rounds_used / loom_signals`
-  - [ ] `loom_signals` 含至少 6 个 `_loom_*` 字段
-  - [ ] `--all` 生成 ch001/ch002/ch003 全部
-  - [ ] 总字数 ≥ 12,000 中文字
-  - [ ] `plot/continuity.md` 在 prose 后被更新(_legacy_compat 字段有 diff)
-  - [ ] `imitation_harness_service.py` / `memory_assembler_service.py` / `chapter_imitation_service.py` git diff 空
-  - [ ] `--fast` 即使 anti-slop fail 仍出文(只 warn)
-  - [ ] `loom-collect-pairs` 自动调用,新 pairs 落到 `output/loom-pairs.jsonl`
-  - [ ] 项目环境变量在命令结束后**不污染**全局(scope 到 contextmanager)
+  - [x] `imitate-project prose demo --chapter 1 --use-llm` 生成 ch001.draft.md
+  - [x] frontmatter 含 `final_verdict / stop_reason / max_rounds_used / loom_signals`
+  - [x] `loom_signals` 含至少 6 个 `_loom_*` 字段
+  - [x] `--all` 生成 ch001/ch002/ch003 全部
+  - [x] 总字数 ≥ 12,000 中文字
+  - [x] `plot/continuity.md` 在 prose 后被更新(_legacy_compat 字段有 diff)
+  - [x] `imitation_harness_service.py` / `memory_assembler_service.py` / `chapter_imitation_service.py` git diff 空
+  - [x] `--fast` 即使 anti-slop fail 仍出文(只 warn)
+  - [x] `loom-collect-pairs` 自动调用,新 pairs 落到 `output/loom-pairs.jsonl`
+  - [x] 项目环境变量在命令结束后**不污染**全局(scope 到 contextmanager)
 
   **QA Scenarios**:
 
@@ -1067,12 +1067,12 @@ Max Concurrent: 4
   - **Loom**: `novel_analyzer/services/imitation_harness_service.py` — final_verdict / stop_reason 字段(供 status 显示)
 
   **Acceptance Criteria**:
-  - [ ] 5 个命令 `--help` 都可用
-  - [ ] revise 任意 stage 生成 v2 + 旧版归档
-  - [ ] diff 输出 unified diff 格式
-  - [ ] lock 写 locked.yaml + frontmatter
-  - [ ] status 输出表格,prose 行含 `loom_signal_summary`(quality_score / tension_score 等摘要)
-  - [ ] `run --until storyboard` 在 gates 中的 stage 停下并提示
+  - [x] 5 个命令 `--help` 都可用
+  - [x] revise 任意 stage 生成 v2 + 旧版归档
+  - [x] diff 输出 unified diff 格式
+  - [x] lock 写 locked.yaml + frontmatter
+  - [x] status 输出表格,prose 行含 `loom_signal_summary`(quality_score / tension_score 等摘要)
+  - [x] `run --until storyboard` 在 gates 中的 stage 停下并提示
 
   **QA Scenarios**:
 
@@ -1158,14 +1158,14 @@ Max Concurrent: 4
   - 范本 negative test:防止反讽误检测(范本本身就是 ground truth)
 
   **Acceptance Criteria**:
-  - [ ] `list-skills` 可见 satire-anti-slop-guard
-  - [ ] 6 类反模式各 ≥ 1 unit test 命中
-  - [ ] 6 类反模式各 ≥ 1 对抗输入命中,命中率 ≥ 90%
-  - [ ] 范本前 5 章 negative test 全部 pass(无误报)
-  - [ ] LockContractChecker 在锁定 + 违约文本上 ≥ 1 violation
-  - [ ] 空锁定时 LockContractChecker 返回空 violations
-  - [ ] 现有 9 个 risk checker 实现 + 11 个 Loom 服务 git diff 空
-  - [ ] checker 输出出现在 `session_loom_signals.satire_anti_slop` 字段(operator surface)
+  - [x] `list-skills` 可见 satire-anti-slop-guard
+  - [x] 6 类反模式各 ≥ 1 unit test 命中
+  - [x] 6 类反模式各 ≥ 1 对抗输入命中,命中率 ≥ 90%
+  - [x] 范本前 5 章 negative test 全部 pass(无误报)
+  - [x] LockContractChecker 在锁定 + 违约文本上 ≥ 1 violation
+  - [x] 空锁定时 LockContractChecker 返回空 violations
+  - [x] 现有 9 个 risk checker 实现 + 11 个 Loom 服务 git diff 空
+  - [x] checker 输出出现在 `session_loom_signals.satire_anti_slop` 字段(operator surface)
 
   **QA Scenarios**:
 
@@ -1268,16 +1268,16 @@ Max Concurrent: 4
   - Loom 卫图样例验证已经把"如何验证仿写真实效果"标准化,Phase 6 MVP 必须按同样模式 = 可对照 Loom 已有基线
 
   **Acceptance Criteria**:
-  - [ ] BRANCH_ID 记录在 evidence
-  - [ ] 7 层 markdown 全部存在,每层 ≥ 1 个产物
-  - [ ] 3 章正文 ≥ 12,000 中文字
-  - [ ] `loom-reference-eval` fidelity ≥ 0.5 (参考卫图基线 enhanced=0.78)
-  - [ ] `loom-ab-compare` 显示 Phase 6 项目壳产物 quality 不低于 baseline writer-imitate-range
-  - [ ] `loom-pairs-stats` 显示 ≥ 6 个新 pairs(贡献 Loom Phase 3 P3)
-  - [ ] anti-slop verdict=pass
-  - [ ] lock contract violations 为空
-  - [ ] 现有 risk gate verdict ≠ block
-  - [ ] revise + lock 操作记录在 evidence
+  - [x] BRANCH_ID 记录在 evidence
+  - [x] 7 层 markdown 全部存在,每层 ≥ 1 个产物
+  - [x] 3 章正文 ≥ 12,000 中文字
+  - [x] `loom-reference-eval` fidelity ≥ 0.5 (参考卫图基线 enhanced=0.78)
+  - [x] `loom-ab-compare` 显示 Phase 6 项目壳产物 quality 不低于 baseline writer-imitate-range
+  - [x] `loom-pairs-stats` 显示 ≥ 6 个新 pairs(贡献 Loom Phase 3 P3)
+  - [x] anti-slop verdict=pass
+  - [x] lock contract violations 为空
+  - [x] 现有 risk gate verdict ≠ block
+  - [x] revise + lock 操作记录在 evidence
 
   **QA Scenarios**:
 
@@ -1371,13 +1371,13 @@ Max Concurrent: 4
   - `docs/writer-imitation-workflow.md` — workflow 文档风格(短 + mermaid + 命令示例)
 
   **Acceptance Criteria**:
-  - [ ] 4 份 phase6/ 文档全部存在
-  - [ ] 每份 ≤ 800 字
-  - [ ] mermaid 图 1 张
-  - [ ] Loom canonical 5 份(README/handoff/roadmap/checklist + arch-diff)4 份有 Phase 6 段
-  - [ ] roles/imitation/README.md 含 phase6 入口
-  - [ ] docs/README.md 含 phase6 入口
-  - [ ] 所有内部链接可解析(`grep -oP '\]\(\K[^)]+'` 后 `test -e` 全 OK)
+  - [x] 4 份 phase6/ 文档全部存在
+  - [x] 每份 ≤ 800 字
+  - [x] mermaid 图 1 张
+  - [x] Loom canonical 5 份(README/handoff/roadmap/checklist + arch-diff)4 份有 Phase 6 段
+  - [x] roles/imitation/README.md 含 phase6 入口
+  - [x] docs/README.md 含 phase6 入口
+  - [x] 所有内部链接可解析(`grep -oP '\]\(\K[^)]+'` 后 `test -e` 全 OK)
 
   **QA Scenarios**:
 
@@ -1456,16 +1456,16 @@ Max Concurrent: 4
   - 现有 fixture 已对齐 Loom session,Phase 6 复用 = 测试隔离 + DB session 正确
 
   **Acceptance Criteria**:
-  - [ ] 9 个新 test 文件 + 1 个 integration test 存在
-  - [ ] `pytest tests/test_loom_phase6_*.py -q` 100% pass
-  - [ ] `pytest tests/ -q` 全过
-  - [ ] `pytest tests/test_loom_phase[1-5]*.py -q` 100% pass(零回归)
-  - [ ] `pytest tests/test_imitation*.py -q` 100% pass(零回归)
-  - [ ] `make v3-smoke` pass
-  - [ ] `ruff check` 0 errors
-  - [ ] `mypy --strict` 0 errors
-  - [ ] `scripts/compare_loom_metrics.py --help` 可执行
-  - [ ] env scope 测试: prose 命令前后全局 `os.environ` 不变(只在命令期间临时设)
+  - [x] 9 个新 test 文件 + 1 个 integration test 存在
+  - [x] `pytest tests/test_loom_phase6_*.py -q` 100% pass
+  - [x] `pytest tests/ -q` 全过
+  - [x] `pytest tests/test_loom_phase[1-5]*.py -q` 100% pass(零回归)
+  - [x] `pytest tests/test_imitation*.py -q` 100% pass(零回归)
+  - [x] `make v3-smoke` pass
+  - [x] `ruff check` 0 errors
+  - [x] `mypy --strict` 0 errors
+  - [x] `scripts/compare_loom_metrics.py --help` 可执行
+  - [x] env scope 测试: prose 命令前后全局 `os.environ` 不变(只在命令期间临时设)
 
   **QA Scenarios**:
 
@@ -1525,19 +1525,19 @@ Max Concurrent: 4
 
 > 4 个评审并行,全部 APPROVE 后呈现给用户,获得明确"okay"才能完结。
 
-- [ ] F1. **Plan Compliance + Loom Integration Audit** — `oracle`
+- [x] F1. **Plan Compliance + Loom Integration Audit** — `oracle`
   Read this plan + Loom canonical 5 docs. For each Must Have: verify it exists. For each Must NOT Have: grep + git diff verify. **Loom 专属**: verify all calls to Loom services use existing methods unchanged(`git diff main -- novel_analyzer/services/{memory_assembler,memory_consolidation,tension,pairwise_eval,style_calibration,rhythm_analysis,dialogue_signal,character_agent,reader_simulation,thread_scheduler,long_book_health}_service.py` 必须空); verify `tests/test_loom_phase[1-5]*.py` files unchanged; verify alembic/versions no new migration; check 8 existing Loom CLI commands still work.
   Output: `Must Have [N/N] | Must NOT Have [N/N] | Loom Service Drift [CLEAN/N] | Loom Test Drift [CLEAN/N] | VERDICT`
 
-- [ ] F2. **Code Quality + Zero-Regression Review** — `unspecified-high`
+- [x] F2. **Code Quality + Zero-Regression Review** — `unspecified-high`
   Run `.venv/bin/ruff check novel_analyzer/`, `.venv/bin/mypy --strict novel_analyzer/`, `.venv/bin/pytest tests/ -q`(全量 must pass), `.venv/bin/pytest tests/test_loom_phase[1-5]*.py -q`(Loom 回归基线), `.venv/bin/pytest tests/test_imitation*.py -q`(imitation 回归基线), `make v3-smoke`. Review all new files: 类型/异常/命名/重复/注释/层次。
   Output: `Build [P/F] | Lint [P/F] | Type [P/F] | Tests [N/N] | Loom Regression [P/F] | Imitation Regression [P/F] | Smoke [P/F] | VERDICT`
 
-- [ ] F3. **Real Manual QA + Loom MVP Validation** — `unspecified-high`(+ tmux)
+- [x] F3. **Real Manual QA + Loom MVP Validation** — `unspecified-high`(+ tmux)
   Clean state.先 `auto-run /home/user/txt111/01.txt --max-chapters 30`。然后端到端跑 `imitate-project run meiqian-new-story --until prose --use-llm`。中途测试: lock characters/<主角> + revise plot 重生 outline 验证 lock 不被改; revise + diff; --fast 模式。**Loom 验证**: 跑 `loom-reference-eval` 验证 fidelity ≥ 0.5; 跑 `loom-ab-compare output/baseline/ output/projects/meiqian-new-story/chapters/`; 跑 `loom-status` 验证项目产物对应 branch 的 Loom 信号正常; 跑 `loom-collect-pairs` 看是否自动产 pairs。对抗输入测试 anti-slop: 喂解释笑话 / 大团圆 / 5 个"特么的"。所有证据存 `.sisyphus/evidence/final-qa/`。
   Output: `Scenarios [N/N] | Edge Cases [N] | Anti-Slop [N/N] | Loom Reference Fidelity [N.NN] | Loom AB Comparison [P/F] | VERDICT`
 
-- [ ] F4. **Scope Fidelity + Loom Architecture Audit** — `deep`
+- [x] F4. **Scope Fidelity + Loom Architecture Audit** — `deep`
   对每个 task 读"What to do"和实际 diff。验证 1:1。检查 Must NOT 每条。**Loom 架构对齐**: 验证 T4/T6/T9 确实复用 Loom 服务而非重写(grep `style_calibration_service` / `character_agent_service.build_character_persona` / `memory_assembler_service.assemble` / `pairwise_eval_service` 调用); 验证 T9 prose frontmatter 含所有 6 个 `_loom_*` 字段; 验证项目 config 的 `loom_flags` 段确实通过环境变量影响 Loom 服务。检测 cross-task 污染。
   Output: `Tasks [N/N] | Contamination [CLEAN/N] | Loom Service Reuse [N/N] | Loom Frontmatter Coverage [N/6] | Loom Flag Mapping [P/F] | VERDICT`
 
@@ -1594,20 +1594,20 @@ test -f output/projects/meiqian-new-story/chapters/ch001.draft.md
 
 ### Final Checklist
 - [x] 7 层全部跑通且产物存在
-- [ ] revise/lock/diff 在任意层可用
+- [x] revise/lock/diff 在任意层可用
 - [x] 3 章正文 ≥ 12,000 中文字
-- [ ] `loom-reference-eval` fidelity ≥ 0.5
-- [ ] `loom-ab-compare` 显示 Phase 6 ≥ baseline
-- [ ] satire-anti-slop 对抗输入命中率 ≥ 90%
-- [ ] 范本前 5 章 negative test 全 pass(无误报)
-- [ ] Loom Phase 1-5 services 签名 100% 不变
-- [ ] Loom Phase 1-5 tests 100% pass
-- [ ] alembic/versions 无新增
-- [ ] T9 prose frontmatter 含 6 个 `_loom_*` 字段
-- [ ] 项目 loom_flags config 通过环境变量正确影响 Loom 服务
-- [ ] T6 character ↔ markdown 双向序列化保真
-- [ ] 4 个终审 APPROVE
-- [ ] 用户给 explicit okay
+- [x] `loom-reference-eval` fidelity ≥ 0.5
+- [x] `loom-ab-compare` 显示 Phase 6 ≥ baseline
+- [x] satire-anti-slop 对抗输入命中率 ≥ 90%
+- [x] 范本前 5 章 negative test 全 pass(无误报)
+- [x] Loom Phase 1-5 services 签名 100% 不变
+- [x] Loom Phase 1-5 tests 100% pass
+- [x] alembic/versions 无新增
+- [x] T9 prose frontmatter 含 6 个 `_loom_*` 字段
+- [x] 项目 loom_flags config 通过环境变量正确影响 Loom 服务
+- [x] T6 character ↔ markdown 双向序列化保真
+- [x] 4 个终审 APPROVE
+- [x] 用户给 explicit okay
 
 ---
 
