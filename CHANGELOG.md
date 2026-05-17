@@ -1,5 +1,12 @@
 ## Unreleased
 
+### Added (Loom Phase 6 - T3)
+- novel_analyzer/services/project_compiler_service.py: ProjectCompilerService + CompiledFlags + Beat dataclasses
+- compile_for_chapter(): parses 7-layer markdown into 9 steering flags + 5 Loom env vars
+- to_cli_args() / to_env_vars() / to_constraint_pack_input(): three output adaptors
+- Graceful degradation on missing markdown files (warning log, empty fields)
+- 11 unit tests covering all parser paths
+
 ### Added (Loom Phase 6 - T1)
 - `novel_analyzer/domain/project_config.py`: ProjectConfig + LoomFlagsConfig Pydantic v2 models for author project shell
 - `novel_analyzer/services/project_shell_service.py`: ProjectShellService with filesystem artifact management, versioning, lock semantics, and Loom flag contextmanager
