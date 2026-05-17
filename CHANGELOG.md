@@ -1,5 +1,16 @@
 ## Unreleased
 
+### Added (Loom Phase 6 - T8)
+- novel_analyzer/services/project_outline_service.py: ProjectOutlineService
+- generate_outline(): per-chapter outline with 6 H2 sections + explicit hook type (悬念问句|模棱两可话|新威胁)
+- generate_storyboard(): per-chapter storyboard with 3-7 scene beats (6 required fields: 场所/POV/镜头类型/节奏标签/信息释放/内容草要)
+- generate_all(): batch generate all chapters
+- skills_dir/imitation-constraint-pack/: scene_beats optional input field (backward compatible — absent = source skeleton)
+- skills_dir/imitation-constraint-pack/schemas/input.schema.json: new input schema with scene_beats array
+- imitate-project outline + storyboard CLI wired (replaces TODO stubs)
+- ProjectCompilerService._parse_beats: extended to handle Chinese field names (场所/镜头类型/节奏标签/信息释放/内容草要)
+- 9 unit tests
+
 ### Added (Loom Phase 6 - T11)
 - skills_dir/satire-anti-slop-guard/: SKILL.md + schemas/check_input.json + schemas/check_output.json
 - novel_analyzer/services/satire_anti_slop_service.py: SatireAntiSlopChecker (6 patterns: meta_commentary, happy_ending, expletive_abuse, early_deflate, internet_slang_abuse, character_emotional_outburst)
