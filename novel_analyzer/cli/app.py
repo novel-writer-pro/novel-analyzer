@@ -10204,6 +10204,29 @@ def imitate_project_storyboard(
                 echo(f"  {s}")
 
 
+@imitate_project_app.command("prose")
+def imitate_project_prose(
+    slug: str = typer.Argument(...),
+    chapter: int = typer.Option(0, "--chapter", help="Chapter index (0=all)"),
+    max_rounds: int = typer.Option(2, "--max-rounds"),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+    fast: bool = typer.Option(False, "--fast", help="Fast mode: anti-slop warns only"),
+) -> None:
+    """Generate prose for chapter(s) via harness-imitation (T9)."""
+    settings = _safe_settings()
+    session_factory = create_session_factory(settings)
+    with session_factory() as session:
+        from novel_analyzer.services.project_prose_service import ProjectProseService
+        svc = ProjectProseService(settings=settings, session=session)
+        if chapter > 0:
+            path = svc.generate_chapter(slug, chapter, max_rounds=max_rounds, use_llm=use_llm, fast_mode=fast)
+            echo(f"Draft: {path}")
+        else:
+            paths = svc.generate_all(slug, max_rounds=max_rounds, use_llm=use_llm, fast_mode=fast)
+            for p in paths:
+                echo(f"  {p}")
+
+
 @imitate_project_app.command("revise")
 def ip_revise(
     slug: str = typer.Argument(...),
