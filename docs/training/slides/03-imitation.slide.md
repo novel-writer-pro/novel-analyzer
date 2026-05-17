@@ -1,7 +1,6 @@
 ---
 marp: true
-size: A4
-orientation: landscape
+theme: a4-landscape
 paginate: false
 ---
 
