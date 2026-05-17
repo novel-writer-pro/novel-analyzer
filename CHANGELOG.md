@@ -1,5 +1,13 @@
 ## Unreleased
 
+### Added (Loom Phase 6 - T6)
+- novel_analyzer/services/project_characters_service.py: ProjectCharactersService for character cards
+- generate_initial_cards(): produces N character card markdown templates with 7 H2 sections
+- inherit_from_source(): bridges Loom CharacterPersona → editable markdown
+- markdown_to_persona(): reverse parses markdown back into CharacterPersona
+- imitate-project characters CLI wired
+- 6 unit tests
+
 ### Added (Loom Phase 6 - T4)
 - novel_analyzer/services/project_style_view_service.py: ProjectStyleViewService renders style/rhythm signals to markdown + JSON
 - imitate-project fingerprint <slug> CLI command wired
