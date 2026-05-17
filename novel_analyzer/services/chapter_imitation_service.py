@@ -194,6 +194,7 @@ class ChapterImitationService:
         )
         title, source_text = self._source_chapter_text(branch_id, source_chapter_index)
         title = self._clean_title(title)
+        source_text = self._clean_source_text_heading(source_text)
 
         previous_summary = ""
         active_characters: list[str] = []
@@ -259,6 +260,14 @@ class ChapterImitationService:
     def _clean_title(title: str) -> str:
         import re as _re
         return _re.sub(r"[（(][^）)]*(?:求收藏|求追读|求月票|加更|本章完|谢谢支持)[^）)]*[）)]", "", title).strip()
+
+    @staticmethod
+    def _clean_source_text_heading(source_text: str) -> str:
+        import re as _re
+        lines = source_text.split("\n", 1)
+        if lines:
+            lines[0] = _re.sub(r"[（(][^）)]*(?:求收藏|求追读|求月票|加更|本章完|谢谢支持)[^）)]*[）)]", "", lines[0]).strip()
+        return "\n".join(lines)
 
     def compare_with_source(
         self,
