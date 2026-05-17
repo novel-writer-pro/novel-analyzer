@@ -1,5 +1,13 @@
 ## Unreleased
 
+### Added (Loom Phase 6 - T5)
+- novel_analyzer/services/project_macro_service.py: ProjectMacroService
+- generate() produces premise.md (5 H2) and world.md (6 H2) with banned-noun filtering
+- revise() supports user feedback iteration
+- imitate-project macro CLI wired
+- RAG library contribution: rag/worldview-dossiers/<slug>-worldview.md
+- 7 unit tests
+
 ### Added (Loom Phase 6 - T6)
 - novel_analyzer/services/project_characters_service.py: ProjectCharactersService for character cards
 - generate_initial_cards(): produces N character card markdown templates with 7 H2 sections

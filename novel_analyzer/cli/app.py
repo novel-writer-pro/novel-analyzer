@@ -10083,11 +10083,19 @@ def ip_fingerprint(
 
 
 @imitate_project_app.command("macro")
-def ip_macro(
-    slug: str = typer.Argument(...),
-    use_llm: bool = typer.Option(False, "--use-llm"),
+def imitate_project_macro(
+    slug: str = typer.Argument(..., help="Project slug"),
+    use_llm: bool = typer.Option(False, "--use-llm", help="Use LLM to fill content"),
 ) -> None:
-    echo("TODO: implement in T2-T10")
+    settings = _safe_settings()
+    session_factory = create_session_factory(settings)
+    with session_factory() as session:
+        from novel_analyzer.services.project_macro_service import ProjectMacroService
+        svc = ProjectMacroService(settings=settings, session=session)
+        premise_path, world_path, rag_path = svc.generate(slug, use_llm=use_llm)
+        echo(f"Generated:\n  {premise_path}\n  {world_path}")
+        if rag_path:
+            echo(f"  RAG entry: {rag_path}")
 
 
 @imitate_project_app.command("characters")
