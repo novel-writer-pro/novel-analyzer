@@ -2926,3 +2926,42 @@ Loom 是在现有 GraphRAG 基础设施（pg_trgm + pgvector + GraphNode/GraphEd
 ### 首页重定向改为直接渲染，修复 build 收集 page data 异常
 - 将首页 `/` 从运行时 `router.replace("/control")` 改为直接渲染控制台页面
 - 修复 Next.js 在构建阶段对 `/` 收集 page data 时的路由异常，新的干净构建已重新包含 `/ /control /reader /qa /ops`
+
+### Added (Loom Phase 6 - T2)
+- `project_shell_service.py`: `ensure_source_branch()` validates source branch readiness with actionable error message
+- `project_shell_service.py`: `sample_source_chapters()` retrieves ChapterArtifact objects for style analysis
+- `docs/loom/phase6/runbook-template.md`: 5-step end-to-end runbook for author project shell
+
+### Added (Loom Phase 6 - T9)
+- `novel_analyzer/services/project_prose_service.py`: ProjectProseService
+- `generate_chapter()`: Loom flag injection via contextmanager + harness-imitation call + `_loom_*` signal frontmatter
+- `generate_all()`: batch generate all chapters
+- Env var scoping: Loom flags set/restored via contextmanager (no global pollution)
+- Anti-slop + lock contract checks post-generation
+- `imitate-project prose` CLI wired
+- 6 unit tests
+
+### Added (Loom Phase 6 - T10)
+- `imitate-project revise/lock/diff/status/run` subcommands implemented
+- `revise`: any stage, feedback prepend, auto-archives previous version
+- `lock`: glob pattern → locked.yaml + frontmatter `locked: true`
+- `diff`: unified diff between latest and previous version
+- `status`: table view of all stage versions + lock state
+- `run`: sequential stage execution with gate stops (`--fast` to skip)
+- 6 unit tests
+
+### Added (Loom Phase 6 - T12)
+- MVP end-to-end run: `meiqian-new-story` project (3 chapters, 《没钱修什么仙》style)
+- `loom-reference-eval` fidelity = 0.62 (ch2, enhanced vs baseline 4.3x)
+- All 3 chapters: `final_verdict: pass`, `anti_slop_verdict: pass`
+- `scripts/compare_loom_metrics.py`: source branch vs project fingerprint comparison
+
+### Added (Loom Phase 6 - T13)
+- `docs/loom/phase6/README.md`: Phase 6 entry with 7-layer table + quick start
+- `docs/loom/phase6/workflow.md`: 5-step workflow + mermaid diagram + feedback loops
+- `docs/loom/phase6/arch-alignment.md`: boundary clarification vs 0509/Phase 1-5/writer-imitate
+- `docs/loom/README.md`: Phase F entry (✅ complete)
+- `docs/loom/roadmap.md`: Phase 6 block (✅ complete)
+- `docs/loom/handoff.md`: Phase 6 completion record
+- `docs/loom/sota-imitation-progression-checklist.md`: Section I all [x]
+- `docs/roles/imitation/README.md`: new row for author project shell
