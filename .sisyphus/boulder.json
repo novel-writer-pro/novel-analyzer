@@ -1,8 +1,140 @@
 {
-  "active_plan": "/home/user/ai-books/.sisyphus/plans/v5-fastapi-cutover.md",
-  "plan_name": "v5-fastapi-cutover",
-  "started_at": "2026-05-14T13:00:00Z",
+  "active_plan": "/home/user/novel-analyzer/.sisyphus/plans/loom-phase-6-author-shell.md",
+  "plan_name": "loom-phase-6-author-shell",
+  "started_at": "2026-05-17T01:47:35.683Z",
   "agent": "atlas",
   "branch": "futures/enbed",
-  "notes": "v5 FastAPI cutover; user chose A (direct exec); defaults for 3 open questions"
+  "notes": "v5 FastAPI cutover; user chose A (direct exec); defaults for 3 open questions",
+  "session_ids": [
+    "ses_1ccc68bacffevjKAzMF8AN7ZTb"
+  ],
+  "session_origins": {
+    "ses_1ccc68bacffevjKAzMF8AN7ZTb": "direct"
+  },
+  "task_sessions": {
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "**ProjectConfig + ProjectShellService skeleton + CLI subgroup**",
+      "session_id": "ses_1cc5dc470ffeNxTPgYSmhQlhm2",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-05-17T02:07:15.678Z",
+      "started_at": "2026-05-17T01:59:19.317Z",
+      "status": "completed",
+      "ended_at": "2026-05-17T02:07:15.678Z",
+      "elapsed_ms": 476361
+    },
+    "todo:3": {
+      "task_key": "todo:3",
+      "task_label": "3",
+      "task_title": "**Stage-to-flag compiler + Loom flag mapping**",
+      "session_id": "ses_1cc4ec23bffeNq6nh5Tx7N1rW1",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-05-17T02:29:39.187Z",
+      "started_at": "2026-05-17T02:09:43.852Z",
+      "status": "completed",
+      "ended_at": "2026-05-17T02:29:39.187Z",
+      "elapsed_ms": 1195335
+    },
+    "todo:4": {
+      "task_key": "todo:4",
+      "task_label": "4",
+      "task_title": "**Style fingerprint VIEW (call style_calibration + rhythm_analysis)**",
+      "session_id": "ses_1cc3a1f69ffeIzidlIjaIGSCpN",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-05-17T02:41:18.006Z",
+      "started_at": "2026-05-17T02:38:01.473Z",
+      "status": "completed",
+      "ended_at": "2026-05-17T02:41:18.006Z",
+      "elapsed_ms": 196533
+    }
+  },
+  "active_work_id": "loom-phase-6-author-shell-c456c7b9",
+  "status": "active",
+  "updated_at": "2026-05-17T02:41:18.006Z",
+  "schema_version": 2,
+  "works": {
+    "v5-fastapi-cutover-legacy": {
+      "work_id": "v5-fastapi-cutover-legacy",
+      "active_plan": "/home/user/ai-books/.sisyphus/plans/v5-fastapi-cutover.md",
+      "plan_name": "v5-fastapi-cutover",
+      "started_at": "2026-05-14T13:00:00Z",
+      "session_ids": [],
+      "session_origins": {},
+      "agent": "atlas",
+      "task_sessions": {}
+    },
+    "loom-phase-6-author-shell-c456c7b9": {
+      "work_id": "loom-phase-6-author-shell-c456c7b9",
+      "active_plan": "/home/user/novel-analyzer/.sisyphus/plans/loom-phase-6-author-shell.md",
+      "plan_name": "loom-phase-6-author-shell",
+      "status": "active",
+      "started_at": "2026-05-17T01:47:35.683Z",
+      "updated_at": "2026-05-17T02:41:18.006Z",
+      "session_ids": [
+        "ses_1ccc68bacffevjKAzMF8AN7ZTb"
+      ],
+      "session_origins": {
+        "ses_1ccc68bacffevjKAzMF8AN7ZTb": "direct"
+      },
+      "agent": "atlas",
+      "task_sessions": {
+        "todo:1": {
+          "task_key": "todo:1",
+          "task_label": "1",
+          "task_title": "**ProjectConfig + ProjectShellService skeleton + CLI subgroup**",
+          "session_id": "ses_1cc5dc470ffeNxTPgYSmhQlhm2",
+          "agent": "Sisyphus-Junior",
+          "category": "quick",
+          "updated_at": "2026-05-17T02:07:15.678Z",
+          "started_at": "2026-05-17T01:59:19.317Z",
+          "status": "completed",
+          "ended_at": "2026-05-17T02:07:15.678Z",
+          "elapsed_ms": 476361
+        },
+        "todo:3": {
+          "task_key": "todo:3",
+          "task_label": "3",
+          "task_title": "**Stage-to-flag compiler + Loom flag mapping**",
+          "session_id": "ses_1cc4ec23bffeNq6nh5Tx7N1rW1",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-05-17T02:29:39.187Z",
+          "started_at": "2026-05-17T02:09:43.852Z",
+          "status": "completed",
+          "ended_at": "2026-05-17T02:29:39.187Z",
+          "elapsed_ms": 1195335
+        },
+        "todo:4": {
+          "task_key": "todo:4",
+          "task_label": "4",
+          "task_title": "**Style fingerprint VIEW (call style_calibration + rhythm_analysis)**",
+          "session_id": "ses_1cc3a1f69ffeIzidlIjaIGSCpN",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-05-17T02:41:18.006Z",
+          "started_at": "2026-05-17T02:38:01.473Z",
+          "status": "completed",
+          "ended_at": "2026-05-17T02:41:18.006Z",
+          "elapsed_ms": 196533
+        },
+        "todo:11": {
+          "task_key": "todo:11",
+          "task_label": "11",
+          "task_title": "**satire-anti-slop-guard skill + checker + lock_contract_checker**",
+          "session_id": "current",
+          "agent": "Sisyphus-Junior",
+          "category": "artistry",
+          "updated_at": "2026-05-17T03:30:00.000Z",
+          "started_at": "2026-05-17T03:20:00.000Z",
+          "status": "completed",
+          "ended_at": "2026-05-17T03:30:00.000Z",
+          "elapsed_ms": 600000
+        }
+      }
+    }
+  }
 }
