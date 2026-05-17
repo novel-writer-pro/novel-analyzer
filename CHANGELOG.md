@@ -1,5 +1,14 @@
 ## Unreleased
 
+### Added (Loom Phase 6 - T14)
+- scripts/compare_loom_metrics.py: compare source branch vs project fingerprint metrics (±20% threshold, exit code 0/1)
+- tests/integration/test_loom_phase6_e2e.py: full 7-layer pipeline e2e test (mock LLM, 2 tests)
+- tests/integration/__init__.py: package marker enabling integration test collection
+- Verified: Loom Phase 1-5 service signatures unchanged (no uncommitted changes)
+- Verified: 132 Loom Phase 1-5 tests pass (zero regression)
+- Verified: 15 imitation tests pass (zero regression)
+- Verified: 81 Phase 6 tests pass
+
 ### Added (Loom Phase 6 - T8)
 - novel_analyzer/services/project_outline_service.py: ProjectOutlineService
 - generate_outline(): per-chapter outline with 6 H2 sections + explicit hook type (悬念问句|模棱两可话|新威胁)

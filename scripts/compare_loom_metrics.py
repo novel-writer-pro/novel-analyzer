@@ -45,7 +45,7 @@ def main() -> int:
     except Exception as e:
         print(f"WARNING: loom-status failed: {e}. Showing project metrics only.")
 
-    print(f"\nLoom Phase 6 — Style Metrics Comparison")
+    print("\nLoom Phase 6 — Style Metrics Comparison")
     print(f"Branch: {args.branch_id} | Project: {args.project_slug}")
     print("-" * 70)
     print(f"{'Metric':<30} {'Project':<15} {'Branch':<15} {'Within 20%'}")
