@@ -9,8 +9,8 @@
 | 我想做什么 | 从这里开始 |
 |-----------|-----------|
 | 快速跑单章仿写 | [writer-imitation-workflow.md](../../writer-imitation-workflow.md) |
-| 理解仿写方法论 | [chapter-imitation-method.md](../../chapter-imitation-method.md) |
-| 接入全书仿写 API | [whole-book-imitation-integration-quickstart.md](../../whole-book-imitation-integration-quickstart.md) |
+| 理解仿写方法论 | [loom/README.md](../../loom/README.md) |
+| 接入全书仿写 API | [loom/roadmap.md](../../loom/roadmap.md) |
 | 引入创新导向 | [imitation-innovation-and-steering.md](../../imitation-innovation-and-steering.md) |
 | 理解控制层架构 | [architecture/imitation-commercial-agent-control-plane-architecture-20260509.md](../../architecture/imitation-commercial-agent-control-plane-architecture-20260509.md) |
 | 看哪些能力已落地 | [architecture/imitation-control-plane-implementation-status-map-20260509.md](../../architecture/imitation-control-plane-implementation-status-map-20260509.md) |
@@ -21,7 +21,7 @@
 
 ## 第一层：方法论与基础
 
-1. [chapter-imitation-method.md](../../chapter-imitation-method.md) — 章节仿写方法论（输入输出、约束、评估）
+1. [loom/README.md](../../loom/README.md) — 章节仿写方法论（输入输出、约束、评估）
 2. [chapter-planning-capability-proposal.md](../../chapter-planning-capability-proposal.md) — 章节规划能力提案
 3. [architecture/chapter-imitation-harness-architecture.md](../../architecture/chapter-imitation-harness-architecture.md) — Harness 架构（推荐生产路线）
 4. [chapter-imitation-ch3-live-report-20260502.md](../../chapter-imitation-ch3-live-report-20260502.md) — 第3章 live 实验报告（D层证据）
@@ -47,13 +47,13 @@
 ## 第四层：全书仿写
 
 11. [whole-book-imitation-docs-index.md](../../whole-book-imitation-docs-index.md) — 全书仿写文档索引（全景）
-12. [whole-book-imitation-integration-quickstart.md](../../whole-book-imitation-integration-quickstart.md) — 接入快速入门
+12. [loom/roadmap.md](../../loom/roadmap.md) — 接入快速入门
 13. [whole-book-imitation-api-stability-summary.md](../../whole-book-imitation-api-stability-summary.md) — API 稳定字段收口
 14. [whole-book-imitation-api-versioning.md](../../whole-book-imitation-api-versioning.md) — API 版本化策略
 15. [whole-book-imitation-api-freeze-readiness.md](../../whole-book-imitation-api-freeze-readiness.md) — API 冻结就绪判断
 16. [whole-book-imitation-freeze-evidence-20260503.md](../../whole-book-imitation-freeze-evidence-20260503.md) — 冻结证据（D层）
 17. [whole-book-imitation-provider-recovery-checklist.md](../../whole-book-imitation-provider-recovery-checklist.md) — Provider 恢复 checklist
-18. [whole-book-imitation-handoff-brief.md](../../whole-book-imitation-handoff-brief.md) — 全书仿写交接说明
+18. [session-handoff-20260517.md](../../session-handoff-20260517.md) — 全书仿写交接说明
 19. [examples/whole-book-imitation-run.sample.json](../../examples/whole-book-imitation-run.sample.json) — 运行样例
 20. [examples/whole-book-imitation-readiness.sample.json](../../examples/whole-book-imitation-readiness.sample.json) — 就绪状态样例
 21. [examples/whole-book-imitation-run.request.sample.json](../../examples/whole-book-imitation-run.request.sample.json) — 请求样例

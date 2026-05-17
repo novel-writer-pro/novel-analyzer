@@ -278,7 +278,7 @@ bundle / report / API / 下游消费
 
 1. `risk-audit-system-overview.md`
 2. `risk-audit-capability.md`
-3. `reader-experience-capability.md`
+3. `reader-panel-handoff-20260516.md`
 
 ### 给架构/后端
 

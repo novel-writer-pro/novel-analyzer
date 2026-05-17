@@ -282,7 +282,7 @@ poetry run novel-analyzer show-window <branch_id> 1 5
 - [development-guide.md](./development-guide.md)
 - [benchmark-baseline-20260511.md](./benchmark-baseline-20260511.md)
 - [critical-open-points.md](./critical-open-points.md)
-- [../direct-usage-guide.md](../direct-usage-guide.md)
+- [../cli-operations-manual.md](../cli-operations-manual.md)
 - [../cli-operations-manual.md](../cli-operations-manual.md)
 - [../../README.md](../../README.md)
 

@@ -44,7 +44,7 @@
 - **接手人 / 审阅者**：再看 [critical-open-points.md](./critical-open-points.md)
 
 ## 相关上游产物
-- `docs/whole-book-imitation-integration-quickstart.md`
+- `docs/loom/roadmap.md`
 - `docs/imitation-next-dev-handoff.md`
 - `.omx/plans/prd-book-deconstruction-quick-deep-profiles.md`
 - `.omx/plans/test-spec-book-deconstruction-quick-deep-profiles.md`

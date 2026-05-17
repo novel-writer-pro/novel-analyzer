@@ -108,7 +108,7 @@ Loom memory 层      →  carry_over_state 的 "组装器"（新增）
 | `docs/loom/style/README.md` | 文风/节奏/对话层设计（Phase 4） |
 | `docs/loom/character/README.md` | 角色认知基层设计（Phase 4） |
 | `docs/cli-operations-manual.md` | CLI 手册（第 12 节 Loom） |
-| `docs/real-run-checklist.md` | 试跑清单（第 8 节 Loom） |
+| `docs/ops-debug-manual-20260514.md` — 运维调试速查 |
 | `CHANGELOG.md` | 变更记录 |
 
 ### 2.3 生产环境真实数据（PostgreSQL）
@@ -766,7 +766,7 @@ novel-analyzer loom-ab-compare output/baseline/ output/loom/ --output-file outpu
 
 ### 操作与验证
 - [`docs/cli-operations-manual.md`](../cli-operations-manual.md) — CLI 手册（第 12 节 Loom）
-- [`docs/real-run-checklist.md`](../real-run-checklist.md) — 试跑清单（第 8 节 Loom）
+- [`docs/ops-debug-manual-20260514.md` — 运维调试速查
 - [`docs/loom/weitu-real-effect-validation.md`](./weitu-real-effect-validation.md) — 卫图样例真实效果验证工作流
 - [`docs/loom/weitu-validation-log-20260511.md`](./weitu-validation-log-20260511.md) — 本轮已执行的卫图验证证据日志
 
