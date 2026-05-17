@@ -1,5 +1,10 @@
 ## Unreleased
 
+### Added (Loom Phase 6 - T1)
+- `novel_analyzer/domain/project_config.py`: ProjectConfig + LoomFlagsConfig Pydantic v2 models for author project shell
+- `novel_analyzer/services/project_shell_service.py`: ProjectShellService with filesystem artifact management, versioning, lock semantics, and Loom flag contextmanager
+- `novel_analyzer/cli/app.py`: `imitate-project` Typer subgroup with 14 stub subcommands
+
 - fix(imitation): strip marketing tags from chapter title before building LLM prompt.
 
   Changelist: `CL-title-clean-20260517`

@@ -10049,5 +10049,113 @@ def reader_panel_stats(
             echo(f"  {dim:<14} {n:>3}x")
 
 
+imitate_project_app = typer.Typer(
+    name="imitate-project",
+    help="Loom Phase 6 Author Project Shell",
+    no_args_is_help=True,
+)
+app.add_typer(imitate_project_app)
+
+
+@imitate_project_app.command("init")
+def ip_init(slug: str = typer.Argument(...)) -> None:
+    echo("TODO: implement in T2-T10")
+
+
+@imitate_project_app.command("fingerprint")
+def ip_fingerprint(
+    slug: str = typer.Argument(...),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    echo("TODO: implement in T2-T10")
+
+
+@imitate_project_app.command("macro")
+def ip_macro(
+    slug: str = typer.Argument(...),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    echo("TODO: implement in T2-T10")
+
+
+@imitate_project_app.command("characters")
+def ip_characters(
+    slug: str = typer.Argument(...),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    echo("TODO: implement in T2-T10")
+
+
+@imitate_project_app.command("plot")
+def ip_plot(
+    slug: str = typer.Argument(...),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    echo("TODO: implement in T2-T10")
+
+
+@imitate_project_app.command("conflicts")
+def ip_conflicts(
+    slug: str = typer.Argument(...),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    echo("TODO: implement in T2-T10")
+
+
+@imitate_project_app.command("outline")
+def ip_outline(
+    slug: str = typer.Argument(...),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    echo("TODO: implement in T2-T10")
+
+
+@imitate_project_app.command("storyboard")
+def ip_storyboard(
+    slug: str = typer.Argument(...),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    echo("TODO: implement in T2-T10")
+
+
+@imitate_project_app.command("prose")
+def ip_prose(
+    slug: str = typer.Argument(...),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    echo("TODO: implement in T2-T10")
+
+
+@imitate_project_app.command("revise")
+def ip_revise(
+    slug: str = typer.Argument(...),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    echo("TODO: implement in T2-T10")
+
+
+@imitate_project_app.command("lock")
+def ip_lock(slug: str = typer.Argument(...)) -> None:
+    echo("TODO: implement in T2-T10")
+
+
+@imitate_project_app.command("diff")
+def ip_diff(slug: str = typer.Argument(...)) -> None:
+    echo("TODO: implement in T2-T10")
+
+
+@imitate_project_app.command("status")
+def ip_status(slug: str = typer.Argument(...)) -> None:
+    echo("TODO: implement in T2-T10")
+
+
+@imitate_project_app.command("run")
+def ip_run(
+    slug: str = typer.Argument(...),
+    use_llm: bool = typer.Option(False, "--use-llm"),
+) -> None:
+    echo("TODO: implement in T2-T10")
+
+
 if __name__ == "__main__":
     app()
