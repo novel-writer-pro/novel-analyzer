@@ -50,13 +50,12 @@
 | **[cross-genre-imitation-commercial-readiness-20260515.md](./cross-genre-imitation-commercial-readiness-20260515.md)** | **跨题材改写 99.4% pass + 6 项 SLA gap + 3 条上线路径** | **业务/PM** |
 | **[baseline-imitation-quality-validation-handoff-20260515.md](./baseline-imitation-quality-validation-handoff-20260515.md)** | **同题材 prompt 修复后 Stage A/B/C 长跑验证步骤** | **下一棒接手** |
 | **[reader-panel-handoff-20260516.md](./reader-panel-handoff-20260516.md)** | **4-persona × 7-dim 阅读体验评估 + comfort_score soft gate** | **下一棒接手** |
+| **[session-handoff-20260517.md](./session-handoff-20260517.md)** | **最新会话交接（scaffold 三层修复 + 31 commits 总结）** | **接手人** |
 | [cli-operations-manual.md](./cli-operations-manual.md) | CLI 命令真相源 | 使用者 |
-| [direct-usage-guide.md](./direct-usage-guide.md) | 日常操作顺序 | 使用者 |
 | [novel-ingest-input-spec.md](./novel-ingest-input-spec.md) | 小说输入规范 (novel.txt 格式) | 使用者 |
 | [api-current-surface.md](./api-current-surface.md) | 当前 API 端点清单 | 接入者 |
 | [interface-manifest.md](./interface-manifest.md) | 稳定接口结构 | 后端 |
 | [chapter-imitation-capability-matrix.md](./chapter-imitation-capability-matrix.md) | 仿写全能力矩阵 + 当前覆盖度 | 产品/架构 |
-| [whole-book-mapping-scale-20260514.md](./whole-book-mapping-scale-20260514.md) | mapping_pack 5/30/100+ 章规模化数据 | 产品/接入者 |
 | [deconstruction-acceleration/roadmap-sota-optimization.md](./deconstruction-acceleration/roadmap-sota-optimization.md) | SOTA 优化路线图 + 架构图 | 架构师 |
 | [deconstruction-acceleration/handoff-sota-optimization.md](./deconstruction-acceleration/handoff-sota-optimization.md) | SOTA 优化交付文档 | 接手人 |
 
@@ -70,10 +69,11 @@
 | 底座优化 | [foundation-optimization/](./foundation-optimization/README.md) | P0-P2 全部完成（R@5 0.81/0.84 锁基线） |
 | 风险审查 | [risk-audit-system-overview.md](./risk-audit-system-overview.md) | 9 checker 生产就绪 |
 | 仿写能力 - 跨题材 | [cross-genre-imitation-commercial-readiness-20260515.md](./cross-genre-imitation-commercial-readiness-20260515.md) | **✅ 170/171 pass** — 技术 ready，infra 4 周可商用 |
-| 仿写能力 - 同题材 | [baseline-imitation-quality-validation-handoff-20260515.md](./baseline-imitation-quality-validation-handoff-20260515.md) | 🔧 prompt 修复已上线，长跑验证 pending |
+| 仿写能力 - 同题材 | [baseline-imitation-quality-validation-handoff-20260515.md](./baseline-imitation-quality-validation-handoff-20260515.md) | 🔧 scaffold 三层修复已上线，Stage C 验证中 |
 | 仿写工作流 | [writer-imitation-workflow.md](./writer-imitation-workflow.md) | 全书仿写可用 |
-| Review 工作流 | [minimal-review-workflow-guide.md](./minimal-review-workflow-guide.md) | DB-only 模式 |
-| 读者体验 | [reader-experience-capability.md](./reader-experience-capability.md) | 基础可用 |
+| 仿写架构 | [loom/](./loom/) | Phase 1-5 完成，ab mode 已启用 |
+| Review 工作流 | [review-workflow-api.md](./review-workflow-api.md) | DB-only 模式 |
+| 读者体验评估 | [reader-panel-handoff-20260516.md](./reader-panel-handoff-20260516.md) | 4-persona × 7-dim，comfort_score soft gate |
 
 ---
 
@@ -122,12 +122,11 @@ Level 0 (本文件)
 
 | 文档 | 说明 |
 |------|------|
+| [loom/README.md](./loom/README.md) | 仿写架构总览（Phase 1-5） |
+| [loom/roadmap.md](./loom/roadmap.md) | Loom 路线图 |
 | [writer-imitation-workflow.md](./writer-imitation-workflow.md) | 仿写工作流 |
-| [chapter-imitation-method.md](./chapter-imitation-method.md) | 章节仿写方法 |
 | [chapter-imitation-capability-matrix.md](./chapter-imitation-capability-matrix.md) | 仿写能力矩阵 |
 | [imitation-control-plane-glossary.md](./imitation-control-plane-glossary.md) | 仿写控制面术语表 |
-| [whole-book-imitation-integration-quickstart.md](./whole-book-imitation-integration-quickstart.md) | 全书仿写快速接入 |
-| [whole-book-imitation-handoff-brief.md](./whole-book-imitation-handoff-brief.md) | 全书仿写交接 |
 
 ## Level 2: API 与接入
 
@@ -167,20 +166,23 @@ Level 0 (本文件)
 ## 当前推荐运行配置
 
 ```bash
-NOVEL_ANALYZER_LLM_PROVIDER_NAME=deepseek
-NOVEL_ANALYZER_LLM_BASE_URL=https://api.deepseek.com/v1
-NOVEL_ANALYZER_LLM_MODEL_NAME=deepseek-v4-flash
-NOVEL_ANALYZER_LLM_STAGE_MODEL_NAME=deepseek-v4-flash
+NOVEL_ANALYZER_LLM_BASE_URL=http://34.97.18.233:65432/v1
+NOVEL_ANALYZER_LLM_MODEL_NAME=claude-haiku-4.5
+NOVEL_ANALYZER_LLM_STAGE_MODEL_NAME=claude-haiku-4.5
+NOVEL_ANALYZER_LLM_REQUESTS_PER_SECOND=1.5
 NOVEL_ANALYZER_USE_MERGED_STAGES=true
+NOVEL_ANALYZER_LOOM_MEMORY_MODE=ab
+NOVEL_ANALYZER_LOOM_PAIRWISE_ENABLED=true
 ```
 
 ---
 
 ## 接手建议阅读顺序
 
-- [release-handoff-brief.md](./release-handoff-brief.md) — 当前 release 到了什么程度
-- [final-handoff.md](./final-handoff.md) — 完整交付边界与风险
+- [session-handoff-20260517.md](./session-handoff-20260517.md) — 最新会话交接（scaffold 三层修复）
+- [runbook/deployment-and-operations-manual-20260515.md](./runbook/deployment-and-operations-manual-20260515.md) — 从零部署
 - [deconstruction-acceleration/handoff-sota-optimization.md](./deconstruction-acceleration/handoff-sota-optimization.md) — SOTA 优化交付
+- [loom/roadmap.md](./loom/roadmap.md) — 仿写架构路线图
 - [../apps/web/README.md](../apps/web/README.md) — 前端启动
 - [../apps/api/README.md](../apps/api/README.md) — 后端启动
 - [../CHANGELOG.md](../CHANGELOG.md) — 最近变更记录

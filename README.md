@@ -259,7 +259,7 @@ open http://127.0.0.1:4173/control
   --rule-override "封建奴籍替换为合同义务工"
 ```
 
-详见 [`docs/whole-book-quickstart-20260514.md`](./docs/whole-book-quickstart-20260514.md)
+详见 [`docs/loom/roadmap.md`](./docs/loom/roadmap.md)
 
 ---
 
