@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "properties": {
+    "verdict": {"type": "string", "enum": ["pass", "warn", "fail"]},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "severity": {"type": "string", "enum": ["blocker", "fail", "warn", "info"]},
+          "type": {"type": "string"},
+          "evidence": {"type": "string"}
+        }
+      }
+    }
+  }
+}
