@@ -1,3 +1,8 @@
+---
+name: satire-anti-slop-guard
+description: Checks generated prose for AI slop patterns specific to satirical Chinese web fiction (meta-commentary, happy endings, expletive abuse, early deflate, internet slang abuse, character emotional outburst).
+---
+
 # satire-anti-slop-guard
 
 Checks generated prose for AI slop patterns specific to satirical Chinese web fiction.
