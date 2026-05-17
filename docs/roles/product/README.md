@@ -33,7 +33,7 @@
 9. [risk-audit-system-overview.md](../../risk-audit-system-overview.md) — 风险审查系统总览
 10. [risk-audit-capability.md](../../risk-audit-capability.md) — 风险审查能力说明
 11. [tracks/reader-experience/README.md](../../tracks/reader-experience/README.md) — 读者体验能力线
-12. [reader-experience-capability.md](../../reader-experience-capability.md) — 读者体验能力规划
+12. [reader-panel-handoff-20260516.md](../../reader-panel-handoff-20260516.md) — 读者体验能力规划
 
 ---
 

@@ -13,8 +13,8 @@
 | 场景 | 入口 |
 |------|------|
 | 快速跑单章仿写 | [writer-imitation-workflow.md](../../writer-imitation-workflow.md) |
-| 理解仿写方法论 | [chapter-imitation-method.md](../../chapter-imitation-method.md) |
-| 接入全书仿写 API | [whole-book-imitation-integration-quickstart.md](../../whole-book-imitation-integration-quickstart.md) |
+| 理解仿写方法论 | [loom/README.md](../../loom/README.md) |
+| 接入全书仿写 API | [loom/roadmap.md](../../loom/roadmap.md) |
 | 引入创新导向 | [imitation-innovation-and-steering.md](../../imitation-innovation-and-steering.md) |
 | 看控制层完整架构 | [architecture/imitation-commercial-agent-control-plane-architecture-20260509.md](../../architecture/imitation-commercial-agent-control-plane-architecture-20260509.md) |
 | 看哪些能力已落地 | [architecture/imitation-control-plane-implementation-status-map-20260509.md](../../architecture/imitation-control-plane-implementation-status-map-20260509.md) |
@@ -27,7 +27,7 @@
 
 ### 第一步：方法论
 
-1. [chapter-imitation-method.md](../../chapter-imitation-method.md) — 章节仿写方法论
+1. [loom/README.md](../../loom/README.md) — 章节仿写方法论
 2. [architecture/chapter-imitation-harness-architecture.md](../../architecture/chapter-imitation-harness-architecture.md) — Harness 架构（推荐生产路线）
 3. [chapter-planning-capability-proposal.md](../../chapter-planning-capability-proposal.md) — 章节规划能力提案
 
@@ -45,7 +45,7 @@
 ### 第四步：全书仿写
 
 9. [whole-book-imitation-docs-index.md](../../whole-book-imitation-docs-index.md) — 全书仿写文档索引
-10. [whole-book-imitation-integration-quickstart.md](../../whole-book-imitation-integration-quickstart.md) — 接入快速入门
+10. [loom/roadmap.md](../../loom/roadmap.md) — 接入快速入门
 11. [whole-book-imitation-api-stability-summary.md](../../whole-book-imitation-api-stability-summary.md) — API 稳定字段收口
 12. [examples/whole-book-imitation-run.sample.json](../../examples/whole-book-imitation-run.sample.json) — 运行样例
 

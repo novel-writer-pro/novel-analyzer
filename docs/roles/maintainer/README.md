@@ -12,8 +12,8 @@
 
 ### 第一步：了解当前 release 状态
 
-1. [release-handoff-brief.md](../../release-handoff-brief.md) — 简版交接说明（先看这个）
-2. [final-handoff.md](../../final-handoff.md) — 完整交付说明（边界、风险、已知问题）
+1. [session-handoff-20260517.md](../../session-handoff-20260517.md) — 简版交接说明（先看这个）
+2. [session-handoff-20260517.md](../../session-handoff-20260517.md) — 完整交付说明（边界、风险、已知问题）
 3. [../CHANGELOG.md](../../../CHANGELOG.md) — 最近几轮改了什么
 
 ### 第二步：了解文档治理结构
@@ -45,8 +45,8 @@
 
 | 问题 | 文档 |
 |------|------|
-| 当前 release 到了什么程度？ | [release-handoff-brief](../../release-handoff-brief.md) |
-| 已知风险和问题有哪些？ | [final-handoff](../../final-handoff.md) |
+| 当前 release 到了什么程度？ | [session-handoff-20260517](../../session-handoff-20260517.md) |
+| 已知风险和问题有哪些？ | [session-handoff-20260517](../../session-handoff-20260517.md) |
 | 文档怎么分层管理？ | [docs-information-architecture-guide](../../strategy/docs-information-architecture-guide.md) |
 | 哪份文档是真相来源？ | [doc-source-of-truth-matrix](../../risk-audit-doc-source-of-truth-matrix.md) |
 | 各能力线当前状态？ | [features/README](../../features/README.md) |

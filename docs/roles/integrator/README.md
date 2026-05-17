@@ -26,7 +26,7 @@
 
 ### 第三步：了解全书仿写接入
 
-9. [whole-book-imitation-integration-quickstart.md](../../whole-book-imitation-integration-quickstart.md) — 全书仿写接入快速入门
+9. [loom/roadmap.md](../../loom/roadmap.md) — 全书仿写接入快速入门
 10. [whole-book-imitation-api-stability-summary.md](../../whole-book-imitation-api-stability-summary.md) — API 稳定字段收口
 11. [whole-book-imitation-api-versioning.md](../../whole-book-imitation-api-versioning.md) — API 版本化策略
 12. [whole-book-imitation-api-freeze-readiness.md](../../whole-book-imitation-api-freeze-readiness.md) — API 冻结就绪判断
@@ -35,7 +35,7 @@
 15. [whole-book-imitation-freeze-evidence-20260503.md](../../whole-book-imitation-freeze-evidence-20260503.md) — 冻结证据
 16. [whole-book-imitation-readiness.sample.json](../../examples/whole-book-imitation-readiness.sample.json) — 就绪状态样例
 17. [whole-book-imitation-sample-coverage-matrix.md](../../whole-book-imitation-sample-coverage-matrix.md) — 样例覆盖矩阵
-18. [whole-book-imitation-handoff-brief.md](../../whole-book-imitation-handoff-brief.md) — 全书仿写交接说明
+18. [session-handoff-20260517.md](../../session-handoff-20260517.md) — 全书仿写交接说明
 
 ### 第四步：了解 Review API 稳定性
 
@@ -69,7 +69,7 @@
 | 当前 API 实现了什么？ | [api-current-surface](../../api-current-surface.md) |
 | 哪些字段是稳定的？ | [review-api-stability-summary](../../review-api-stability-summary.md) |
 | 接入前要确认什么？ | [system-review-integration-checklist](../../system-review-integration-checklist.md) |
-| 全书仿写怎么接？ | [whole-book-imitation-integration-quickstart](../../whole-book-imitation-integration-quickstart.md) |
+| 全书仿写怎么接？ | [loom/roadmap.md](../../loom/roadmap.md) |
 
 ---
 
