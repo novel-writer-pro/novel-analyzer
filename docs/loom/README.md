@@ -163,7 +163,7 @@ Loom（新增层，叠加在上方）
 
 ---
 
-### F. 作家项目壳（Author Project Shell）🔲 Phase 6
+### F. 作家项目壳（Author Project Shell）✅ Phase 6
 
 **解决的问题**：
 - 9 个 steering flag 需要在终端里背，作家体验差
