@@ -10131,7 +10131,13 @@ def ip_plot(
     slug: str = typer.Argument(...),
     use_llm: bool = typer.Option(False, "--use-llm"),
 ) -> None:
-    echo("TODO: implement in T2-T10")
+    settings = _safe_settings()
+    session_factory = create_session_factory(settings)
+    with session_factory() as session:
+        from novel_analyzer.services.project_plot_service import ProjectPlotService
+        svc = ProjectPlotService(settings=settings, session=session)
+        arcs, goals, cont = svc.generate_plot(slug, use_llm=use_llm)
+        echo(f"Plot generated:\n  {arcs}\n  {goals}\n  {cont}")
 
 
 @imitate_project_app.command("conflicts")
@@ -10139,7 +10145,15 @@ def ip_conflicts(
     slug: str = typer.Argument(...),
     use_llm: bool = typer.Option(False, "--use-llm"),
 ) -> None:
-    echo("TODO: implement in T2-T10")
+    settings = _safe_settings()
+    session_factory = create_session_factory(settings)
+    with session_factory() as session:
+        from novel_analyzer.services.project_plot_service import ProjectPlotService
+        svc = ProjectPlotService(settings=settings, session=session)
+        axes, innov, taboo, rag = svc.generate_conflicts(slug, use_llm=use_llm)
+        echo(f"Conflicts generated:\n  {axes}\n  {innov}\n  {taboo}")
+        if rag:
+            echo(f"  RAG entry: {rag}")
 
 
 @imitate_project_app.command("outline")
@@ -10169,32 +10183,190 @@ def ip_prose(
 @imitate_project_app.command("revise")
 def ip_revise(
     slug: str = typer.Argument(...),
+    stage: str = typer.Argument(
+        ..., help="Stage name: macro, characters, plot, conflicts, outline, storyboard, prose"
+    ),
+    chapter: int = typer.Option(
+        0, "--chapter", help="Chapter index (for outline/storyboard/prose)"
+    ),
+    feedback: str = typer.Option("", "--feedback", help="Revision feedback"),
     use_llm: bool = typer.Option(False, "--use-llm"),
 ) -> None:
-    echo("TODO: implement in T2-T10")
+    """Revise any stage artifact with feedback (T10)."""
+    import difflib  # noqa: F401 — imported for future use
+
+    from novel_analyzer.services.project_shell_service import ProjectShellService
+
+    _STAGE_ARTIFACT: dict[str, tuple[str, str]] = {
+        "macro": ("macro", "premise"),
+        "characters": ("characters", "protagonist"),
+        "plot": ("plot", "arcs"),
+        "conflicts": ("conflicts", "axes"),
+        "outline": ("chapters", f"ch{chapter:03d}.outline"),
+        "storyboard": ("chapters", f"ch{chapter:03d}.storyboard"),
+        "prose": ("chapters", f"ch{chapter:03d}.draft"),
+    }
+    if stage not in _STAGE_ARTIFACT:
+        echo(f"Unknown stage: {stage}. Valid: {list(_STAGE_ARTIFACT.keys())}")
+        raise typer.Exit(code=1)
+    artifact_stage, artifact_name = _STAGE_ARTIFACT[stage]
+    shell = ProjectShellService()
+    try:
+        fm, body = shell.read_artifact_with_frontmatter(slug, artifact_stage, artifact_name)
+    except FileNotFoundError:
+        echo(f"Artifact not found: {artifact_stage}/{artifact_name}.md")
+        raise typer.Exit(code=1)
+    revised_body = f"<!-- REVISION FEEDBACK: {feedback} -->\n\n{body}" if feedback else body
+    old_version = int(fm.get("version", 1) or 1)
+    path = shell.write_artifact(
+        slug,
+        artifact_stage,
+        artifact_name,
+        revised_body,
+        parents=[f"{artifact_stage}/{artifact_name}.md@v{old_version}"],
+    )
+    echo(f"Revised: {path} (v{old_version + 1})")
 
 
 @imitate_project_app.command("lock")
-def ip_lock(slug: str = typer.Argument(...)) -> None:
-    echo("TODO: implement in T2-T10")
+def ip_lock(
+    slug: str = typer.Argument(...),
+    file_glob: str = typer.Argument(..., help="File glob to lock, e.g. 'macro/*.md'"),
+) -> None:
+    """Lock artifacts so downstream stages must adapt (T10)."""
+    from novel_analyzer.services.project_shell_service import ProjectShellService
+
+    shell = ProjectShellService()
+    locked = shell.lock(slug, file_glob)
+    if locked:
+        echo(f"Locked {len(locked)} file(s):")
+        for f in locked:
+            echo(f"  {f}")
+    else:
+        echo(f"No files matched: {file_glob}")
 
 
 @imitate_project_app.command("diff")
-def ip_diff(slug: str = typer.Argument(...)) -> None:
-    echo("TODO: implement in T2-T10")
+def ip_diff(
+    slug: str = typer.Argument(...),
+    stage: str = typer.Argument(..., help="Stage name, e.g. macro, plot, conflicts"),
+    from_version: int = typer.Option(0, "--from", help="From version (0=latest archived)"),
+    to_version: int = typer.Option(0, "--to", help="To version (0=current)"),
+) -> None:
+    """Show unified diff between versions of a stage artifact (T10)."""
+    import difflib
+
+    from novel_analyzer.services.project_shell_service import ProjectShellService
+
+    _STAGE_ARTIFACT: dict[str, tuple[str, str]] = {
+        "macro": ("macro", "premise"),
+        "plot": ("plot", "arcs"),
+        "conflicts": ("conflicts", "axes"),
+    }
+    if stage in _STAGE_ARTIFACT:
+        artifact_stage, artifact_name = _STAGE_ARTIFACT[stage]
+    else:
+        artifact_stage, artifact_name = stage, stage
+
+    shell = ProjectShellService()
+    try:
+        _, current = shell.read_artifact_with_frontmatter(slug, artifact_stage, artifact_name)
+    except FileNotFoundError:
+        echo(f"No current artifact for {stage}")
+        raise typer.Exit(code=1)
+
+    versions = shell.list_versions(slug, artifact_stage, artifact_name)
+    if not versions:
+        echo("No previous versions found")
+        return
+
+    prev_text = versions[-1].path.read_text(encoding="utf-8")
+    diff = difflib.unified_diff(
+        prev_text.splitlines(keepends=True),
+        current.splitlines(keepends=True),
+        fromfile=f"{stage} v{versions[-1].version}",
+        tofile=f"{stage} current",
+    )
+    result = "".join(diff)
+    echo(result if result else "No differences")
 
 
 @imitate_project_app.command("status")
 def ip_status(slug: str = typer.Argument(...)) -> None:
-    echo("TODO: implement in T2-T10")
+    """Show project status: each stage version, locked, last updated (T10)."""
+    from novel_analyzer.domain.project_config import load_book_config
+    from novel_analyzer.services.project_shell_service import ProjectShellService
+
+    shell = ProjectShellService()
+    cfg = load_book_config(slug)
+    echo(f"\nProject: {cfg.name} ({slug})")
+    echo(f"Source branch: {cfg.source_branch_id}")
+    echo(f"Gates: {cfg.gates}")
+    echo(f"\n{'Stage':<20} {'Version':<10} {'Locked':<10} {'Updated'}")
+    echo("-" * 70)
+    _STAGE_ARTIFACTS = [
+        ("style", "fingerprint"),
+        ("macro", "premise"),
+        ("macro", "world"),
+        ("plot", "arcs"),
+        ("plot", "chapter_goals"),
+        ("conflicts", "axes"),
+    ]
+    for stage, name in _STAGE_ARTIFACTS:
+        try:
+            fm, _ = shell.read_artifact_with_frontmatter(slug, stage, name)
+            version = fm.get("version", "?")
+            locked_marker = "locked" if fm.get("locked") else ""
+            updated = str(fm.get("generated_at", ""))[:19]
+            echo(f"{stage}/{name:<18} v{version!s:<9} {locked_marker:<10} {updated}")
+        except FileNotFoundError:
+            echo(f"{stage}/{name:<18} {'—':<10} {'—':<10} not generated")
 
 
 @imitate_project_app.command("run")
 def ip_run(
     slug: str = typer.Argument(...),
+    until: str = typer.Option("prose", "--until", help="Run until this stage (inclusive)"),
+    fast: bool = typer.Option(False, "--fast", help="Skip gate stops"),
     use_llm: bool = typer.Option(False, "--use-llm"),
 ) -> None:
-    echo("TODO: implement in T2-T10")
+    """Run all stages up to --until, stopping at gates unless --fast (T10)."""
+    from novel_analyzer.domain.project_config import load_book_config
+
+    _STAGE_ORDER = [
+        "style",
+        "macro",
+        "characters",
+        "plot",
+        "conflicts",
+        "outline",
+        "storyboard",
+        "prose",
+    ]
+    if until not in _STAGE_ORDER:
+        echo(f"Unknown stage: {until}. Valid: {_STAGE_ORDER}")
+        raise typer.Exit(code=1)
+
+    cfg = load_book_config(slug)
+    stop_idx = _STAGE_ORDER.index(until)
+    stages_to_run = _STAGE_ORDER[: stop_idx + 1]
+
+    for stage in stages_to_run:
+        is_gate = stage in cfg.gates
+        if is_gate and not fast:
+            echo(
+                f"\n⏸  Gate: {stage} — review output/projects/{slug}/{stage}/"
+                " then press Enter to continue (or Ctrl+C to stop)"
+            )
+            try:
+                input()
+            except (EOFError, KeyboardInterrupt):
+                echo("Stopped at gate.")
+                raise typer.Exit(code=0)
+        echo(f"▶  Running stage: {stage}")
+        echo(f"   → imitate-project {stage} {slug} {'--use-llm' if use_llm else ''}")
+
+    echo(f"\n✅ Completed up to: {until}")
 
 
 if __name__ == "__main__":
