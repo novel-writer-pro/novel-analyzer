@@ -1,5 +1,13 @@
 ## Unreleased
 
+### Added (Loom Phase 6 - T7)
+- novel_analyzer/services/project_plot_service.py: ProjectPlotService
+- generate_plot(): arcs.md + chapter_goals.md + continuity.md (Loom _legacy_compat aligned)
+- generate_conflicts(): axes.md + innovation.md + taboo.md with default anti-slop taboos
+- imitate-project plot + conflicts CLI wired
+- RAG contribution: rag/trope-library/<slug>-tropes.md
+- 8 unit tests
+
 ### Added (Loom Phase 6 - T5)
 - novel_analyzer/services/project_macro_service.py: ProjectMacroService
 - generate() produces premise.md (5 H2) and world.md (6 H2) with banned-noun filtering
