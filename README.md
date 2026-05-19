@@ -135,10 +135,13 @@ http://127.0.0.1:4173
 | **受控仿写** | ✅ 跨题材 99.4%；🔧 同题材验证中 | [`docs/capabilities/03-imitation.md`](./docs/capabilities/03-imitation.md) |
 | **商业化运营** | ⚠️ 4 周可商用 B2B；6 项 SLA gap | [`docs/capabilities/04-commercialization.md`](./docs/capabilities/04-commercialization.md) |
 
+> 快速理解仿写这条能力线到底如何工作、用了什么技术、解决了什么问题：[`docs/imitation-architecture-map-20260518.md`](./docs/imitation-architecture-map-20260518.md)
+
 ### 高频常用
 
 | 文档 | 用途 |
 |------|------|
+| [`docs/imitation-architecture-map-20260518.md`](./docs/imitation-architecture-map-20260518.md) | **仿写能力大架构图**（一眼看懂链路、能力与技术核心） |
 | [`docs/cli-operations-manual.md`](./docs/cli-operations-manual.md) | CLI 命令真相源 |
 | [`docs/api-current-surface.md`](./docs/api-current-surface.md) | 当前 API 端点清单 |
 | [`docs/ops-debug-manual-20260514.md`](./docs/ops-debug-manual-20260514.md) | 故障速查（5 棵决策树） |
