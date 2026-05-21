@@ -966,6 +966,39 @@ class RetrievalService:
             limit=max(limit * self.RAW_CANDIDATE_MULTIPLIER, limit),
         )
 
+    @staticmethod
+    def _filter_hits_by_max_chapter(
+        hits: list[RetrievalHit],
+        max_chapter: int | None,
+    ) -> list[RetrievalHit]:
+        if max_chapter is None:
+            return hits
+        return [hit for hit in hits if hit.chapter_index <= max_chapter]
+
+    @classmethod
+    def _filter_routes_by_max_chapter(
+        cls,
+        routes: list[tuple[str, list[RetrievalHit]]],
+        route_diagnostics: list[RetrievalRouteDiagnostics],
+        max_chapter: int | None,
+    ) -> tuple[list[tuple[str, list[RetrievalHit]]], list[RetrievalRouteDiagnostics]]:
+        if max_chapter is None:
+            return routes, route_diagnostics
+        route_map = {
+            route_name: cls._filter_hits_by_max_chapter(hits, max_chapter)
+            for route_name, hits in routes
+        }
+        filtered_routes = [(route_name, hits) for route_name, hits in route_map.items() if hits]
+        filtered_diagnostics = [
+            RetrievalRouteDiagnostics(
+                route=item.route,
+                hit_count=len(route_map.get(item.route, [])),
+                latency_ms=item.latency_ms,
+            )
+            for item in route_diagnostics
+        ]
+        return filtered_routes, filtered_diagnostics
+
     def search_branch(self, branch_id: str, query: str, limit: int = 5, max_chapter: int | None = None) -> list[RetrievalHit]:
         """Search retrieval documents for a branch.
 
@@ -974,9 +1007,14 @@ class RetrievalService:
         """
 
         raw_hits = self._search_branch_raw(branch_id, query, limit)
+        raw_hits = self._filter_hits_by_max_chapter(raw_hits, max_chapter)
+        if max_chapter is not None and len(raw_hits) < limit:
+            expanded_limit = max(limit * 4, limit + 4)
+            raw_hits = self._filter_hits_by_max_chapter(
+                self._search_branch_raw(branch_id, query, expanded_limit),
+                max_chapter,
+            )
         reranked_hits, _ = self._apply_rerank(query, raw_hits, limit=limit)
-        if max_chapter is not None:
-            reranked_hits = [h for h in reranked_hits if h.chapter_index <= max_chapter]
         return reranked_hits
 
     def search_branch_with_diagnostics(
@@ -984,6 +1022,7 @@ class RetrievalService:
         branch_id: str,
         query: str,
         limit: int = 5,
+        max_chapter: int | None = None,
     ) -> RetrievalSearchDiagnostics:
         """Return raw/reranked hits plus route and latency diagnostics for eval."""
 
@@ -1009,10 +1048,39 @@ class RetrievalService:
                 RetrievalRouteDiagnostics(route=route_name, hit_count=len(hits), latency_ms=0.0)
                 for route_name, hits in routes
             ]
+        routes, route_diagnostics = self._filter_routes_by_max_chapter(
+            routes,
+            route_diagnostics,
+            max_chapter,
+        )
         raw_hits = self._fuse_recall_lists(
             [hits for _route_name, hits in routes],
             limit=max(limit * 4, limit),
         )
+        if max_chapter is not None and len(raw_hits) < limit:
+            expanded_limit = max(limit * 4, limit + 4)
+            try:
+                expanded_routes, expanded_diagnostics = self._search_branch_routes_with_diagnostics(
+                    branch_id,
+                    query,
+                    expanded_limit,
+                )
+            except RuntimeError:
+                expanded_routes = routes
+                expanded_diagnostics = route_diagnostics
+            expanded_routes, expanded_diagnostics = self._filter_routes_by_max_chapter(
+                expanded_routes,
+                expanded_diagnostics,
+                max_chapter,
+            )
+            expanded_raw_hits = self._fuse_recall_lists(
+                [hits for _route_name, hits in expanded_routes],
+                limit=max(expanded_limit * 4, expanded_limit),
+            )
+            if len(expanded_raw_hits) > len(raw_hits):
+                routes = expanded_routes
+                route_diagnostics = expanded_diagnostics
+                raw_hits = expanded_raw_hits
         raw_latency_ms = self._elapsed_ms(raw_started_at)
         if self._should_skip_rerank_for_diagnostics(routes, raw_hits, limit=limit):
             reranked_hits = raw_hits[:limit]

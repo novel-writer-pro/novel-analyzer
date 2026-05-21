@@ -12,6 +12,7 @@ from novel_analyzer.rerank.service import get_rerank_provider
 from novel_analyzer.services.ingest_service import IngestService
 from novel_analyzer.services.retrieval_service import (
     RetrievalHit,
+    RetrievalRouteDiagnostics,
     RetrievalService,
 )
 from novel_analyzer.services.run_service import RunService
@@ -369,6 +370,50 @@ def test_search_branch_with_diagnostics_can_skip_rerank_when_lexical_top_is_stab
         assert [hit.chapter_index for hit in diagnostics.reranked_hits] == [1, 2]
 
 
+def test_search_branch_with_diagnostics_filters_max_chapter_before_rerank(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    with _session() as session:
+        service = RetrievalService(session, Settings(embedding_backend="stub"))
+        routes = [
+            (
+                "fts",
+                [
+                    RetrievalHit(chapter_index=9, title="九", summary_text="未来", score=1.0, keyword_list=[]),
+                    RetrievalHit(chapter_index=2, title="二", summary_text="安全", score=0.8, keyword_list=[]),
+                ],
+            )
+        ]
+        rerank_candidates: list[int] = []
+
+        monkeypatch.setattr(
+            service,
+            "_search_branch_routes_with_diagnostics",
+            lambda branch_id, query, limit: (
+                routes,
+                [RetrievalRouteDiagnostics(route="fts", hit_count=2, latency_ms=1.0)],
+            ),
+        )
+
+        def _fake_apply_rerank(query: str, hits: list[RetrievalHit], *, limit: int):
+            rerank_candidates.extend(hit.chapter_index for hit in hits)
+            return hits[:limit], True
+
+        monkeypatch.setattr(service, "_apply_rerank", _fake_apply_rerank)
+
+        diagnostics = service.search_branch_with_diagnostics(
+            "branch-1",
+            "命格",
+            limit=2,
+            max_chapter=2,
+        )
+
+        assert rerank_candidates == [2]
+        assert diagnostics.route_counts == {"fts": 1}
+        assert [hit.chapter_index for hit in diagnostics.raw_hits] == [2]
+        assert [hit.chapter_index for hit in diagnostics.reranked_hits] == [2]
+
+
 def test_search_branch_routes_skip_vector_when_lexical_coverage_is_enough(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -519,6 +564,64 @@ def test_search_branch_public_contract_stays_plain_hit_list(
             "score",
             "keyword_list",
         }
+
+
+def test_search_branch_filters_future_hits_before_rerank(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    with _session() as session:
+        service = RetrievalService(session, Settings(rerank_model_name="fake-model"))
+        raw_hits = [
+            RetrievalHit(chapter_index=9, title="九", summary_text="未来章节", score=0.99, keyword_list=[]),
+            RetrievalHit(chapter_index=2, title="二", summary_text="当前证据", score=0.60, keyword_list=[]),
+            RetrievalHit(chapter_index=1, title="一", summary_text="更早证据", score=0.50, keyword_list=[]),
+        ]
+        seen_candidates: list[int] = []
+
+        monkeypatch.setattr(
+            service,
+            "_search_branch_raw",
+            lambda branch_id, query, limit: raw_hits,
+        )
+
+        def _fake_apply_rerank(query: str, hits: list[RetrievalHit], *, limit: int):
+            seen_candidates.extend(hit.chapter_index for hit in hits)
+            return hits[:limit], False
+
+        monkeypatch.setattr(service, "_apply_rerank", _fake_apply_rerank)
+
+        hits = service.search_branch("branch-public", "命格", limit=2, max_chapter=2)
+
+        assert seen_candidates == [2, 1]
+        assert [hit.chapter_index for hit in hits] == [2, 1]
+
+
+def test_search_branch_refetches_more_candidates_when_spoiler_filter_truncates(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    with _session() as session:
+        service = RetrievalService(session, Settings(rerank_backend="disabled"))
+        initial_hits = [
+            RetrievalHit(chapter_index=9, title="九", summary_text="未来一", score=0.9, keyword_list=[]),
+            RetrievalHit(chapter_index=8, title="八", summary_text="未来二", score=0.8, keyword_list=[]),
+        ]
+        expanded_hits = initial_hits + [
+            RetrievalHit(chapter_index=2, title="二", summary_text="安全一", score=0.7, keyword_list=[]),
+            RetrievalHit(chapter_index=1, title="一", summary_text="安全二", score=0.6, keyword_list=[]),
+        ]
+        calls: list[int] = []
+
+        def _fake_raw(branch_id: str, query: str, limit: int) -> list[RetrievalHit]:
+            calls.append(limit)
+            return initial_hits if len(calls) == 1 else expanded_hits
+
+        monkeypatch.setattr(service, "_search_branch_raw", _fake_raw)
+        monkeypatch.setattr(service, "_apply_rerank", lambda query, hits, *, limit: (hits[:limit], False))
+
+        hits = service.search_branch("branch-public", "命格", limit=2, max_chapter=2)
+
+        assert calls == [2, 8]
+        assert [hit.chapter_index for hit in hits] == [2, 1]
 
 
 def test_entity_exact_route_returns_fact_backed_chapters(tmp_path: Path) -> None:

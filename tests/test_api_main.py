@@ -630,6 +630,75 @@ def test_api_readme_mentions_review_and_search_endpoints() -> None:
         assert needle in readme
 
 
+def test_search_branch_endpoint_accepts_q_and_returns_retrieval_hit_shape(monkeypatch) -> None:
+    _reset_client()
+    client = _get_client()
+
+    class _FakeHit:
+        chapter_index = 3
+        title = "第三章"
+        summary_text = "卫图继续修行。"
+        score = 0.91
+        keyword_list = ["卫图", "修行"]
+
+    monkeypatch.setattr(
+        "novel_analyzer.services.retrieval_service.RetrievalService.search_branch",
+        lambda self, branch_id, query, limit=10, max_chapter=None: [_FakeHit()],
+    )
+
+    r = client.get("/api/search-branch?branch_id=branch-1&q=%E5%8D%AB%E5%9B%BE")
+    assert r.status_code == 200
+    payload = r.json()
+    assert payload["query"] == "卫图"
+    assert payload["hits"][0]["chapter_index"] == 3
+    assert payload["hits"][0]["title"] == "第三章"
+    assert payload["hits"][0]["summary_text"] == "卫图继续修行。"
+    assert payload["hits"][0]["chunk_text"] == "卫图继续修行。"
+    assert payload["hits"][0]["keyword_list"] == ["卫图", "修行"]
+
+
+def test_search_branch_endpoint_accepts_legacy_query_alias(monkeypatch) -> None:
+    _reset_client()
+    client = _get_client()
+
+    monkeypatch.setattr(
+        "novel_analyzer.services.retrieval_service.RetrievalService.search_branch",
+        lambda self, branch_id, query, limit=10, max_chapter=None: [],
+    )
+
+    r = client.get("/api/search-branch?branch_id=branch-1&query=%E5%8D%AB%E5%9B%BE")
+    assert r.status_code == 200
+    payload = r.json()
+    assert payload["query"] == "卫图"
+    assert payload["hits"] == []
+
+
+def test_search_branch_endpoint_rejects_blank_query() -> None:
+    _reset_client()
+    client = _get_client()
+
+    r = client.get("/api/search-branch?branch_id=branch-1")
+    assert r.status_code == 400
+    assert "missing query text" in r.text
+
+
+def test_search_branch_endpoint_returns_500_on_backend_error(monkeypatch) -> None:
+    _reset_client()
+    client = _get_client()
+
+    def _boom(self, branch_id, query, limit=10, max_chapter=None):  # noqa: ANN001
+        raise RuntimeError("backend exploded")
+
+    monkeypatch.setattr(
+        "novel_analyzer.services.retrieval_service.RetrievalService.search_branch",
+        _boom,
+    )
+
+    r = client.get("/api/search-branch?branch_id=branch-1&q=%E5%8D%AB%E5%9B%BE")
+    assert r.status_code == 500
+    assert "backend exploded" in r.text
+
+
 def test_api_readme_mentions_whole_book_imitation_samples() -> None:
     readme = Path("apps/api/README.md").read_text(encoding="utf-8")
     assert "whole-book-imitation-run.request.sample.json" in readme

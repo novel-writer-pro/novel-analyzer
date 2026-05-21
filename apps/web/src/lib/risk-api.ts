@@ -39,7 +39,13 @@ export const fetchChapterSource = (apiBase: string, branchId: string, chapterInd
   requestJson<ChapterSource>(`${apiBase}/api/chapter-source?branch_id=${branchId}&chapter_index=${chapterIndex}`);
 
 export const fetchSearchBranch = (apiBase: string, branchId: string, query: string, limit?: number) =>
-  requestJson<{ hits: SearchHit[] }>(`${apiBase}/api/search-branch?branch_id=${branchId}&query=${encodeURIComponent(query)}&limit=${limit || 10}`);
+  requestJson<{ hits: SearchHit[] }>(
+    `${apiBase}/api/search-branch?${new URLSearchParams({
+      branch_id: branchId,
+      q: query,
+      limit: String(limit || 10),
+    }).toString()}`
+  );
 
 function params(runId: string, branchId: string) {
   return new URLSearchParams({ run_id: runId, branch_id: branchId }).toString();

@@ -135,31 +135,42 @@ def ask_branch_stream(req: AskBranchRequest):
 @router.post("/search-branch")
 def search_branch(
     branch_id: str = Query(...),
-    q: str = Query(..., alias="q"),
+    q: str | None = Query(None, alias="q"),
+    query: str | None = Query(None),
     limit: int = Query(10),
     database_url: str | None = Query(None),
 ) -> dict:
-    query = q  # WSGI canonical names this 'q'
+    from fastapi.responses import JSONResponse
     from novel_analyzer.services.retrieval_service import RetrievalService
+
+    query_text = (q or query or "").strip()
+    if not query_text:
+        return JSONResponse(
+            status_code=400,
+            content={"error": "missing query text; provide `q` or `query`"},
+        )
 
     settings = resolve_settings(database_url)
     with get_db_session(database_url) as session:
         svc = RetrievalService(session, settings)
         try:
-            hits = svc.search(branch_id, query, top_k=limit)
+            hits = svc.search_branch(branch_id, query_text, limit=limit)
             return {
-                "query": query,
+                "query": query_text,
                 "hits": [
                     {
-                        "chunk_text": h.chunk_text[:300],
+                        "chunk_text": h.summary_text[:300],
                         "chapter_index": h.chapter_index,
+                        "title": h.title,
+                        "summary_text": h.summary_text,
                         "score": h.score,
+                        "keyword_list": h.keyword_list,
                     }
                     for h in hits
                 ],
             }
         except Exception as e:
-            return {"error": str(e)}
+            return JSONResponse(status_code=500, content={"error": str(e)})
 
 
 

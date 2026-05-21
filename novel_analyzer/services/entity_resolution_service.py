@@ -28,6 +28,7 @@ class EntityResolutionService:
 
     SIMILARITY_THRESHOLD = 0.6
     MIN_LABEL_LENGTH = 2
+    CHARACTER_NODE_TYPES = ('entity', 'character')
 
     _branch_cache: dict[str, dict[str, str]] = {}
     _branch_cache_version: dict[str, int] = {}
@@ -46,7 +47,7 @@ class EntityResolutionService:
         node = self.session.scalar(
             select(GraphNode)
             .where(GraphNode.branch_id == branch_id)
-            .where(GraphNode.node_type == 'character')
+            .where(GraphNode.node_type.in_(self.CHARACTER_NODE_TYPES))
             .where(GraphNode.label == label)
         )
         if node is None:
@@ -60,7 +61,7 @@ class EntityResolutionService:
         node_count = self.session.scalar(
             select(func.count(GraphNode.id))
             .where(GraphNode.branch_id == branch_id)
-            .where(GraphNode.node_type == 'character')
+            .where(GraphNode.node_type.in_(self.CHARACTER_NODE_TYPES))
         ) or 0
         cached_version = self._branch_cache_version.get(branch_id, -1)
         if cached_version == node_count and branch_id in self._branch_cache:
@@ -69,7 +70,7 @@ class EntityResolutionService:
         nodes = self.session.scalars(
             select(GraphNode)
             .where(GraphNode.branch_id == branch_id)
-            .where(GraphNode.node_type == 'character')
+            .where(GraphNode.node_type.in_(self.CHARACTER_NODE_TYPES))
             .order_by(GraphNode.occurrence_count.desc())
         ).all()
 
