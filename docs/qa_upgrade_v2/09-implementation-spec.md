@@ -92,6 +92,10 @@ answer_question()
 ### 目标
 从“返回 `RetrievalHit`”逐步升级到“能返回 `EvidenceHit`”。
 
+同时要满足：
+
+> **retrieval 核心在不启 graph 的情况下也能完整工作。**
+
 ### 建议策略
 不要一次推翻。
 
@@ -113,11 +117,16 @@ def search_evidence(
 把现有 route 包进 `EvidenceHit`。
 
 #### Step 3
-新增 graph typed routes。
+新增 graph typed routes（optional capability）。
+
+#### Step 0（新增）
+先把 FTS / similarity / like / keyword / entity_exact / vector 这些 core retrieval 路由抽成未来可复用核心候选，不让 graph 成为抽离前置条件。
 
 ---
 
 ## 2.5 graph typed routes 建议
+
+> graph 在未来 reusable RAG core 里应视为 capability plugin，而不是默认核心层。
 
 ### 当前问题
 `relationship_route()` 太单一，图谱能力没有按问题类型打开。
@@ -272,10 +281,10 @@ class AnswerContextBuilder:
 - 加 `StructuredQueryPlan` + query parse service
 
 ### PR3
-- 加 `EvidenceHit` + retrieval evidence path
+- 加 `EvidenceHit` + core retrieval evidence path
 
 ### PR4
-- graph typed routes
+- graph typed routes（optional capability）
 
 ### PR5
 - answer context builder + result contract 扩展
@@ -311,6 +320,6 @@ class AnswerContextBuilder:
 1. `QueryUnderstandingService.build_query_plan`
 2. `RetrievalService.search_evidence`
 3. `BranchQAService._build_answer_context`
-4. `RetrievalService._relation_route / _world_rule_route / _foreshadow_route / _causal_route`
+4. `RetrievalService._relation_route / _world_rule_route / _foreshadow_route / _causal_route`（optional）
 
-这四块是 V2 主骨架。
+其中前 3 块更接近 reusable core，最后一块更接近 optional graph capability。

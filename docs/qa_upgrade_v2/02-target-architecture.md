@@ -10,6 +10,10 @@
 
 `question -> query understanding -> retrieval plan -> multi-lane retrieval -> evidence fusion -> graph reasoning -> evidence-aware rerank -> grounded answer generation -> answer verification`
 
+并进一步演进为：
+
+`question -> query understanding -> core retrieval -> evidence fusion -> optional capability(graph) -> rerank -> grounded answer`
+
 ---
 
 ## 2. 目标架构图
@@ -19,25 +23,37 @@ flowchart TD
     A[User Question] --> B[Query Understanding]
     B --> C[Structured Query Plan]
 
-    C --> D1[Lexical Retrieval]
-    C --> D2[Fact Retrieval]
-    C --> D3[Graph Retrieval]
-    C --> D4[Vector Retrieval]
-    C --> D5[Window / Timeline Retrieval]
+    subgraph CORE[Reusable RAG Core]
+        C --> D1[Lexical Retrieval]
+        C --> D2[Fact Retrieval]
+        C --> D4[Vector Retrieval]
+        C --> D5[Window / Timeline Retrieval]
 
-    D1 --> E[Evidence Normalization]
-    D2 --> E
-    D3 --> E
-    D4 --> E
-    D5 --> E
+        D1 --> E[Evidence Normalization]
+        D2 --> E
+        D4 --> E
+        D5 --> E
+        E --> F[Evidence Fusion]
+        F --> G[Evidence-aware Rerank]
+    end
 
-    E --> F[Evidence Fusion]
-    F --> G[Evidence-aware Rerank]
+    subgraph OPTIONAL[Optional Capability]
+        C --> D3[Graph Retrieval]
+        D3 --> E2[Graph Evidence / Path / Signal]
+    end
+
+    E2 --> G
     G --> H[Answer Context Builder]
     H --> I[LLM Grounded Answer]
     I --> J[Answer Verification / Grounding]
     J --> K[BranchQAResult v2]
 ```
+
+### 设计约束（新增）
+
+- graph 必须可以关闭
+- graph 关闭时，core 仍应可工作
+- 其他领域知识问答默认先复用 core，不要求先定义图谱 ontology
 
 ---
 
@@ -73,6 +89,10 @@ V2 最重要的新对象不是新的 reranker，而是 `StructuredQueryPlan`。
 
 ### 为什么要它
 因为后面的 retrieval / rerank / context builder 都应该基于同一个中间契约，而不是各自猜问题意图。
+
+同时它也是未来抽离 reusable RAG core 的关键边界：
+
+> **query understanding contract 应先独立于 novel-specific graph 语义而存在。**
 
 ---
 
@@ -152,6 +172,8 @@ V2 先做 L0+L1 即可。
 - world rule connected subgraph
 - foreshadow open/payoff path
 - causal chain path
+
+> 这条 lane 在未来 reusable core 中应视为 **optional capability**，不是默认必选核心层。
 
 ### D. Vector lane
 继续保留 chunk embedding 召回，但建议未来：
@@ -298,16 +320,17 @@ prompt 模板更稳，后续也更好 debug。
 ### 第一阶段
 - 规则 + prompt 生成 `StructuredQueryPlan`
 - 不改底层表结构，先改 service contract
-- graph route 先做 typed route
+- core 先在无 graph 情况下可独立工作
 
 ### 第二阶段
 - 引入 `EvidenceHit`
-- rerank 吃 chunk / fact / graph path
+- rerank 先吃 chunk / fact / window
+- graph 作为可选 evidence lane 接进来
 - answer builder 结构化
 
 ### 第三阶段
-- graph-aware rerank
-- question-conditioned subgraph retrieval
+- graph-aware rerank（optional）
+- question-conditioned subgraph retrieval（optional）
 - better answer verification
 
 ---
@@ -320,4 +343,4 @@ prompt 模板更稳，后续也更好 debug。
 - 不建议先加非常重的 agentic planner
 
 优先级应该是：
-**结构化 query plan > 证据对象统一 > graph retrieval 升级 > rerank 增强 > 模型微调**
+**结构化 query plan > 证据对象统一 > core retrieval 稳定 > optional graph capability > rerank 增强 > 模型微调**

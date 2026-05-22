@@ -1,5 +1,14 @@
 ## Unreleased
 
+### Added (QA reusable RAG core direction - 2026-05-22)
+- docs/architecture/independent-agent-knowledge-and-retrieval.md: added reusable RAG core vs optional graph vs domain-adapter extraction direction
+- docs/qa_upgrade_v2/02-target-architecture.md: updated QA V2 target architecture to make graph an optional capability instead of a mandatory core layer
+- docs/qa_upgrade_v2/03-roadmap.md: revised P2 wording to stabilize core retrieval before optional graph integration
+- docs/qa_upgrade_v2/08-schema-and-contracts.md: clarified that core contracts should not assume graph is always present
+- docs/qa_upgrade_v2/09-implementation-spec.md: updated implementation order so core retrieval works without graph before graph routes are layered in
+- docs/qa_upgrade_v2/15-audit-and-change-log.md: recorded the reusable-core / optional-graph architecture decision
+- docs/handoffs/qa-upgrade-v2-handoff-20260522.md: extended next-owner guidance with the new decoupling direction
+
 ### Added (QA Upgrade V2 SOPs - 2026-05-22)
 - docs/qa_upgrade_v2/17-parser-regression-playbook.md: new SOP for regression bucket selection, badcase promotion, and when parser cases must become tests
 - docs/qa_upgrade_v2/18-qa-eval-runbook.md: new SOP for sample intake, manual review, replay, and backlog-to-regression flow

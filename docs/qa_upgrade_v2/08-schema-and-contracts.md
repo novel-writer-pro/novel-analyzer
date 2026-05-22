@@ -17,6 +17,10 @@ QA V2 的核心不是再多加几个 route，而是把现在隐式散落在各�
 3. `AnswerContextBundle`
 4. `GroundedBranchQAResult`
 
+并且建议把这些对象视为：
+
+> **reusable RAG core 的第一批稳定 contract**，它们默认不依赖 graph 必须存在。
+
 ---
 
 ## 2. StructuredQueryPlan
@@ -158,6 +162,20 @@ QA V2 的核心不是再多加几个 route，而是把现在隐式散落在各�
 | `causal_chain` | 因果链证据 |
 | `foreshadow_thread` | 伏笔链路证据 |
 
+其中推荐按“核心必选 / 可选增强”理解：
+
+### core-first source types
+- `chapter_summary`
+- `chunk`
+- `fact`
+- `window`
+
+### optional capability source types
+- `graph_node`
+- `graph_path`
+- `causal_chain`
+- `foreshadow_thread`
+
 ## 3.4 lane 建议枚举
 - `fts`
 - `similarity`
@@ -205,6 +223,7 @@ QA V2 的核心不是再多加几个 route，而是把现在隐式散落在各�
 - retrieval 层输出“找到了什么”
 - answer builder 再决定“哪些要放进回答上下文”
 - 不要在 retrieval service 里过早把所有证据压成字符串
+- graph evidence 必须可选；bundle 不能假定 graph 永远存在
 
 ---
 
@@ -324,6 +343,9 @@ QA V2 的核心不是再多加几个 route，而是把现在隐式散落在各�
 
 ### 第三步
 让 `retrieval_service` 增量产出 `EvidenceHit`。
+
+### 第三步补充
+先支持 core-first source types，再让 graph-derived source types 以 optional 形式接入。
 
 ### 第四步
 让 answer builder 从结构化 bundle 生成 prompt。

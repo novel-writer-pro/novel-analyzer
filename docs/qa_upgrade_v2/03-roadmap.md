@@ -119,20 +119,21 @@ Roadmap 按“先稳定、再增强、最后拉高上限”的顺序推进。
 ## Phase 2 — Retrieval & Graph Fusion V2（P2）
 
 ### 目标
-让图谱从“辅助上下文”升级成“显式召回维度”。
+先把 retrieval 核心 contract 立稳，再把图谱作为可选增强层接入。
 
 ### 任务
 1. 定义 `EvidenceHit`
-2. graph retrieval typed route 化：
+2. 先把 lexical/fact/vector/window 输出统一成 evidence objects
+3. graph retrieval typed route 化（optional capability）：
    - relation route
    - world_rule route
    - foreshadow route
    - causal route
-3. 让 fact lane 扩展到更多 fact_type
-4. 把 chunk/fact/graph/window 统一成 evidence objects
+4. 让 fact lane 扩展到更多 fact_type
 5. lane diagnostics 标准化
 
 ### 交付标准
+- core retrieval 在 graph 关闭时仍可稳定工作
 - graph lane 不只是 chapter score，而能输出 path / node / edge evidence
 - timeline / foreshadow / relation 类问题召回显著稳定
 - retrieval 输出变成可 rerank、可 answer、可 debug 的统一结构
@@ -263,8 +264,9 @@ Roadmap 按“先稳定、再增强、最后拉高上限”的顺序推进。
 - [ ] 建立专项 handoff
 
 ### 下周开始做
-- [ ] graph typed routes
 - [ ] `EvidenceHit` contract
+- [ ] core retrieval evidence contract（graph 可关闭）
+- [ ] graph typed routes（optional）
 - [ ] answer context builder v2
 
 这套顺序能保证你后面开发不是返工式推进。

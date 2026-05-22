@@ -334,3 +334,51 @@
 
 ### Next Owner Notes
 - 当首批真实样本入库时，优先使用本 SOP 检查 bucket、来源、expected 行为、回流路径是否一致
+
+---
+
+## Audit Entry — 2026-05-22 继续推进（Reusable RAG Core / Optional Graph 方案）
+
+### Trigger
+- 用户希望继续优化 QA，并进一步判断是否能解耦出可复用的核心 RAG 体系，供其他领域知识问答复用
+- 用户新增约束：graph 很重，应该可以启动或不启动
+
+### Inputs Reviewed
+- [docs/architecture/independent-agent-knowledge-and-retrieval.md](file:///home/user/novel-analyzer/docs/architecture/independent-agent-knowledge-and-retrieval.md)
+- [docs/architecture/novel-assistant-system-architecture.md](file:///home/user/novel-analyzer/docs/architecture/novel-assistant-system-architecture.md)
+- [docs/qa_upgrade_v2/02-target-architecture.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/02-target-architecture.md)
+- [docs/qa_upgrade_v2/03-roadmap.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/03-roadmap.md)
+- [docs/qa_upgrade_v2/08-schema-and-contracts.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/08-schema-and-contracts.md)
+- [docs/qa_upgrade_v2/09-implementation-spec.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/09-implementation-spec.md)
+- [novel_analyzer/services/qa_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/qa_service.py)
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [novel_analyzer/services/query_understanding_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/query_understanding_service.py)
+- Oracle 架构评估：建议先抽 hybrid retrieval + query-plan + rerank/fusion，再把 graph 留在 adapter/capability 层
+
+### Findings
+- `RetrievalService` 已经具备较强的 reusable-core 候选形态：多路召回、RRF、rerank、diagnostics、anti-spoiler 前置过滤
+- `QueryUnderstandingService` 的结构化 contract 也可复用，但其 taxonomy 仍有小说 domain bias
+- `BranchQAService` 当前把窗口/伏笔/因果/世界规则/回答 orchestration 混在一起，是主要耦合点
+- graph 若被视为必选核心层，会显著抬高复用门槛
+
+### Decisions
+- 定义一个默认不依赖 graph 的 reusable RAG core
+- 把 graph 降为 optional capability，而不是 core 必选项
+- 把 novel-specific 语义（chapter/spoiler/foreshadow/world_rule/causal answer shaping）留在 adapter 层
+
+### Files Changed
+- [docs/architecture/independent-agent-knowledge-and-retrieval.md](file:///home/user/novel-analyzer/docs/architecture/independent-agent-knowledge-and-retrieval.md)
+- [docs/qa_upgrade_v2/02-target-architecture.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/02-target-architecture.md)
+- [docs/qa_upgrade_v2/03-roadmap.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/03-roadmap.md)
+- [docs/qa_upgrade_v2/08-schema-and-contracts.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/08-schema-and-contracts.md)
+- [docs/qa_upgrade_v2/09-implementation-spec.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/09-implementation-spec.md)
+
+### Verification
+- 方案与当前代码边界一致：core 候选、optional graph、adapter 语义不再混说
+- “graph 可关闭”已正式写入设计，而不是只停留在聊天约定
+
+### Deferred Risks
+- 当前仍是架构/文档层演进，尚未开始代码抽离；后续需要结合实际耦合映射决定 PR 顺序
+
+### Next Owner Notes
+- 真正开始代码抽离时，优先顺序应是：contract → retrieval core → adapters → optional graph capability
