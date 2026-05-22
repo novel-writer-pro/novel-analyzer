@@ -4,6 +4,13 @@ from __future__ import annotations
 
 from typing import Any
 
+from rag_core import (
+    PlannedEntity,
+    QueryConstraints,
+    QueryTimeScope,
+    RetrievalPreferences,
+    StructuredQueryPlan,
+)
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from novel_analyzer.domain.analysis_dimensions import AnalysisDimension
@@ -508,65 +515,6 @@ class BranchQAResult(BaseModel):
     answer_mode: str = Field(default="normal")
     degraded_reason: str | None = Field(default=None)
     factscore_grounding_rate: float | None = Field(default=None, ge=0.0, le=1.0)
-
-
-class PlannedEntity(BaseModel):
-    """One query-time entity mention after normalization/canonicalization."""
-
-    surface: str
-    canonical: str
-    entity_type: str = Field(default="entity")
-    confidence: float = Field(default=0.0, ge=0.0, le=1.0)
-
-
-class QueryTimeScope(BaseModel):
-    """Optional chapter/time constraints parsed from a user question."""
-
-    mode: str = Field(default="unbounded")
-    chapter_start: int | None = None
-    chapter_end: int | None = None
-    strict_upper_bound: bool = Field(default=False)
-
-
-class QueryConstraints(BaseModel):
-    """Execution constraints inferred from a question."""
-
-    anti_spoiler: bool = Field(default=False)
-    must_cite_evidence: bool = Field(default=True)
-    prefer_multi_hop: bool = Field(default=False)
-    allow_conservative_answer: bool = Field(default=True)
-
-
-class RetrievalPreferences(BaseModel):
-    """High-level retrieval planning hints for downstream QA."""
-
-    lanes: list[str] = Field(default_factory=lambda: ["fts", "fact", "graph", "vector", "window"])
-    prefer_graph: bool = Field(default=False)
-    prefer_timeline: bool = Field(default=False)
-    prefer_window: bool = Field(default=False)
-    prefer_causal: bool = Field(default=False)
-    prefer_foreshadow: bool = Field(default=False)
-    candidate_limit: int = Field(default=24, ge=1)
-    final_limit: int = Field(default=6, ge=1)
-
-
-class StructuredQueryPlan(BaseModel):
-    """Structured query-understanding output for branch QA."""
-
-    raw_question: str
-    normalized_question: str
-    question_type: str = Field(default="general")
-    intent: str = Field(default="locate_fact")
-    answer_expectation: str = Field(default="direct_fact")
-    entities: list[PlannedEntity] = Field(default_factory=list)
-    relations: list[str] = Field(default_factory=list)
-    world_rules: list[str] = Field(default_factory=list)
-    events: list[str] = Field(default_factory=list)
-    time_scope: QueryTimeScope = Field(default_factory=QueryTimeScope)
-    constraints: QueryConstraints = Field(default_factory=QueryConstraints)
-    retrieval_plan: RetrievalPreferences = Field(default_factory=RetrievalPreferences)
-    ambiguities: list[str] = Field(default_factory=list)
-    diagnostic_notes: list[str] = Field(default_factory=list)
 
 
 class ChapterNoteRow(BaseModel):

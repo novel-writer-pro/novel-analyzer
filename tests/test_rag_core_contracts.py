@@ -88,3 +88,28 @@ def test_retrieval_service_reuses_rag_core_diagnostics_contracts() -> None:
 
     assert ServiceRouteDiagnostics is CoreRouteDiagnostics
     assert ServiceSearchDiagnostics is CoreSearchDiagnostics
+
+
+def test_rag_core_exports_query_planning_contracts() -> None:
+    from rag_core import RetrievalPreferences, StructuredQueryPlan
+
+    prefs = RetrievalPreferences()
+    plan = StructuredQueryPlan(
+        raw_question="What happened?",
+        normalized_question="What happened?",
+        retrieval_plan=prefs,
+    )
+
+    assert prefs.lanes == ["fts", "fact", "graph", "vector", "window"]
+    assert plan.retrieval_plan is prefs
+    assert plan.question_type == "general"
+
+
+def test_novel_query_planning_contracts_reuse_rag_core_types() -> None:
+    from rag_core import RetrievalPreferences as CoreRetrievalPreferences
+    from rag_core import StructuredQueryPlan as CoreStructuredQueryPlan
+    from novel_analyzer.domain.schemas import RetrievalPreferences as NovelRetrievalPreferences
+    from novel_analyzer.domain.schemas import StructuredQueryPlan as NovelStructuredQueryPlan
+
+    assert NovelRetrievalPreferences is CoreRetrievalPreferences
+    assert NovelStructuredQueryPlan is CoreStructuredQueryPlan

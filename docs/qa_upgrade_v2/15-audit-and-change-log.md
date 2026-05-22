@@ -499,3 +499,43 @@
 
 ### Next Owner Notes
 - 下一步若继续抽代码，优先考虑纯函数/纯 mechanics（例如 fusion 或 rerank 逻辑），而不是先碰 novel adapter orchestration
+
+---
+
+## Audit Entry — 2026-05-22 继续推进（Query-planning contract 双栖）
+
+### Trigger
+- `RetrievalHit` 和 retrieval diagnostics contract 已进入 `rag_core`
+- 下一步若继续让 core contract 变完整，最合适的是把 query-planning contract 也统一，而不是保留 `novel_analyzer.domain.schemas` 的平行定义
+
+### Inputs Reviewed
+- [rag_core/contracts.py](file:///home/user/novel-analyzer/rag_core/contracts.py)
+- [novel_analyzer/domain/schemas.py](file:///home/user/novel-analyzer/novel_analyzer/domain/schemas.py)
+- [novel_analyzer/services/query_understanding_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/query_understanding_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Findings
+- `StructuredQueryPlan` 不能只迁一半；它与 `PlannedEntity / QueryTimeScope / QueryConstraints / RetrievalPreferences` 是一组 contract
+- 如果只共享其中一部分，会让现有 `QueryUnderstandingService` 依赖结构断裂
+
+### Decisions
+- 一次性把整组 query-planning contract 提升到 `rag_core`
+- 让 `novel_analyzer.domain.schemas` 直接复用 shared types
+- 继续保持 contract-first、小步迁移，而不触碰 query understanding 的 novel taxonomy 或 graph 语义
+
+### Files Changed
+- [rag_core/contracts.py](file:///home/user/novel-analyzer/rag_core/contracts.py)
+- [rag_core/__init__.py](file:///home/user/novel-analyzer/rag_core/__init__.py)
+- [novel_analyzer/domain/schemas.py](file:///home/user/novel-analyzer/novel_analyzer/domain/schemas.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Verification
+- RED：测试先证明 `novel_analyzer.domain.schemas` 还未复用 shared types
+- GREEN：同一测试在迁移整组 contract 后通过（`8 passed`）
+- Manual QA：直接导入并打印 `prefs_same_object=True`、`plan_same_object=True`、`constraints_same_object=True`
+
+### Deferred Risks
+- 这一步仍只迁移 contract，不迁移 `QueryUnderstandingService` 的实现本体
+
+### Next Owner Notes
+- 下一步若继续抽代码，可优先考虑把纯 retrieval mechanics（RRF / rerank helper）移入 `rag_core`，而不是先碰 query taxonomy 或 graph augmentation

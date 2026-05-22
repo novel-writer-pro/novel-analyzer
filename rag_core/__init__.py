@@ -6,6 +6,9 @@ in ``novel_analyzer`` until later extraction steps.
 """
 
 from .contracts import (
+    PlannedEntity,
+    QueryConstraints,
+    QueryTimeScope,
     RetrievalHit,
     RetrievalPreferences,
     RetrievalRouteDiagnostics,
@@ -17,6 +20,9 @@ from .protocols import CorpusAdapter, GraphAdapter
 __all__ = [
     "CorpusAdapter",
     "GraphAdapter",
+    "PlannedEntity",
+    "QueryConstraints",
+    "QueryTimeScope",
     "RetrievalHit",
     "RetrievalPreferences",
     "RetrievalRouteDiagnostics",

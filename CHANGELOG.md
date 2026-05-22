@@ -1,5 +1,12 @@
 ## Unreleased
 
+### Changed (rag_core query-planning adoption - 2026-05-22)
+- rag_core/contracts.py: promoted the full query-planning contract group (PlannedEntity, QueryTimeScope, QueryConstraints, RetrievalPreferences, StructuredQueryPlan)
+- novel_analyzer/domain/schemas.py: switched local query-planning types to reuse rag_core contracts
+- tests/test_rag_core_contracts.py: extended TDD coverage to prove novel query-planning contracts now resolve to rag_core types
+- docs/qa_upgrade_v2/15-audit-and-change-log.md: recorded the fourth extraction step and its verification trail
+- docs/handoffs/qa-upgrade-v2-handoff-20260522.md: updated code-extraction status with shared query-planning contracts
+
 ### Changed (rag_core diagnostics adoption - 2026-05-22)
 - rag_core/contracts.py: promoted RetrievalRouteDiagnostics and RetrievalSearchDiagnostics into the shared core contract layer
 - novel_analyzer/services/retrieval_service.py: switched local diagnostics contracts to reuse rag_core.contracts

@@ -55,6 +55,36 @@ class RetrievalPreferences:
 
 
 @dataclass(frozen=True, slots=True)
+class PlannedEntity:
+    """One query-time entity mention after normalization/canonicalization."""
+
+    surface: str
+    canonical: str
+    entity_type: str = "entity"
+    confidence: float = 0.0
+
+
+@dataclass(frozen=True, slots=True)
+class QueryTimeScope:
+    """Optional scope constraints parsed from a user question."""
+
+    mode: str = "unbounded"
+    chapter_start: int | None = None
+    chapter_end: int | None = None
+    strict_upper_bound: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class QueryConstraints:
+    """Execution constraints inferred from a question."""
+
+    anti_spoiler: bool = False
+    must_cite_evidence: bool = True
+    prefer_multi_hop: bool = False
+    allow_conservative_answer: bool = True
+
+
+@dataclass(frozen=True, slots=True)
 class StructuredQueryPlan:
     """Minimal reusable query-understanding contract.
 
@@ -67,4 +97,12 @@ class StructuredQueryPlan:
     question_type: str = "general"
     intent: str = "locate_fact"
     answer_expectation: str = "direct_fact"
+    entities: list[PlannedEntity] = field(default_factory=list)
+    relations: list[str] = field(default_factory=list)
+    world_rules: list[str] = field(default_factory=list)
+    events: list[str] = field(default_factory=list)
+    time_scope: QueryTimeScope = field(default_factory=QueryTimeScope)
+    constraints: QueryConstraints = field(default_factory=QueryConstraints)
     retrieval_plan: RetrievalPreferences = field(default_factory=RetrievalPreferences)
+    ambiguities: list[str] = field(default_factory=list)
+    diagnostic_notes: list[str] = field(default_factory=list)
