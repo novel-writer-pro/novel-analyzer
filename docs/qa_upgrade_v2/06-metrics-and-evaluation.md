@@ -158,7 +158,47 @@ QA V2 不能只看一个总分。至少要拆三层：
 
 ---
 
-## 8. 推荐产出物
+## 8. Gate 设计（新增）
+
+## 8.1 Phase Gate
+
+### P0 Gate
+- alias / anti-spoiler / API contract 三类 correctness 问题有回归验证
+- diagnostics 至少能看到 query → route → rerank → answer 基本链路
+
+### P1 Gate
+- parser regression set 可稳定运行
+- 至少可统计 entity / time scope / question_type 三项准确度
+- ambiguity / parse failure 不再只留在人工备注里
+
+### P2 Gate
+- `EvidenceHit` / evidence bundle 已能稳定导出
+- graph lane 贡献可单独评估
+
+### P3 Gate
+- rerank 收益可被证明，且 latency 不突破预算
+
+### P4 Gate
+- grounded answer 指标提升，unsupported claim 不恶化
+
+## 8.2 Release Gate
+
+以下任一不满足，不应把 QA V2 对外视为“进入稳定升级态”：
+- 没有固定 regression queries
+- 没有 question-type bucket 指标
+- 没有 badcase taxonomy
+- 没有至少一份 handoff / audit / delivery log 可供下一棒追溯
+
+## 8.3 Rollback Gate
+
+以下任一出现，应阻止继续放量或宣称阶段完成：
+- parser 接线导致 spoiler-safe recall 显著下降
+- rerank 提升不成立且 latency 明显上升
+- answer grounding rate 下降但未被 observability 抓到根因
+
+---
+
+## 9. 推荐产出物
 
 ### 离线
 - `qa_query_parse_eval.json`
@@ -175,7 +215,7 @@ QA V2 不能只看一个总分。至少要拆三层：
 
 ---
 
-## 9. 最小可用验收标准
+## 10. 最小可用验收标准
 
 建议先设一个现实目标，而不是一步到位。
 
@@ -193,7 +233,7 @@ QA V2 不能只看一个总分。至少要拆三层：
 
 ---
 
-## 10. 结论
+## 11. 结论
 
 V2 成不成功，不是看 demo 时回答多自然，而是看以下三个问题能不能稳定回答：
 

@@ -1,5 +1,23 @@
 # 04. Delivery Checklist
 
+> 本清单不是只给开发者自检，也用于评审、提测、上线前 gate、以及 handoff 审计。
+
+---
+
+## 0. 审计通用项（新增）
+
+### 每个阶段都要补齐
+- [ ] 已记录本轮目标、输入文档、关键发现
+- [ ] 已记录本轮修改文件与修改原因
+- [ ] 已记录验证命令 / 验证方式 / 观察结论
+- [ ] 已记录 deferred risks 与下一棒建议
+- [ ] 已更新 handoff / delivery log / changelog 中至少一个对应入口
+
+### 每个“完成”结论都必须附带证据
+- [ ] 有测试 / 命令 / demo / diagnostics 支撑
+- [ ] 有明确的 pass / fail / unknown 判断
+- [ ] 没有把“设计已写”误报为“能力已上线”
+
 ## 1. P0 稳定化 Checklist
 
 ### 功能正确性
@@ -30,8 +48,16 @@
 - [ ] 已支持时间范围抽取
 - [ ] 已支持关系/规则/伏笔/因果意图抽取
 - [ ] 已支持 ambiguity 标记
+- [ ] 已支持 parse failure taxonomy（至少区分 entity miss / scope miss / ambiguity / unsupported type）
+- [ ] 已支持 badcase 回流到 regression set
+- [ ] 已有 baseline / advanced / frontier 能力边界说明
 - [ ] query parse 结果可进入 diagnostics
 - [ ] 复杂 query 有回归样例
+
+### Query Understanding 审计证据
+- [ ] 至少一份 query plan JSON 示例
+- [ ] 至少一份 parse 失败案例及归因
+- [ ] 至少一份 alias / timeline / foreshadow difficult query 回放记录
 
 ---
 
@@ -77,6 +103,8 @@
 - [ ] difficult queries 单独收集
 - [ ] alias / relation / timeline / foreshadow 各自有样本
 - [ ] 数据版本可追踪
+- [ ] badcase 有回流入口，不再只靠人工记忆
+- [ ] query bank / gold set / manual notes 的来源字段可追踪
 
 ---
 
@@ -99,6 +127,11 @@
 - [ ] unsupported claim ratio
 - [ ] human accept rate
 
+### Gate / Audit
+- [ ] 本阶段的通过线已明示
+- [ ] 本阶段的阻塞条件已明示
+- [ ] 本阶段的结果已写入 delivery log 或专项 audit log
+
 ---
 
 ## 8. 上线前 Checklist
@@ -119,6 +152,8 @@
 - [ ] 记录 rerank 错排样例
 - [ ] 记录 answer hallucination 样例
 - [ ] 每周补充一批 regression queries
+- [ ] 每周更新一次错误 taxonomy 分布
+- [ ] 每周把新增 badcase 归档到 query bank / difficult set / gold set backlog
 
 ---
 

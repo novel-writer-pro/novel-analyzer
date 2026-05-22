@@ -4,6 +4,48 @@
 
 Roadmap 按“先稳定、再增强、最后拉高上限”的顺序推进。
 
+新增一条执行纪律：**每个 phase 都必须同时产出代码推进、评估证据、审计记录、handoff 更新。**
+
+---
+
+## 当前状态快照（2026-05-22）
+
+| Phase | 状态 | 当前判断 |
+|---|---|---|
+| P0 稳定化 | 部分完成 | 第一批正确性修复已落地，但 route-level spoiler-safe planning / 全量 diagnostics 仍未完结 |
+| P1 Query Understanding V2 | 已起步 | schema + service skeleton + targeted tests 已有，尚未接入 QA 主链 |
+| P2 Retrieval & Graph Fusion | 未正式启动 | contract 与 typed route 方向明确，但未进入主链集成 |
+| P3 Evidence-aware Rerank | 设计中 | 目前仍以章节卡片级 rerank 为主 |
+| P4 Grounded Answer | 设计中 | 现有 grounding 有 shadow 能力，但 contract 尚未系统化 |
+| P5 Data & Evaluation | 初始设计完成 | 指标框架存在，但 gate、badcase 回流、审计模板不足 |
+
+---
+
+## Query Understanding 技术路线（新增）
+
+### Baseline（当前应尽快达成）
+- question_type taxonomy 稳定
+- entity / alias / time_scope / anti_spoiler 约束稳定抽取
+- retrieval preference 可进入 diagnostics
+- 至少覆盖 relation / timeline / foreshadow / world_rule / causal_why / character_state
+
+### Advanced（P1 后半段到 P2 前半段）
+- ambiguity detection
+- query rewrite / canonical rewrite
+- implicit constraint extraction（例如“前20章”“第一次”“真正影响主线”）
+- decomposition hint（复杂问题标记为 multi-hop / multi-stage）
+
+### Frontier（P2+/P3+ 逐步吸收）
+- structured multi-hop retrieval planning
+- question-conditioned subgraph planning
+- answer expectation aware evidence budgeting
+- online badcase feedback → parser regression set 自动沉淀
+
+### 不建议过早投入的方向
+- 一上来引入重 agent planner
+- 没有 benchmark 就接强依赖 LLM parser
+- 先追求“看起来聪明”，不先把 parser contract 稳住
+
 ---
 
 ## Phase 0 — 基线稳定化（P0）
@@ -46,14 +88,29 @@ Roadmap 按“先稳定、再增强、最后拉高上限”的顺序推进。
    - answer expectation
 4. 为 QA pipeline 接入 query plan
 5. 为 diagnostics 导出 query parse 结果
+6. 为 ambiguity / parse failure / alias miss 建立 error taxonomy
+7. 建立 parser regression set 与 badcase 回流入口
 
 ### 交付标准
 - 复杂问题可被稳定分型
 - 至少 80% 的测试问题可提取出正确实体与时间范围
 - retrieval 与 answer 层不再各自猜问题意图
+- query parse 错误能被归类到固定 taxonomy，而不是散落在人工反馈里
 
 ### 推荐周期
 - 4~7 天
+
+### Phase Gate（新增）
+- `StructuredQueryPlan` schema 冻结到可供上下游复用的版本
+- 至少有一批 `20~30` 条 parser regression tests
+- diagnostics 可导出 query plan / parse error / ambiguity flag
+- 至少有一份 alias / timeline / difficult query 的 badcase 清单
+
+### Rollback Gate（新增）
+以下任一出现则不应把 P1 视为完成：
+- parser 接入后 retrieval recall 明显退化且无法解释
+- anti-spoiler 约束被 parser 接线破坏
+- 实体 canonical 化不稳定，导致 alias 问题回退
 
 ---
 
@@ -144,6 +201,12 @@ Roadmap 按“先稳定、再增强、最后拉高上限”的顺序推进。
 - 每次改动都能回答“到底变好没”
 - 能区分是 query understanding 问题、retrieval 问题，还是 generation 问题
 
+### Release Gate（新增）
+- 没有 regression set，不允许宣称“query understanding 已稳定”
+- 没有 retrieval / rerank / answer 三层拆分指标，不允许宣称“QA V2 整体提升”
+- 没有 badcase 回流机制，不允许宣称“进入可持续迭代状态”
+- 没有专项 audit / handoff 记录，不允许宣称“可持续接力开发”
+
 ### 推荐周期
 - 与 P1~P4 并行推进，首版 3~5 天起步
 
@@ -194,6 +257,8 @@ Roadmap 按“先稳定、再增强、最后拉高上限”的顺序推进。
 - [ ] `/api/search-branch` contract 修正
 - [ ] 设计 `StructuredQueryPlan`
 - [ ] 写 query parse mock / schema / tests
+- [ ] 建立 QA V2 审计记录入口
+- [ ] 建立专项 handoff
 
 ### 下周开始做
 - [ ] graph typed routes

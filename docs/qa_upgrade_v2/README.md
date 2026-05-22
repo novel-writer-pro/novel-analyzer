@@ -45,6 +45,7 @@
 12. [`12-phase-delivery-log.md`](./12-phase-delivery-log.md)
 13. [`13-llm-runtime-profile.md`](./13-llm-runtime-profile.md)
 14. [`14-demo-and-verification.md`](./14-demo-and-verification.md)
+15. [`15-audit-and-change-log.md`](./15-audit-and-change-log.md)
 
 ---
 
@@ -88,6 +89,7 @@
 | `12-phase-delivery-log.md` | 阶段交付记录、效果演示与验证命令 |
 | `13-llm-runtime-profile.md` | 当前指定 LLM 运行配置与联调建议 |
 | `14-demo-and-verification.md` | 当前阶段的效果演示、验证命令与手工 demo 步骤 |
+| `15-audit-and-change-log.md` | QA V2 的专项评估、修改、验证与风险审计入口 |
 
 ---
 
@@ -101,3 +103,17 @@
 4. 最后做 `P3 answer generation & grounding`
 
 一句话：**先补地基，再卷模型。**
+
+---
+
+## 当前开发进度快照（2026-05-22）
+
+- `P0`：第一批正确性修复已落地，见 [`12-phase-delivery-log.md`](./12-phase-delivery-log.md)
+- `P1`：`StructuredQueryPlan` schema 与 `QueryUnderstandingService` 骨架已起步，已有针对性测试
+- `P2+`：仍以 contract、eval、observability、handoff、gate 设计为主，尚未完成主链接线
+
+当前最需要补的不是“再加一个 route”，而是：
+- query understanding 的技术分层与失败模式
+- phase gate / release gate / rollback gate
+- badcase 回流到 query bank / regression set 的机制
+- 评估、修改、验证、handoff 的持续审计轨
