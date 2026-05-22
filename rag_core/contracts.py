@@ -17,6 +17,30 @@ class RetrievalHit:
 
 
 @dataclass(frozen=True, slots=True)
+class RetrievalRouteDiagnostics:
+    """Per-route diagnostics for latency and contribution checks."""
+
+    route: str
+    hit_count: int
+    latency_ms: float
+
+
+@dataclass(frozen=True, slots=True)
+class RetrievalSearchDiagnostics:
+    """Raw, fused, and reranked retrieval views for inspection/evaluation."""
+
+    query: str
+    raw_hits: list[RetrievalHit]
+    reranked_hits: list[RetrievalHit]
+    rerank_applied: bool
+    fusion_applied: bool = False
+    route_counts: dict[str, int] | None = None
+    route_diagnostics: list[RetrievalRouteDiagnostics] | None = None
+    raw_latency_ms: float = 0.0
+    rerank_latency_ms: float = 0.0
+
+
+@dataclass(frozen=True, slots=True)
 class RetrievalPreferences:
     """High-level retrieval planning hints for downstream pipelines."""
 

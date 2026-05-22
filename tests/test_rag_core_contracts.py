@@ -62,3 +62,29 @@ def test_retrieval_service_reuses_rag_core_hit_contract() -> None:
     from novel_analyzer.services.retrieval_service import RetrievalHit as ServiceRetrievalHit
 
     assert ServiceRetrievalHit is CoreRetrievalHit
+
+
+def test_rag_core_exports_retrieval_diagnostics_contracts() -> None:
+    from rag_core import RetrievalHit, RetrievalRouteDiagnostics, RetrievalSearchDiagnostics
+
+    route = RetrievalRouteDiagnostics(route="fts", hit_count=3, latency_ms=12.5)
+    report = RetrievalSearchDiagnostics(
+        query="卫图",
+        raw_hits=[RetrievalHit(chapter_index=1, title="一", summary_text="命格初现", score=1.0, keyword_list=[])],
+        reranked_hits=[],
+        rerank_applied=False,
+    )
+
+    assert route.route == "fts"
+    assert report.query == "卫图"
+    assert report.raw_hits[0].title == "一"
+
+
+def test_retrieval_service_reuses_rag_core_diagnostics_contracts() -> None:
+    from rag_core import RetrievalRouteDiagnostics as CoreRouteDiagnostics
+    from rag_core import RetrievalSearchDiagnostics as CoreSearchDiagnostics
+    from novel_analyzer.services.retrieval_service import RetrievalRouteDiagnostics as ServiceRouteDiagnostics
+    from novel_analyzer.services.retrieval_service import RetrievalSearchDiagnostics as ServiceSearchDiagnostics
+
+    assert ServiceRouteDiagnostics is CoreRouteDiagnostics
+    assert ServiceSearchDiagnostics is CoreSearchDiagnostics

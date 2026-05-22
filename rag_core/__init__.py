@@ -5,7 +5,13 @@ Novel-specific orchestration, graph semantics, and adapter implementations stay
 in ``novel_analyzer`` until later extraction steps.
 """
 
-from .contracts import RetrievalHit, RetrievalPreferences, StructuredQueryPlan
+from .contracts import (
+    RetrievalHit,
+    RetrievalPreferences,
+    RetrievalRouteDiagnostics,
+    RetrievalSearchDiagnostics,
+    StructuredQueryPlan,
+)
 from .protocols import CorpusAdapter, GraphAdapter
 
 __all__ = [
@@ -13,5 +19,7 @@ __all__ = [
     "GraphAdapter",
     "RetrievalHit",
     "RetrievalPreferences",
+    "RetrievalRouteDiagnostics",
+    "RetrievalSearchDiagnostics",
     "StructuredQueryPlan",
 ]

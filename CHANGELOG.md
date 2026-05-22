@@ -1,5 +1,12 @@
 ## Unreleased
 
+### Changed (rag_core diagnostics adoption - 2026-05-22)
+- rag_core/contracts.py: promoted RetrievalRouteDiagnostics and RetrievalSearchDiagnostics into the shared core contract layer
+- novel_analyzer/services/retrieval_service.py: switched local diagnostics contracts to reuse rag_core.contracts
+- tests/test_rag_core_contracts.py: extended TDD coverage to prove diagnostics contracts are now shared between rag_core and RetrievalService
+- docs/qa_upgrade_v2/15-audit-and-change-log.md: recorded the third extraction step and verification trail
+- docs/handoffs/qa-upgrade-v2-handoff-20260522.md: updated code-extraction status with diagnostics contract reuse
+
 ### Changed (rag_core contract adoption - 2026-05-22)
 - novel_analyzer/services/retrieval_service.py: switched local RetrievalHit to reuse rag_core.contracts.RetrievalHit
 - tests/test_rag_core_contracts.py: added TDD coverage proving RetrievalService now shares the core RetrievalHit contract

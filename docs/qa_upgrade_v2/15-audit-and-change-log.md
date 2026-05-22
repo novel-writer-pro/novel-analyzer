@@ -460,3 +460,42 @@
 
 ### Next Owner Notes
 - 下一步可优先评估 `StructuredQueryPlan` 是否也适合类似双栖，再考虑提炼 `RetrievalSearchDiagnostics` 或纯 fusion/rerank 核心
+
+---
+
+## Audit Entry — 2026-05-22 继续推进（Retrieval diagnostics contract 双栖）
+
+### Trigger
+- `RetrievalHit` 已经双栖共享到 `rag_core`
+- 下一步最稳妥的延伸是让 retrieval diagnostics 也进入 shared core，而不提前移动 retrieval mechanics
+
+### Inputs Reviewed
+- [rag_core/contracts.py](file:///home/user/novel-analyzer/rag_core/contracts.py)
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Findings
+- `RetrievalRouteDiagnostics` / `RetrievalSearchDiagnostics` 与 `RetrievalHit` 一样，本质是纯 contract，不携带 graph 或 novel 语义
+- 如果继续留在 `retrieval_service.py` 本地定义，会拖慢后续把 pure retrieval core 往 `rag_core` 迁移的节奏
+
+### Decisions
+- 把两个 diagnostics contract 提升到 `rag_core.contracts`
+- 让 `RetrievalService` 直接复用 shared diagnostics types
+- 继续维持 contract-first、小步迁移策略
+
+### Files Changed
+- [rag_core/contracts.py](file:///home/user/novel-analyzer/rag_core/contracts.py)
+- [rag_core/__init__.py](file:///home/user/novel-analyzer/rag_core/__init__.py)
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Verification
+- RED：`rag_core` 先无法导出 diagnostics contract，测试失败
+- GREEN：同一测试在提升 contract 后通过（`6 passed`）
+- Manual QA：直接导入并打印 `route_same_object=True`、`search_same_object=True`
+
+### Deferred Risks
+- 仍未开始迁移 `_apply_rerank`、RRF、route 逻辑本体；这一拍只处理 contract
+
+### Next Owner Notes
+- 下一步若继续抽代码，优先考虑纯函数/纯 mechanics（例如 fusion 或 rerank 逻辑），而不是先碰 novel adapter orchestration

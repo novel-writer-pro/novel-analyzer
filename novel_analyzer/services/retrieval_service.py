@@ -7,7 +7,7 @@ import time
 from dataclasses import dataclass
 from typing import Any
 
-from rag_core import RetrievalHit
+from rag_core import RetrievalHit, RetrievalRouteDiagnostics, RetrievalSearchDiagnostics
 from sqlalchemy import select, text
 from sqlalchemy.engine import RowMapping
 from sqlalchemy.orm import Session
@@ -34,30 +34,6 @@ class ChunkDraft:
     start_offset: int
     end_offset: int
     keywords: list[str]
-
-
-@dataclass(frozen=True, slots=True)
-class RetrievalRouteDiagnostics:
-    """Per-route retrieval diagnostics for latency and contribution checks."""
-
-    route: str
-    hit_count: int
-    latency_ms: float
-
-
-@dataclass(frozen=True, slots=True)
-class RetrievalSearchDiagnostics:
-    """Raw, fused, and reranked retrieval views for inspection/evaluation."""
-
-    query: str
-    raw_hits: list[RetrievalHit]
-    reranked_hits: list[RetrievalHit]
-    rerank_applied: bool
-    fusion_applied: bool = False
-    route_counts: dict[str, int] | None = None
-    route_diagnostics: list[RetrievalRouteDiagnostics] | None = None
-    raw_latency_ms: float = 0.0
-    rerank_latency_ms: float = 0.0
 
 
 class RetrievalService:
