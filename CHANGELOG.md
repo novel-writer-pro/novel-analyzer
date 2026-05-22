@@ -1,5 +1,15 @@
 ## Unreleased
 
+### Added (QA Upgrade V2 docs governance - 2026-05-22)
+- docs/qa_upgrade_v2/README.md: added current-progress snapshot and audit entrypoint for QA V2
+- docs/qa_upgrade_v2/03-roadmap.md: extended with current phase status, query-understanding capability tiers, and explicit phase/release/rollback gates
+- docs/qa_upgrade_v2/04-delivery-checklist.md: upgraded from feature checklist to evidence- and audit-aware delivery checklist
+- docs/qa_upgrade_v2/06-metrics-and-evaluation.md: added phase gate, release gate, and rollback gate definitions
+- docs/qa_upgrade_v2/12-phase-delivery-log.md: recorded documentation-governance delivery phase
+- docs/qa_upgrade_v2/15-audit-and-change-log.md: new QA V2-specific audit ledger for findings, decisions, verification, and deferred risks
+- docs/handoffs/qa-upgrade-v2-handoff-20260522.md: new dedicated handoff for QA V2 next-owner continuity
+- docs/handoffs/README.md: indexed the new QA V2 handoff
+
 ### Added (Loom Phase 6 - T14)
 - scripts/compare_loom_metrics.py: compare source branch vs project fingerprint metrics (±20% threshold, exit code 0/1)
 - tests/integration/test_loom_phase6_e2e.py: full 7-layer pipeline e2e test (mock LLM, 2 tests)

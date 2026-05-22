@@ -9,6 +9,7 @@
 
 | 日期 | 主题 | 交接文档 |
 |------|------|---------|
+| **2026-05-22** | **QA Upgrade V2 文档深化 + 审计治理** | [qa-upgrade-v2-handoff-20260522.md](./qa-upgrade-v2-handoff-20260522.md) |
 | **2026-05-17** | **Loom Phase 6 完成 — Author Project Shell（18 commits）** | [session-handoff-20260517-phase6.md](./session-handoff-20260517-phase6.md) |
 | 2026-05-17 | scaffold 三层修复 + 31 commits 总结 | [session-handoff-20260517.md](./session-handoff-20260517.md) |
 | 2026-05-16 | Reader Panel — 4-persona × 7-dim 阅读体验评估 + comfort_score soft gate | [reader-panel-handoff-20260516.md](./reader-panel-handoff-20260516.md) |
