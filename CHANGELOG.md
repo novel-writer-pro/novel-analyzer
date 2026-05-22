@@ -1,5 +1,11 @@
 ## Unreleased
 
+### Added (QA Upgrade V2 evolution follow-up - 2026-05-22)
+- docs/qa_upgrade_v2/07-development-plan.md: added query-understanding coverage-truth matrix and next regression buckets
+- docs/qa_upgrade_v2/16-query-understanding-techniques-appendix.md: new appendix covering baseline / advanced / frontier query-understanding patterns, adoption order, and evaluation hooks
+- docs/qa_upgrade_v2/15-audit-and-change-log.md: added follow-up audit entries for coverage calibration and appendix rollout
+- docs/handoffs/qa-upgrade-v2-handoff-20260522.md: extended next-owner guidance with coverage truth and appendix reading order
+
 ### Added (QA Upgrade V2 docs governance - 2026-05-22)
 - docs/qa_upgrade_v2/README.md: added current-progress snapshot and audit entrypoint for QA V2
 - docs/qa_upgrade_v2/03-roadmap.md: extended with current phase status, query-understanding capability tiers, and explicit phase/release/rollback gates

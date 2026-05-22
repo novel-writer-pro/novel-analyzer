@@ -41,6 +41,8 @@ Roadmap 按“先稳定、再增强、最后拉高上限”的顺序推进。
 - answer expectation aware evidence budgeting
 - online badcase feedback → parser regression set 自动沉淀
 
+详细外部模式与采纳顺序，见 [`16-query-understanding-techniques-appendix.md`](./16-query-understanding-techniques-appendix.md)。
+
 ### 不建议过早投入的方向
 - 一上来引入重 agent planner
 - 没有 benchmark 就接强依赖 LLM parser

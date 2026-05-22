@@ -15,6 +15,8 @@
 - 把 [06-metrics-and-evaluation.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/06-metrics-and-evaluation.md) 补齐 phase gate / release gate / rollback gate
 - 把 [12-phase-delivery-log.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/12-phase-delivery-log.md) 追加本轮文档治理阶段
 - 新增 [15-audit-and-change-log.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/15-audit-and-change-log.md) 作为 QA V2 审计入口
+- 把 [07-development-plan.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/07-development-plan.md) 补成带“当前测试覆盖真相”的开发计划
+- 新增 [16-query-understanding-techniques-appendix.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/16-query-understanding-techniques-appendix.md) 作为 Query Understanding 外部模式与采纳顺序附录
 
 ## 2. 下一步推荐（接手人）
 
@@ -24,6 +26,7 @@
 ### P1
 - 把 `tests/test_query_understanding_service.py` 的当前覆盖面与 roadmap 中的 parser gate 一一对齐
 - 明确哪几类 query 已经被 skeleton 支持，哪几类仍是 design-only
+- 优先补 relation / world_rule / foreshadow / ambiguity / parse failure taxonomy 这五类测试桶
 
 ### P2
 - 如果开始接 `qa_service` 主链，先要求：
@@ -42,20 +45,25 @@
 1. [docs/qa_upgrade_v2/README.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/README.md)
 2. [docs/qa_upgrade_v2/03-roadmap.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/03-roadmap.md)
 3. [docs/qa_upgrade_v2/04-delivery-checklist.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/04-delivery-checklist.md)
-4. [docs/qa_upgrade_v2/15-audit-and-change-log.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/15-audit-and-change-log.md)
+4. [docs/qa_upgrade_v2/07-development-plan.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/07-development-plan.md)
+5. [docs/qa_upgrade_v2/15-audit-and-change-log.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/15-audit-and-change-log.md)
+6. [docs/qa_upgrade_v2/16-query-understanding-techniques-appendix.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/16-query-understanding-techniques-appendix.md)
 
 ### 如果要继续实现 query understanding
 - 先核对：`StructuredQueryPlan` 是否与 roadmap gate 一致
 - 再核对：现有测试是否覆盖 alias / timeline / difficult query
+- 再核对：新增能力属于 baseline / advanced / frontier 哪一层，避免过早引入重 planner
 - 最后再动主链接线
 
 ## 5. 文档索引
 - [QA Upgrade V2 README](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/README.md)
 - [Roadmap](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/03-roadmap.md)
 - [Delivery Checklist](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/04-delivery-checklist.md)
+- [Development Plan](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/07-development-plan.md)
 - [Metrics and Evaluation](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/06-metrics-and-evaluation.md)
 - [Phase Delivery Log](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/12-phase-delivery-log.md)
 - [Audit and Change Log](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/15-audit-and-change-log.md)
+- [Query Understanding Techniques Appendix](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/16-query-understanding-techniques-appendix.md)
 
 ## 6. 本会话 commit 列表
 - 本次 handoff 对应 commit 由当前会话在提交后补充到 git 历史中

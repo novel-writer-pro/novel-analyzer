@@ -46,6 +46,7 @@
 13. [`13-llm-runtime-profile.md`](./13-llm-runtime-profile.md)
 14. [`14-demo-and-verification.md`](./14-demo-and-verification.md)
 15. [`15-audit-and-change-log.md`](./15-audit-and-change-log.md)
+16. [`16-query-understanding-techniques-appendix.md`](./16-query-understanding-techniques-appendix.md)
 
 ---
 
@@ -90,6 +91,7 @@
 | `13-llm-runtime-profile.md` | 当前指定 LLM 运行配置与联调建议 |
 | `14-demo-and-verification.md` | 当前阶段的效果演示、验证命令与手工 demo 步骤 |
 | `15-audit-and-change-log.md` | QA V2 的专项评估、修改、验证与风险审计入口 |
+| `16-query-understanding-techniques-appendix.md` | Query understanding 的外部模式、采纳顺序与评估 hooks |
 
 ---
 

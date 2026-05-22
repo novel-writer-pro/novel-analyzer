@@ -139,3 +139,78 @@
 ### Next Owner Notes
 - 下一棒优先继续把 roadmap / checklist / handoff / changelog 的治理补齐
 - 每次新增阶段性结论时，都应继续往本文件追加 audit entry，而不是覆盖历史
+
+---
+
+## Audit Entry — 2026-05-22 继续推进（Query Understanding 覆盖面校准）
+
+### Trigger
+- 用户要求继续推进和演进 QA V2
+- 上一轮文档治理完成后，需要进一步把“已实现 vs 设计中”的边界写实，避免 roadmap 高估 query understanding 完成度
+
+### Inputs Reviewed
+- [tests/test_query_understanding_service.py](file:///home/user/novel-analyzer/tests/test_query_understanding_service.py)
+- [07-development-plan.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/07-development-plan.md)
+- [08-schema-and-contracts.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/08-schema-and-contracts.md)
+- [09-implementation-spec.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/09-implementation-spec.md)
+
+### Findings
+- 当前自动化测试只明确覆盖了 timeline/time_scope/anti-spoiler、alias→canonical、局部 retrieval preference
+- 仍未覆盖 ambiguity、parse failure taxonomy、relation/world_rule/foreshadow 抽取、diagnostics 导出、主链接线一致性
+- 因此“P1 已起步”成立，但“P1 接近稳定”不成立
+
+### Decisions
+- 在开发计划中增加“当前覆盖真相”矩阵
+- 在测试建议中明确最小下一批 regression buckets
+- 后续所有 query understanding 进度判断，都以测试桶而不是口头表述为准
+
+### Files Changed
+- [07-development-plan.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/07-development-plan.md) — 增加测试覆盖真相、缺口与最小补测顺序
+- [15-audit-and-change-log.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/15-audit-and-change-log.md) — 记录本轮覆盖面校准
+
+### Verification
+- 逐行比对现有测试内容与 roadmap / development plan 中对 P1 的要求
+- 仅记录已读文件能证明的覆盖项，不推断未见代码行为
+
+### Deferred Risks
+- relation / world_rule / foreshadow 可能在实现中已有部分逻辑，但在当前已读测试面中未被证明，故本轮仍按“未覆盖”处理
+
+### Next Owner Notes
+- 继续扩 query-understanding regression surface 时，优先补“意图/失败模式/边界条件”，再补更多 happy-path 样例
+
+---
+
+## Audit Entry — 2026-05-22 继续推进（Query Understanding 技术附录落地）
+
+### Trigger
+- 在完成覆盖面校准后，需要把 query understanding 的外部模式收敛成可供仓库持续使用的 appendix，避免后续讨论反复停留在口头层
+
+### Inputs Reviewed
+- [README.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/README.md)
+- [03-roadmap.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/03-roadmap.md)
+- [07-development-plan.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/07-development-plan.md)
+- 当前会话已收集到的外部模式线索（如 QueryPlan / QueryProcessor / pre-retrieval query understanding 结构）
+
+### Findings
+- 当前主文档已定义 `StructuredQueryPlan`，但缺一个单独说明“为什么这样分层、什么该现在做、什么不该现在做”的技术附录
+- 如果没有附录，后续很容易再次跳到“先上更重 planner / 更强 parser”而忽略 regression 和 observability 地基
+
+### Decisions
+- 新增 Query Understanding appendix
+- 用 baseline / advanced / frontier + evaluation hooks + do-not-do-now 组织内容
+- 只写适配 novel-analyzer 当前阶段的采纳顺序，不把附录写成泛泛研究综述
+
+### Files Changed
+- [16-query-understanding-techniques-appendix.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/16-query-understanding-techniques-appendix.md) — 新增技术附录
+- [README.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/README.md) — 加入附录索引
+- [03-roadmap.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/03-roadmap.md) — 连接技术路线与附录
+
+### Verification
+- 附录内容与当前 repo 的 `StructuredQueryPlan` / roadmap / development plan 用词保持一致
+- 不把外部模式直接当作“本项目已实现能力”写入
+
+### Deferred Risks
+- 外部模式仍未沉淀成独立 research note；如果未来需要更强引用链，可再拆单独研究文档
+
+### Next Owner Notes
+- 后续如果引入 rewrite / decomposition / planner，先回看本附录的采纳顺序，再决定是否推进

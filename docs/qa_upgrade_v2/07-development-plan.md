@@ -48,6 +48,29 @@
 - `novel_analyzer/services/qa_service.py`
 - `novel_analyzer/domain/schemas.py`
 
+### 当前覆盖真相（2026-05-22）
+
+基于当前已存在的 [`tests/test_query_understanding_service.py`](file:///home/user/novel-analyzer/tests/test_query_understanding_service.py)，本项目对 Query Understanding 的自动化覆盖还处在**骨架验证**阶段，而不是“功能完整阶段”。
+
+| 能力 | 当前状态 | 证据 |
+|---|---|---|
+| timeline question_type | 已覆盖 | timeline query plan 测试 |
+| time scope 抽取 | 已覆盖 | `前20章` 范围断言 |
+| anti-spoiler constraint | 已覆盖 | `plan.constraints.anti_spoiler` 断言 |
+| alias → canonical | 已覆盖 | `卫图少年 -> 卫图` 断言 |
+| retrieval preference（timeline/causal） | 部分覆盖 | 仅覆盖 `prefer_timeline` / `prefer_causal` |
+| ambiguity detection | 未覆盖 | 无现有测试 |
+| parse failure taxonomy | 未覆盖 | 无现有测试 |
+| relation intent extraction | 未覆盖 | 无现有测试 |
+| world_rule extraction | 未覆盖 | 无现有测试 |
+| foreshadow extraction | 未覆盖 | 无现有测试 |
+| diagnostics 导出 | 未覆盖 | 无现有测试 |
+| QA 主链接线一致性 | 未覆盖 | 还未进入集成覆盖 |
+
+这意味着当前文档里所有“P1 已起步”的表述都应理解为：
+
+> **schema 和 parser skeleton 已存在，但还没有足够的 regression surface 来支撑“query understanding 已稳定”。**
+
 ---
 
 ## Lane C — Retrieval & Evidence Contract
@@ -141,6 +164,17 @@
 - query plan schema 稳定
 - 至少有 20~30 条 parser regression tests
 
+### PR2 当前缺口（新增）
+建议把 `20~30` 条 parser regression tests 至少拆成以下桶：
+- alias / canonical
+- timeline / chapter range
+- causal_why
+- relation intent
+- world_rule
+- foreshadow
+- ambiguity / underspecified question
+- parse failure / fallback behavior
+
 ## PR3 evidence contract
 - retrieval diagnostics 能输出 evidence-level objects
 - graph route 可输出结构化 path
@@ -172,6 +206,23 @@ tests/
 - `tests/test_qa_service.py`
 - `tests/test_retrieval_service.py`
 - `tests/test_domain_dictionary_service.py`
+
+### 推荐先补的最小测试集（新增）
+
+如果下一步继续做 Query Understanding，优先顺序建议是：
+
+1. 在 `tests/test_query_understanding_service.py` 继续补：
+   - relation intent
+   - world_rule
+   - foreshadow
+   - ambiguity flag
+   - parse failure taxonomy
+2. 新增 `tests/test_qa_query_plan.py`：
+   - 覆盖 `qa_service` 消费 query plan 的行为一致性
+3. 等主链接线后，再补：
+   - diagnostics export
+   - anti-spoiler + query plan 联动
+   - difficult query regression bucket
 
 ---
 
