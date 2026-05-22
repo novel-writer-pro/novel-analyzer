@@ -47,6 +47,8 @@
 14. [`14-demo-and-verification.md`](./14-demo-and-verification.md)
 15. [`15-audit-and-change-log.md`](./15-audit-and-change-log.md)
 16. [`16-query-understanding-techniques-appendix.md`](./16-query-understanding-techniques-appendix.md)
+17. [`17-parser-regression-playbook.md`](./17-parser-regression-playbook.md)
+18. [`18-qa-eval-runbook.md`](./18-qa-eval-runbook.md)
 
 ---
 
@@ -92,6 +94,8 @@
 | `14-demo-and-verification.md` | 当前阶段的效果演示、验证命令与手工 demo 步骤 |
 | `15-audit-and-change-log.md` | QA V2 的专项评估、修改、验证与风险审计入口 |
 | `16-query-understanding-techniques-appendix.md` | Query understanding 的外部模式、采纳顺序与评估 hooks |
+| `17-parser-regression-playbook.md` | parser regression case 的分桶、回流与维护 SOP |
+| `18-qa-eval-runbook.md` | qa_eval 样本 intake、审核、回放与沉淀 SOP |
 
 ---
 

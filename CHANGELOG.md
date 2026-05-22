@@ -1,5 +1,11 @@
 ## Unreleased
 
+### Added (QA Upgrade V2 SOPs - 2026-05-22)
+- docs/qa_upgrade_v2/17-parser-regression-playbook.md: new SOP for regression bucket selection, badcase promotion, and when parser cases must become tests
+- docs/qa_upgrade_v2/18-qa-eval-runbook.md: new SOP for sample intake, manual review, replay, and backlog-to-regression flow
+- docs/qa_upgrade_v2/15-audit-and-change-log.md: recorded the SOP rollout and its scope limits
+- docs/handoffs/qa-upgrade-v2-handoff-20260522.md: added SOP reading order for future sample contributors
+
 ### Added (QA Upgrade V2 qa_eval skeleton - 2026-05-22)
 - data/qa_eval/: created real QA eval directory skeleton with README-only contracts for query_bank_v2, difficult_queries, alias_gold, relation_gold, timeline_gold, parser_regression, answer_eval, and badcase_backlog
 - docs/qa_upgrade_v2/05-data-preparation.md: linked the new skeleton and clarified that the repo now contains concrete contract entrypoints without fake sample data

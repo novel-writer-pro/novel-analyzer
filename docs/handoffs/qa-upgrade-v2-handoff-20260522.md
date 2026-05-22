@@ -20,6 +20,7 @@
 - 把 [05-data-preparation.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/05-data-preparation.md) 补成带 `data/qa_eval/` 目录 contract、parser regression buckets 与 jsonl 样本规范的数据准备文档
 - 把 [11-risk-register-and-backlog.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/11-risk-register-and-backlog.md) 补成包含 regression/data-contract backlog 的任务池
 - 在仓库中真实创建 `data/qa_eval/` 目录骨架及各子目录 README contract（不含伪造样本）
+- 新增 parser / qa_eval 两份 SOP，说明 regression case、badcase 回流、人工审核与 replay 的执行方式
 
 ## 2. 下一步推荐（接手人）
 
@@ -35,6 +36,7 @@
 ### 数据资产
 - 从 [`data/qa_eval/parser_regression/README.md`](file:///home/user/novel-analyzer/data/qa_eval/parser_regression/README.md) 开始填首批 regression 样本
 - 从 [`data/qa_eval/badcase_backlog/README.md`](file:///home/user/novel-analyzer/data/qa_eval/badcase_backlog/README.md) 开始接 badcase 回流
+- 新增样本前，先读 [`17-parser-regression-playbook.md`](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/17-parser-regression-playbook.md) 和 [`18-qa-eval-runbook.md`](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/18-qa-eval-runbook.md)
 
 ### P2
 - 如果开始接 `qa_service` 主链，先要求：
@@ -60,6 +62,8 @@
 7. [docs/qa_upgrade_v2/05-data-preparation.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/05-data-preparation.md)
 8. [docs/qa_upgrade_v2/11-risk-register-and-backlog.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/11-risk-register-and-backlog.md)
 9. [data/qa_eval/README.md](file:///home/user/novel-analyzer/data/qa_eval/README.md)
+10. [docs/qa_upgrade_v2/17-parser-regression-playbook.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/17-parser-regression-playbook.md)
+11. [docs/qa_upgrade_v2/18-qa-eval-runbook.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/18-qa-eval-runbook.md)
 
 ### 如果要继续实现 query understanding
 - 先核对：`StructuredQueryPlan` 是否与 roadmap gate 一致
@@ -78,6 +82,8 @@
 - [Phase Delivery Log](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/12-phase-delivery-log.md)
 - [Audit and Change Log](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/15-audit-and-change-log.md)
 - [Query Understanding Techniques Appendix](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/16-query-understanding-techniques-appendix.md)
+- [Parser Regression Playbook](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/17-parser-regression-playbook.md)
+- [QA Eval Runbook](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/18-qa-eval-runbook.md)
 - [QA Eval Data Skeleton](file:///home/user/novel-analyzer/data/qa_eval/README.md)
 
 ## 6. 本会话 commit 列表

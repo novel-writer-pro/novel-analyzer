@@ -294,3 +294,43 @@
 
 ### Next Owner Notes
 - 下一步若开始填样本，优先从 `parser_regression/` 和 `badcase_backlog/` 开始，而不是先追求 query_bank 全量化
+
+---
+
+## Audit Entry — 2026-05-22 继续推进（Parser / qa_eval SOP 落地）
+
+### Trigger
+- `qa_eval` 目录骨架已经落库，但仍缺少“怎么新增样本、怎么审核、怎么回流、怎么 replay”的操作说明
+- 用户继续要求持续优化，因此需要把这套骨架推进成可执行 SOP，而不只是静态目录说明
+
+### Inputs Reviewed
+- [data/qa_eval/README.md](file:///home/user/novel-analyzer/data/qa_eval/README.md)
+- [data/qa_eval/parser_regression/README.md](file:///home/user/novel-analyzer/data/qa_eval/parser_regression/README.md)
+- [05-data-preparation.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/05-data-preparation.md)
+- [07-development-plan.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/07-development-plan.md)
+
+### Findings
+- 目录和 contract 已经存在，但缺操作层指导时，后续贡献者仍可能不知道：
+  - 什么时候新增 regression case
+  - 什么时候只记 badcase 不进 regression
+  - 什么时候样本必须同步进入自动化测试
+
+### Decisions
+- 新增 parser regression playbook
+- 新增 qa_eval runbook
+- 让 SOP 和现有目录 contract、开发计划、handoff 一起工作，而不是各自独立
+
+### Files Changed
+- [17-parser-regression-playbook.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/17-parser-regression-playbook.md)
+- [18-qa-eval-runbook.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/18-qa-eval-runbook.md)
+- [README.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/README.md)
+
+### Verification
+- SOP 内容与现有 bucket 命名、qa_eval 目录、audit 逻辑保持一致
+- 不扩展为新的产品需求，仅补执行层指导
+
+### Deferred Risks
+- 当前仍未引入真实样本；SOP 只能降低未来样本接入成本，不能替代真实数据建设
+
+### Next Owner Notes
+- 当首批真实样本入库时，优先使用本 SOP 检查 bucket、来源、expected 行为、回流路径是否一致
