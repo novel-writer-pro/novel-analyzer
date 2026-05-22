@@ -1,5 +1,12 @@
 ## Unreleased
 
+### Changed (rag_core fusion adoption - 2026-05-22)
+- rag_core/fusion.py: introduced a shared reciprocal-rank fusion helper for retrieval pipelines
+- novel_analyzer/services/retrieval_service.py: switched `_fuse_recall_lists` to reuse the shared rag_core fusion helper
+- tests/test_rag_core_contracts.py: extended TDD coverage to prove RetrievalService now uses the shared reciprocal-rank fusion helper
+- docs/qa_upgrade_v2/15-audit-and-change-log.md: recorded the fifth extraction step and its verification trail
+- docs/handoffs/qa-upgrade-v2-handoff-20260522.md: updated code-extraction status with shared fusion mechanics
+
 ### Changed (rag_core query-planning adoption - 2026-05-22)
 - rag_core/contracts.py: promoted the full query-planning contract group (PlannedEntity, QueryTimeScope, QueryConstraints, RetrievalPreferences, StructuredQueryPlan)
 - novel_analyzer/domain/schemas.py: switched local query-planning types to reuse rag_core contracts

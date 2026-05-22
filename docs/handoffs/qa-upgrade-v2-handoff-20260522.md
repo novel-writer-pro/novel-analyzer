@@ -59,6 +59,7 @@
 - `RetrievalService` 已开始复用 shared `RetrievalHit`
 - `RetrievalRouteDiagnostics` / `RetrievalSearchDiagnostics` 也已进入 shared core
 - `StructuredQueryPlan / RetrievalPreferences / QueryConstraints / QueryTimeScope / PlannedEntity` 也已进入 shared core
+- RRF fusion helper 也已进入 `rag_core`，`RetrievalService` 开始复用 shared mechanics
 - 现有 `novel_analyzer` 服务实现整体还未迁移过去，这仍然是刻意控制风险的渐进式抽离
 
 ## 3. 已知限制

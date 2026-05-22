@@ -15,6 +15,7 @@ from .contracts import (
     RetrievalSearchDiagnostics,
     StructuredQueryPlan,
 )
+from .fusion import reciprocal_rank_fuse
 from .protocols import CorpusAdapter, GraphAdapter
 
 __all__ = [
@@ -28,4 +29,5 @@ __all__ = [
     "RetrievalRouteDiagnostics",
     "RetrievalSearchDiagnostics",
     "StructuredQueryPlan",
+    "reciprocal_rank_fuse",
 ]

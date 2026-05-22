@@ -113,3 +113,29 @@ def test_novel_query_planning_contracts_reuse_rag_core_types() -> None:
 
     assert NovelRetrievalPreferences is CoreRetrievalPreferences
     assert NovelStructuredQueryPlan is CoreStructuredQueryPlan
+
+
+def test_rag_core_exports_reciprocal_rank_fusion_helper() -> None:
+    from rag_core import RetrievalHit, reciprocal_rank_fuse
+
+    route_hits = [
+        [
+            RetrievalHit(chapter_index=1, title="一", summary_text="命格初现", score=10.0, keyword_list=[]),
+            RetrievalHit(chapter_index=2, title="二", summary_text="弱相关", score=9.0, keyword_list=[]),
+        ],
+        [
+            RetrievalHit(chapter_index=2, title="二", summary_text="弱相关", score=1.0, keyword_list=[]),
+            RetrievalHit(chapter_index=1, title="一", summary_text="命格初现", score=0.5, keyword_list=[]),
+        ],
+    ]
+
+    fused = reciprocal_rank_fuse(route_hits, limit=2)
+
+    assert [hit.chapter_index for hit in fused] == [1, 2]
+
+
+def test_retrieval_service_uses_rag_core_reciprocal_rank_fusion() -> None:
+    from rag_core.fusion import reciprocal_rank_fuse as core_rrf
+    from novel_analyzer.services.retrieval_service import RetrievalService
+
+    assert RetrievalService._fuse_recall_lists is core_rrf

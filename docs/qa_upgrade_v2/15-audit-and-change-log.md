@@ -539,3 +539,42 @@
 
 ### Next Owner Notes
 - 下一步若继续抽代码，可优先考虑把纯 retrieval mechanics（RRF / rerank helper）移入 `rag_core`，而不是先碰 query taxonomy 或 graph augmentation
+
+---
+
+## Audit Entry — 2026-05-22 继续推进（RRF fusion mechanics 进入 rag_core）
+
+### Trigger
+- contract 层已经共享到 `rag_core`
+- 下一步最合适的不是继续抽 adapter-heavy 逻辑，而是开始把纯 retrieval mechanics 中最安全的一块提升进去
+
+### Inputs Reviewed
+- [rag_core/contracts.py](file:///home/user/novel-analyzer/rag_core/contracts.py)
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Findings
+- `_fuse_recall_lists` 是纯 RRF fusion helper，不依赖 DB、graph、novel taxonomy 或 adapter 语义
+- 它刚好处于 contract-first 抽离后的下一拍：contract 已共享，现在 mechanics 也能开始共享
+
+### Decisions
+- 新增 `rag_core/fusion.py`
+- 把 `reciprocal_rank_fuse` 提升为 shared helper
+- 让 `RetrievalService._fuse_recall_lists` 直接复用 shared helper，而不改其他 retrieval 行为
+
+### Files Changed
+- [rag_core/fusion.py](file:///home/user/novel-analyzer/rag_core/fusion.py)
+- [rag_core/__init__.py](file:///home/user/novel-analyzer/rag_core/__init__.py)
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Verification
+- RED：测试先因 `rag_core` 还没有 fusion helper 而失败
+- GREEN：同一测试在抽出 helper 后通过（`10 passed`）
+- Manual QA：直接导入并打印 `same_object=True`
+
+### Deferred Risks
+- 这一步只迁移 fusion，不迁移 rerank helper 或 route 收集逻辑
+
+### Next Owner Notes
+- 如果继续抽 retrieval mechanics，下一拍优先考虑 `_apply_rerank` 或纯 diagnostics helper，而不是 route SQL 本体
