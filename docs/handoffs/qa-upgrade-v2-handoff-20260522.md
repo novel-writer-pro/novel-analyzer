@@ -19,6 +19,7 @@
 - 新增 [16-query-understanding-techniques-appendix.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/16-query-understanding-techniques-appendix.md) 作为 Query Understanding 外部模式与采纳顺序附录
 - 把 [05-data-preparation.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/05-data-preparation.md) 补成带 `data/qa_eval/` 目录 contract、parser regression buckets 与 jsonl 样本规范的数据准备文档
 - 把 [11-risk-register-and-backlog.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/11-risk-register-and-backlog.md) 补成包含 regression/data-contract backlog 的任务池
+- 在仓库中真实创建 `data/qa_eval/` 目录骨架及各子目录 README contract（不含伪造样本）
 
 ## 2. 下一步推荐（接手人）
 
@@ -30,6 +31,10 @@
 - 明确哪几类 query 已经被 skeleton 支持，哪几类仍是 design-only
 - 优先补 relation / world_rule / foreshadow / ambiguity / parse failure taxonomy 这五类测试桶
 - 同步建立 `data/qa_eval/parser_regression/` 的同名数据桶，不要只补测试不补样本目录
+
+### 数据资产
+- 从 [`data/qa_eval/parser_regression/README.md`](file:///home/user/novel-analyzer/data/qa_eval/parser_regression/README.md) 开始填首批 regression 样本
+- 从 [`data/qa_eval/badcase_backlog/README.md`](file:///home/user/novel-analyzer/data/qa_eval/badcase_backlog/README.md) 开始接 badcase 回流
 
 ### P2
 - 如果开始接 `qa_service` 主链，先要求：
@@ -54,6 +59,7 @@
 6. [docs/qa_upgrade_v2/16-query-understanding-techniques-appendix.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/16-query-understanding-techniques-appendix.md)
 7. [docs/qa_upgrade_v2/05-data-preparation.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/05-data-preparation.md)
 8. [docs/qa_upgrade_v2/11-risk-register-and-backlog.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/11-risk-register-and-backlog.md)
+9. [data/qa_eval/README.md](file:///home/user/novel-analyzer/data/qa_eval/README.md)
 
 ### 如果要继续实现 query understanding
 - 先核对：`StructuredQueryPlan` 是否与 roadmap gate 一致
@@ -72,6 +78,7 @@
 - [Phase Delivery Log](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/12-phase-delivery-log.md)
 - [Audit and Change Log](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/15-audit-and-change-log.md)
 - [Query Understanding Techniques Appendix](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/16-query-understanding-techniques-appendix.md)
+- [QA Eval Data Skeleton](file:///home/user/novel-analyzer/data/qa_eval/README.md)
 
 ## 6. 本会话 commit 列表
 - 本次 handoff 对应 commit 由当前会话在提交后补充到 git 历史中

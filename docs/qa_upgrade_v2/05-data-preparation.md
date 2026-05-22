@@ -250,6 +250,13 @@ runs/qa_eval/
 data/qa_eval/
 ```
 
+当前仓库已建议落下真实目录骨架：
+- [`data/qa_eval/README.md`](file:///home/user/novel-analyzer/data/qa_eval/README.md)
+- [`data/qa_eval/parser_regression/README.md`](file:///home/user/novel-analyzer/data/qa_eval/parser_regression/README.md)
+- [`data/qa_eval/badcase_backlog/README.md`](file:///home/user/novel-analyzer/data/qa_eval/badcase_backlog/README.md)
+
+这样后续接手人不需要先猜“数据应该放哪”，可以直接按 README contract 开始补真实样本。
+
 ### 推荐采用的仓库内布局（新增）
 
 为了让 regression、gold set、badcase 回流、人工备注能长期共存，建议在 `data/qa_eval/` 下进一步明确为：

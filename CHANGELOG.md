@@ -1,5 +1,11 @@
 ## Unreleased
 
+### Added (QA Upgrade V2 qa_eval skeleton - 2026-05-22)
+- data/qa_eval/: created real QA eval directory skeleton with README-only contracts for query_bank_v2, difficult_queries, alias_gold, relation_gold, timeline_gold, parser_regression, answer_eval, and badcase_backlog
+- docs/qa_upgrade_v2/05-data-preparation.md: linked the new skeleton and clarified that the repo now contains concrete contract entrypoints without fake sample data
+- docs/qa_upgrade_v2/15-audit-and-change-log.md: recorded the qa_eval skeleton rollout decision and guardrails
+- docs/handoffs/qa-upgrade-v2-handoff-20260522.md: updated next-owner guidance to start from the new qa_eval skeleton
+
 ### Added (QA Upgrade V2 regression/data contracts - 2026-05-22)
 - docs/qa_upgrade_v2/05-data-preparation.md: added `data/qa_eval/` directory contract, parser regression buckets, and jsonl sample schemas
 - docs/qa_upgrade_v2/07-development-plan.md: linked parser test buckets to data buckets and defined rollout order for regression assets

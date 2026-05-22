@@ -185,6 +185,11 @@
 - `ambiguity.jsonl`
 - `parse_failure_taxonomy.jsonl`
 
+当前仓库已经落了真实目录骨架，可直接从以下入口开始补真实样本：
+- [`data/qa_eval/parser_regression/README.md`](file:///home/user/novel-analyzer/data/qa_eval/parser_regression/README.md)
+- [`data/qa_eval/difficult_queries/README.md`](file:///home/user/novel-analyzer/data/qa_eval/difficult_queries/README.md)
+- [`data/qa_eval/badcase_backlog/README.md`](file:///home/user/novel-analyzer/data/qa_eval/badcase_backlog/README.md)
+
 这样做的好处是：
 - 单测覆盖行为边界
 - 数据桶覆盖样本边界

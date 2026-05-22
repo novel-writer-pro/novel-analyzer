@@ -251,3 +251,46 @@
 
 ### Next Owner Notes
 - 如果下一步开始补真实样本，优先从 alias、timeline、ambiguity、world_rule 这四桶落首批 jsonl
+
+---
+
+## Audit Entry — 2026-05-22 继续推进（qa_eval 目录骨架落库）
+
+### Trigger
+- 前一轮已经定义了 `data/qa_eval/` contract，但目录还不存在
+- 用户继续要求持续优化，因此需要把 contract 进一步变成真实仓库骨架，降低下一棒落样本的摩擦成本
+
+### Inputs Reviewed
+- [05-data-preparation.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/05-data-preparation.md)
+- [07-development-plan.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/07-development-plan.md)
+
+### Findings
+- 只有文档 contract、没有真实目录时，后续接手人仍要先自行建立结构，容易再次偏离命名和分层
+- 但如果现在直接创建空 `jsonl` 样本文件，会制造没有来源保证的伪资产
+
+### Decisions
+- 创建真实 `data/qa_eval/` 目录骨架
+- 每个子目录只放 `README.md` contract，不放占位样本
+- 让 README contract 成为未来填入真实数据的唯一入口说明
+
+### Files Changed
+- [data/qa_eval/README.md](file:///home/user/novel-analyzer/data/qa_eval/README.md)
+- [data/qa_eval/query_bank_v2/README.md](file:///home/user/novel-analyzer/data/qa_eval/query_bank_v2/README.md)
+- [data/qa_eval/difficult_queries/README.md](file:///home/user/novel-analyzer/data/qa_eval/difficult_queries/README.md)
+- [data/qa_eval/alias_gold/README.md](file:///home/user/novel-analyzer/data/qa_eval/alias_gold/README.md)
+- [data/qa_eval/relation_gold/README.md](file:///home/user/novel-analyzer/data/qa_eval/relation_gold/README.md)
+- [data/qa_eval/timeline_gold/README.md](file:///home/user/novel-analyzer/data/qa_eval/timeline_gold/README.md)
+- [data/qa_eval/parser_regression/README.md](file:///home/user/novel-analyzer/data/qa_eval/parser_regression/README.md)
+- [data/qa_eval/answer_eval/README.md](file:///home/user/novel-analyzer/data/qa_eval/answer_eval/README.md)
+- [data/qa_eval/badcase_backlog/README.md](file:///home/user/novel-analyzer/data/qa_eval/badcase_backlog/README.md)
+- [05-data-preparation.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/05-data-preparation.md)
+
+### Verification
+- 目录命名与上一轮文档 contract 一致
+- 未创建伪造样本文件，只创建 README contract
+
+### Deferred Risks
+- 真实样本仍未入库；这一步只降低未来样本落地摩擦，不替代真实数据准备
+
+### Next Owner Notes
+- 下一步若开始填样本，优先从 `parser_regression/` 和 `badcase_backlog/` 开始，而不是先追求 query_bank 全量化
