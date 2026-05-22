@@ -214,3 +214,40 @@
 
 ### Next Owner Notes
 - 后续如果引入 rewrite / decomposition / planner，先回看本附录的采纳顺序，再决定是否推进
+
+---
+
+## Audit Entry — 2026-05-22 继续推进（Regression buckets 与 qa_eval 目录 contract）
+
+### Trigger
+- 用户继续要求推进和演进
+- 在补完覆盖真相与技术附录后，下一步最该固化的是 regression buckets 与 qa_eval 数据目录 contract，否则“下一步怎么补测试/数据”仍然停留在口头建议
+
+### Inputs Reviewed
+- [05-data-preparation.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/05-data-preparation.md)
+- [07-development-plan.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/07-development-plan.md)
+- [11-risk-register-and-backlog.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/11-risk-register-and-backlog.md)
+
+### Findings
+- 当前文档已知道需要 query bank / difficult set / gold set，但还没有把 parser_regression / badcase_backlog 写成显式目录 contract
+- 如果不把 regression bucket 名称与数据桶名称固定下来，后续测试和数据很容易各说各话
+
+### Decisions
+- 在数据准备文档中显式加入 `data/qa_eval/` 推荐层级
+- 为 `parser_regression/`、`difficult_queries/`、`badcase_backlog/` 补样本字段 contract
+- 在开发计划和 backlog 中同步把 regression buckets 升级为明确任务
+
+### Files Changed
+- [05-data-preparation.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/05-data-preparation.md) — 增加 `data/qa_eval/` 目录与 jsonl contract
+- [07-development-plan.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/07-development-plan.md) — 增加 regression buckets 与数据桶联动要求
+- [11-risk-register-and-backlog.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/11-risk-register-and-backlog.md) — 把 regression/data contract 升级为显式 backlog 项
+
+### Verification
+- regression bucket 命名与当前开发计划中的 PR2 当前缺口保持一致
+- 数据目录设计与当前 query bank / difficult set / gold set 的既有文档方向保持兼容
+
+### Deferred Risks
+- 本轮只定义 contract，不创建真实 `data/qa_eval/` 样本文件，避免凭空制造伪数据
+
+### Next Owner Notes
+- 如果下一步开始补真实样本，优先从 alias、timeline、ambiguity、world_rule 这四桶落首批 jsonl

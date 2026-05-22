@@ -250,6 +250,116 @@ runs/qa_eval/
 data/qa_eval/
 ```
 
+### 推荐采用的仓库内布局（新增）
+
+为了让 regression、gold set、badcase 回流、人工备注能长期共存，建议在 `data/qa_eval/` 下进一步明确为：
+
+```text
+data/qa_eval/
+  query_bank_v2/
+    README.md
+    entity_fact.jsonl
+    relation.jsonl
+    timeline.jsonl
+    world_rule.jsonl
+    foreshadow.jsonl
+    causal_why.jsonl
+  difficult_queries/
+    README.md
+    ambiguous.jsonl
+    spoiler_sensitive.jsonl
+    multi_hop.jsonl
+  alias_gold/
+    aliases.jsonl
+  relation_gold/
+    relation_changes.jsonl
+  timeline_gold/
+    timeline_arcs.jsonl
+  parser_regression/
+    README.md
+    alias_and_canonical.jsonl
+    timeline_and_scope.jsonl
+    relation_intent.jsonl
+    world_rule.jsonl
+    foreshadow.jsonl
+    ambiguity.jsonl
+    parse_failure_taxonomy.jsonl
+  answer_eval/
+    grounding_cases.jsonl
+    insufficient_context.jsonl
+  badcase_backlog/
+    retrieval_miss.jsonl
+    rerank_misorder.jsonl
+    parser_failures.jsonl
+    answer_hallucination.jsonl
+```
+
+这里最关键的是 `parser_regression/`：
+- 它是 Query Understanding P1 gate 的直接证据面
+- 它不等同于 query bank，而是专门用来守 parser 行为边界
+- 它的桶划分应与 [`07-development-plan.md`](./07-development-plan.md) 中的 regression buckets 对齐
+
+---
+
+## 7.1 推荐文件 contract（新增）
+
+建议统一使用 `jsonl`，每行一个样本，便于：
+- 增量追加
+- 人工 diff
+- 按桶抽样
+- CLI / notebook / 脚本复用
+
+### parser regression 样本建议字段
+
+```json
+{
+  "id": "parser-rel-0001",
+  "branch_id": "...",
+  "question": "卫图和单武举的关系是怎么一步步变化的？",
+  "bucket": "relation_intent",
+  "expected": {
+    "question_type": "relation",
+    "intent": "trace_change",
+    "entities": ["卫图", "单武举"],
+    "time_scope": null,
+    "ambiguity": false
+  },
+  "difficulty": "medium",
+  "source": "manual",
+  "notes": "要求识别为关系变化，不是普通人物状态问题"
+}
+```
+
+### difficult query 样本建议字段
+
+```json
+{
+  "id": "difficult-amb-0003",
+  "branch_id": "...",
+  "question": "他为什么后来不再信任她？",
+  "bucket": "ambiguous",
+  "risk": ["missing_subject", "missing_object", "needs_context"],
+  "expected_action": "flag_ambiguity",
+  "notes": "重点不在答对，而在不要假装理解清楚"
+}
+```
+
+### badcase backlog 样本建议字段
+
+```json
+{
+  "id": "badcase-parser-0012",
+  "observed_at": "2026-05-22",
+  "branch_id": "...",
+  "question": "这个规则第一次真正影响主线是什么时候？",
+  "failure_layer": "parser",
+  "failure_type": "world_rule_scope_miss",
+  "symptom": "被误分类为 general，未触发 world_rule preference",
+  "next_bucket": "world_rule",
+  "status": "open"
+}
+```
+
 ---
 
 ## 8. 数据准备的验收标准
@@ -259,6 +369,8 @@ data/qa_eval/
 - [ ] alias dataset 可用于回归测试
 - [ ] 至少有 relation / timeline / foreshadow 三类 gold set
 - [ ] 数据可版本化、可复跑、可增量扩展
+- [ ] parser regression buckets 已和 query understanding gate 对齐
+- [ ] badcase backlog 能回灌到 parser_regression / difficult_queries / gold set
 
 ---
 

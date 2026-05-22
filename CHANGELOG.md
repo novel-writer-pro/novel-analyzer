@@ -1,5 +1,12 @@
 ## Unreleased
 
+### Added (QA Upgrade V2 regression/data contracts - 2026-05-22)
+- docs/qa_upgrade_v2/05-data-preparation.md: added `data/qa_eval/` directory contract, parser regression buckets, and jsonl sample schemas
+- docs/qa_upgrade_v2/07-development-plan.md: linked parser test buckets to data buckets and defined rollout order for regression assets
+- docs/qa_upgrade_v2/11-risk-register-and-backlog.md: added parser-regression and qa_eval data-contract backlog items
+- docs/qa_upgrade_v2/15-audit-and-change-log.md: recorded the regression/data-contract formalization audit entry
+- docs/handoffs/qa-upgrade-v2-handoff-20260522.md: extended next-owner guidance with qa_eval directory and regression-bucket follow-through
+
 ### Added (QA Upgrade V2 evolution follow-up - 2026-05-22)
 - docs/qa_upgrade_v2/07-development-plan.md: added query-understanding coverage-truth matrix and next regression buckets
 - docs/qa_upgrade_v2/16-query-understanding-techniques-appendix.md: new appendix covering baseline / advanced / frontier query-understanding patterns, adoption order, and evaluation hooks

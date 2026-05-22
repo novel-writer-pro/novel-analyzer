@@ -175,6 +175,21 @@
 - ambiguity / underspecified question
 - parse failure / fallback behavior
 
+### 推荐把这些桶同步落到数据目录
+除了测试代码，建议同时在 [`05-data-preparation.md`](./05-data-preparation.md) 约定的 `data/qa_eval/parser_regression/` 下准备同名数据桶：
+- `alias_and_canonical.jsonl`
+- `timeline_and_scope.jsonl`
+- `relation_intent.jsonl`
+- `world_rule.jsonl`
+- `foreshadow.jsonl`
+- `ambiguity.jsonl`
+- `parse_failure_taxonomy.jsonl`
+
+这样做的好处是：
+- 单测覆盖行为边界
+- 数据桶覆盖样本边界
+- 以后 parser 规则 / LLM parse / rewrite 升级时能复用同一批 regression 样本
+
 ## PR3 evidence contract
 - retrieval diagnostics 能输出 evidence-level objects
 - graph route 可输出结构化 path
@@ -223,6 +238,12 @@ tests/
    - diagnostics export
    - anti-spoiler + query plan 联动
    - difficult query regression bucket
+
+### 推荐执行顺序（回归资产视角）
+1. 先补 `tests/test_query_understanding_service.py`
+2. 再落 `data/qa_eval/parser_regression/` 的 7 个桶
+3. 再让 badcase backlog 进入对应桶
+4. 最后再考虑把 parser 升级成更复杂的 rewrite / decomposition / planner 体系
 
 ---
 

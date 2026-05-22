@@ -66,6 +66,12 @@
 ### QA-PLAN-005
 query parse diagnostics 导出
 
+### QA-PLAN-006
+建立 parser regression buckets（alias / timeline / relation / world_rule / foreshadow / ambiguity / parse failure）
+
+### QA-PLAN-007
+建立 parser badcase → regression bucket 回流流程
+
 ---
 
 ## 4. P2 Backlog（Retrieval & Graph Fusion）
@@ -136,6 +142,12 @@ grounding summary contract
 ### QA-DATA-005
 建立 QA eval report contract
 
+### QA-DATA-006
+建立 `data/qa_eval/` 目录 contract 与 jsonl 样本规范
+
+### QA-DATA-007
+建立 badcase backlog 样本格式与状态流转字段
+
 ---
 
 ## 8. 推荐看板顺序
@@ -146,6 +158,11 @@ grounding summary contract
 - QA-STAB-003
 - QA-PLAN-001
 - QA-PLAN-002
+
+### Query Understanding 继续演进时，下一批优先放：
+- QA-PLAN-006
+- QA-PLAN-007
+- QA-DATA-006
 
 ### 下一冲刺再放：
 - QA-RET-001

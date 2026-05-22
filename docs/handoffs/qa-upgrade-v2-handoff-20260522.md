@@ -17,6 +17,8 @@
 - 新增 [15-audit-and-change-log.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/15-audit-and-change-log.md) 作为 QA V2 审计入口
 - 把 [07-development-plan.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/07-development-plan.md) 补成带“当前测试覆盖真相”的开发计划
 - 新增 [16-query-understanding-techniques-appendix.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/16-query-understanding-techniques-appendix.md) 作为 Query Understanding 外部模式与采纳顺序附录
+- 把 [05-data-preparation.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/05-data-preparation.md) 补成带 `data/qa_eval/` 目录 contract、parser regression buckets 与 jsonl 样本规范的数据准备文档
+- 把 [11-risk-register-and-backlog.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/11-risk-register-and-backlog.md) 补成包含 regression/data-contract backlog 的任务池
 
 ## 2. 下一步推荐（接手人）
 
@@ -27,12 +29,14 @@
 - 把 `tests/test_query_understanding_service.py` 的当前覆盖面与 roadmap 中的 parser gate 一一对齐
 - 明确哪几类 query 已经被 skeleton 支持，哪几类仍是 design-only
 - 优先补 relation / world_rule / foreshadow / ambiguity / parse failure taxonomy 这五类测试桶
+- 同步建立 `data/qa_eval/parser_regression/` 的同名数据桶，不要只补测试不补样本目录
 
 ### P2
 - 如果开始接 `qa_service` 主链，先要求：
   1. diagnostics schema 落地
   2. parser failure taxonomy 落地
   3. regression set 基础目录落地
+  4. badcase backlog 能回流到 parser_regression / difficult_queries / gold set
 
 ## 3. 已知限制
 - Oracle 背景任务多次 fallback 后完成，但没有返回有效文本，不应把它当作已完成架构评审
@@ -48,6 +52,8 @@
 4. [docs/qa_upgrade_v2/07-development-plan.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/07-development-plan.md)
 5. [docs/qa_upgrade_v2/15-audit-and-change-log.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/15-audit-and-change-log.md)
 6. [docs/qa_upgrade_v2/16-query-understanding-techniques-appendix.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/16-query-understanding-techniques-appendix.md)
+7. [docs/qa_upgrade_v2/05-data-preparation.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/05-data-preparation.md)
+8. [docs/qa_upgrade_v2/11-risk-register-and-backlog.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/11-risk-register-and-backlog.md)
 
 ### 如果要继续实现 query understanding
 - 先核对：`StructuredQueryPlan` 是否与 roadmap gate 一致
@@ -60,7 +66,9 @@
 - [Roadmap](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/03-roadmap.md)
 - [Delivery Checklist](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/04-delivery-checklist.md)
 - [Development Plan](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/07-development-plan.md)
+- [Data Preparation](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/05-data-preparation.md)
 - [Metrics and Evaluation](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/06-metrics-and-evaluation.md)
+- [Risk Register and Backlog](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/11-risk-register-and-backlog.md)
 - [Phase Delivery Log](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/12-phase-delivery-log.md)
 - [Audit and Change Log](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/15-audit-and-change-log.md)
 - [Query Understanding Techniques Appendix](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/16-query-understanding-techniques-appendix.md)
