@@ -4,6 +4,12 @@
 
 本文件用于把 QA Upgrade V2 的推进过程显式记录为“阶段交付”，避免后续开发只有 roadmap，没有实际落地边界。
 
+从本轮开始，阶段记录不再只写“做了什么”，还要补齐：
+- 评估结论
+- 审计入口
+- deferred risks
+- 下一棒接力建议
+
 ---
 
 ## Phase A — 文档与架构包（已完成）
@@ -204,3 +210,34 @@
 - graph-aware rerank
 - grounded answer contract
 - QA eval dataset 首版
+
+---
+
+## Phase D — 文档深化与审计治理（本轮已落地）
+
+### 交付目标
+把 QA Upgrade V2 从“有设计主线”推进到“可审计、可交接、可 gate 的执行文档包”。
+
+### 已落地内容
+- 补 current progress snapshot，明确 `P0/P1/P2+` 状态
+- 补 Query Understanding 技术路线：baseline / advanced / frontier
+- 补 phase gate / release gate / rollback gate
+- 补 checklist 的审计通用项与证据要求
+- 新增专项 audit 文件：`15-audit-and-change-log.md`
+- 新增专项 handoff（见 handoff 目录）
+- 根 `CHANGELOG.md` 追加 QA V2 文档治理记录
+
+### 阶段价值
+这一阶段解决的不是“功能缺失”，而是“治理缺失”：
+- 下一棒如何知道当前做到了哪一步
+- 哪些能力是设计完成，哪些能力是真接上主链了
+- 哪些结论有验证支撑，哪些仍只是方向判断
+
+### 阶段验收
+- roadmap 能反映当前已落地进度，而不是只写理想顺序
+- checklist 能支撑审计，不再只是功能核对表
+- 至少有一份专项 audit 记录和一份专项 handoff 可供接手
+
+### 风险与未完成项
+- Oracle 评审任务未返回有效文字结论，因此本阶段未把“Oracle 观点”写成事实依据
+- 外部研究结果未单独沉淀为研究附录，后续可视需要补 `research note`
