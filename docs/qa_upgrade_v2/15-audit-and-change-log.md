@@ -425,3 +425,38 @@
 
 ### Next Owner Notes
 - 下一步应优先考虑让 `RetrievalHit` / query-plan contract 在现有服务中逐步双栖，再决定是否迁移 `RetrievalService` 的纯核心部分
+
+---
+
+## Audit Entry — 2026-05-22 继续推进（RetrievalHit 双栖共享 contract）
+
+### Trigger
+- `rag_core` 最小骨架已经落库，需要验证现有服务是否能逐步改用 shared contract，而不是保留平行的第二套类型定义
+
+### Inputs Reviewed
+- [rag_core/contracts.py](file:///home/user/novel-analyzer/rag_core/contracts.py)
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Findings
+- `RetrievalService` 原本仍保留自己的 `RetrievalHit` dataclass，会让 core 与现有服务继续平行演化
+- 这是最适合先做 contract 双栖验证的一步，因为它只影响类型绑定，不影响 route、SQL、graph 或 rerank 行为
+
+### Decisions
+- 让 `novel_analyzer.services.retrieval_service.RetrievalHit` 直接复用 `rag_core.RetrievalHit`
+- 用 TDD 锁定“两个 import 实际引用同一个类对象”
+
+### Files Changed
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Verification
+- RED：`test_retrieval_service_reuses_rag_core_hit_contract` 先因类型不相同失败
+- GREEN：同一测试在切换为 shared contract 后通过（`4 passed`）
+- Manual QA：直接导入并打印 `same_object=True`
+
+### Deferred Risks
+- 这一步仍只覆盖 `RetrievalHit`，尚未开始双栖 `StructuredQueryPlan` 或其他 contract
+
+### Next Owner Notes
+- 下一步可优先评估 `StructuredQueryPlan` 是否也适合类似双栖，再考虑提炼 `RetrievalSearchDiagnostics` 或纯 fusion/rerank 核心

@@ -23,6 +23,7 @@
 - 新增 parser / qa_eval 两份 SOP，说明 regression case、badcase 回流、人工审核与 replay 的执行方式
 - 明确 reusable RAG core 采用“默认无 graph，graph 为 optional capability，novel 为 adapter”的抽离方向
 - 新增 `rag_core/` 最小代码骨架，承接 shared contracts 与 adapter protocols，作为后续代码抽离落点
+- `RetrievalService` 已开始双栖复用 `rag_core` 的 `RetrievalHit` contract，证明 contract-first 抽离可行
 
 ## 2. 下一步推荐（接手人）
 
@@ -54,7 +55,8 @@
 
 ### 当前代码状态
 - `rag_core/` 已存在，但目前只包含最小 contracts / protocols
-- 现有 `novel_analyzer` 服务实现还未迁移过去，这一步是刻意控制风险的第一拍
+- `RetrievalService` 已开始复用 shared `RetrievalHit`
+- 现有 `novel_analyzer` 服务实现整体还未迁移过去，这仍然是刻意控制风险的渐进式抽离
 
 ## 3. 已知限制
 - Oracle 背景任务多次 fallback 后完成，但没有返回有效文本，不应把它当作已完成架构评审

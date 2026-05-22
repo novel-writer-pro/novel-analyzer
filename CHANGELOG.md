@@ -1,5 +1,11 @@
 ## Unreleased
 
+### Changed (rag_core contract adoption - 2026-05-22)
+- novel_analyzer/services/retrieval_service.py: switched local RetrievalHit to reuse rag_core.contracts.RetrievalHit
+- tests/test_rag_core_contracts.py: added TDD coverage proving RetrievalService now shares the core RetrievalHit contract
+- docs/qa_upgrade_v2/15-audit-and-change-log.md: recorded the second extraction step and its RED→GREEN verification
+- docs/handoffs/qa-upgrade-v2-handoff-20260522.md: updated code-extraction status to note RetrievalHit contract reuse
+
 ### Added (rag_core first extraction step - 2026-05-22)
 - rag_core/: introduced a minimal reusable core package for shared contracts and adapter protocols
 - tests/test_rag_core_contracts.py: added TDD coverage proving the new package imports cleanly and keeps graph optional at the protocol layer

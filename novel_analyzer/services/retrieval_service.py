@@ -7,6 +7,7 @@ import time
 from dataclasses import dataclass
 from typing import Any
 
+from rag_core import RetrievalHit
 from sqlalchemy import select, text
 from sqlalchemy.engine import RowMapping
 from sqlalchemy.orm import Session
@@ -33,17 +34,6 @@ class ChunkDraft:
     start_offset: int
     end_offset: int
     keywords: list[str]
-
-
-@dataclass(frozen=True, slots=True)
-class RetrievalHit:
-    """A normalized search hit returned by the query service."""
-
-    chapter_index: int
-    title: str
-    summary_text: str
-    score: float
-    keyword_list: list[str]
 
 
 @dataclass(frozen=True, slots=True)

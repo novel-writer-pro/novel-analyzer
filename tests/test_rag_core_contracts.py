@@ -55,3 +55,10 @@ def test_existing_novel_schemas_remain_importable() -> None:
 
     assert plan.question_type == "general"
     assert hit.title == "命格初现"
+
+
+def test_retrieval_service_reuses_rag_core_hit_contract() -> None:
+    from rag_core import RetrievalHit as CoreRetrievalHit
+    from novel_analyzer.services.retrieval_service import RetrievalHit as ServiceRetrievalHit
+
+    assert ServiceRetrievalHit is CoreRetrievalHit
