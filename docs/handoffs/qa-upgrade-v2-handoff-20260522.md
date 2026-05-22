@@ -22,6 +22,7 @@
 - 在仓库中真实创建 `data/qa_eval/` 目录骨架及各子目录 README contract（不含伪造样本）
 - 新增 parser / qa_eval 两份 SOP，说明 regression case、badcase 回流、人工审核与 replay 的执行方式
 - 明确 reusable RAG core 采用“默认无 graph，graph 为 optional capability，novel 为 adapter”的抽离方向
+- 新增 `rag_core/` 最小代码骨架，承接 shared contracts 与 adapter protocols，作为后续代码抽离落点
 
 ## 2. 下一步推荐（接手人）
 
@@ -51,6 +52,10 @@
 - graph 保持 optional，不作为其他领域知识问答复用的前置依赖
 - novel-specific 语义（chapter、anti-spoiler、foreshadow、world_rule、causal answer shaping）保留在 adapter
 
+### 当前代码状态
+- `rag_core/` 已存在，但目前只包含最小 contracts / protocols
+- 现有 `novel_analyzer` 服务实现还未迁移过去，这一步是刻意控制风险的第一拍
+
 ## 3. 已知限制
 - Oracle 背景任务多次 fallback 后完成，但没有返回有效文本，不应把它当作已完成架构评审
 - 本轮重点是文档治理，不代表 retrieval / rerank / grounded answer 已新增实现
@@ -71,6 +76,7 @@
 10. [docs/qa_upgrade_v2/17-parser-regression-playbook.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/17-parser-regression-playbook.md)
 11. [docs/qa_upgrade_v2/18-qa-eval-runbook.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/18-qa-eval-runbook.md)
 12. [docs/architecture/independent-agent-knowledge-and-retrieval.md](file:///home/user/novel-analyzer/docs/architecture/independent-agent-knowledge-and-retrieval.md)
+13. [rag_core/__init__.py](file:///home/user/novel-analyzer/rag_core/__init__.py)
 
 ### 如果要继续实现 query understanding
 - 先核对：`StructuredQueryPlan` 是否与 roadmap gate 一致

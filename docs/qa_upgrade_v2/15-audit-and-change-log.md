@@ -382,3 +382,46 @@
 
 ### Next Owner Notes
 - 真正开始代码抽离时，优先顺序应是：contract → retrieval core → adapters → optional graph capability
+
+---
+
+## Audit Entry — 2026-05-22 继续推进（rag_core 首步代码抽离）
+
+### Trigger
+- 架构方向已经明确为 reusable core + optional graph + novel adapter
+- 用户要求继续开发，不停在纯文档层
+- 为避免过早误拆 novel-specific 逻辑，先从 shared contracts 和 adapter protocols 的最小代码骨架开始
+
+### Inputs Reviewed
+- [docs/architecture/independent-agent-knowledge-and-retrieval.md](file:///home/user/novel-analyzer/docs/architecture/independent-agent-knowledge-and-retrieval.md)
+- [docs/qa_upgrade_v2/08-schema-and-contracts.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/08-schema-and-contracts.md)
+- [docs/qa_upgrade_v2/09-implementation-spec.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/09-implementation-spec.md)
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [novel_analyzer/domain/schemas.py](file:///home/user/novel-analyzer/novel_analyzer/domain/schemas.py)
+
+### Findings
+- 当前最安全的第一步不是移动 `BranchQAService` 或 graph 逻辑，而是先引入一个可导入的 `rag_core` 包骨架
+- 这一步只要承接 shared contracts 和 protocol 边界，就能为后续抽离留出稳定落点，同时不破坏现有 novel 代码路径
+
+### Decisions
+- 先新增 `rag_core` 包
+- 只包含：shared contract + `CorpusAdapter` / `GraphAdapter` protocol
+- 不在这一步移动现有 `novel_analyzer` 服务实现
+- 使用 TDD：先让 `rag_core` 导入测试失败，再补最小实现
+
+### Files Changed
+- [rag_core/__init__.py](file:///home/user/novel-analyzer/rag_core/__init__.py)
+- [rag_core/contracts.py](file:///home/user/novel-analyzer/rag_core/contracts.py)
+- [rag_core/protocols.py](file:///home/user/novel-analyzer/rag_core/protocols.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Verification
+- RED：`.venv/bin/python -m pytest tests/test_rag_core_contracts.py -q` 先因 `ModuleNotFoundError: No module named 'rag_core'` 失败
+- GREEN：同一测试在补完最小实现后通过（`3 passed`）
+- Manual QA：通过 `.venv/bin/python` 直接导入 `rag_core`，实例化 contract 并打印输出成功
+
+### Deferred Risks
+- 这一步尚未实现真正的 retrieval core 迁移，只是给后续迁移创造落点
+
+### Next Owner Notes
+- 下一步应优先考虑让 `RetrievalHit` / query-plan contract 在现有服务中逐步双栖，再决定是否迁移 `RetrievalService` 的纯核心部分
