@@ -265,6 +265,7 @@
   - `apply_rerank_scores`
   - `build_rerank_text`
   - `coerce_keywords`
+  - `cosine_similarity`
 - 现有服务已开始双栖复用：
   - `RetrievalService` 复用 `RetrievalHit`
   - `RetrievalService` 复用 diagnostics contracts
@@ -272,6 +273,7 @@
 - `RetrievalService` 复用 rerank helper
   - `RetrievalService` 复用 rerank text helper
   - `RetrievalService` 复用 keyword normalization helper
+  - `RetrievalService` 复用 cosine similarity helper
 - `novel_analyzer.domain.schemas` 复用 query-planning contract 组
 
 ### 阶段价值

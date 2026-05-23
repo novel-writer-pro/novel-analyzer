@@ -696,3 +696,41 @@
 
 ### Next Owner Notes
 - 如果继续抽 retrieval pure helper，下一步可考虑 `_normalize_keywords` / `_query_hints` / `_bm25_text` 这些更接近 materialization 的边界，但要先确认它们是否已经进入 domain adapter 区域
+
+---
+
+## Audit Entry — 2026-05-22 继续推进（Cosine similarity helper 进入 rag_core）
+
+### Trigger
+- 已经把 contract、RRF、rerank score application、rerank text builder、keyword normalization 逐步提升到 `rag_core`
+- 下一步最合适的 vector 纯 helper 是 `_cosine_similarity`
+
+### Inputs Reviewed
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Findings
+- `_cosine_similarity` 是纯数值 helper，不依赖 retrieval route、graph、DB 或 provider
+- 它很适合作为 reusable vector helper 进入 `rag_core`
+
+### Decisions
+- 新增 `rag_core/vector.py`
+- 提升 `cosine_similarity` 为 shared helper
+- 让 `RetrievalService` 直接复用 shared implementation
+
+### Files Changed
+- [rag_core/vector.py](file:///home/user/novel-analyzer/rag_core/vector.py)
+- [rag_core/__init__.py](file:///home/user/novel-analyzer/rag_core/__init__.py)
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Verification
+- RED：测试先因 `rag_core` 还没有 cosine helper 而失败
+- GREEN：同一测试在提升 helper 后通过（`18 passed`）
+- Manual QA：直接导入并打印 `same_object=True`，并验证 self-sim/orthogonal/empty 三种结果
+
+### Deferred Risks
+- 这一步仍未迁移更大的 vector route 逻辑，只迁移底层数值 helper
+
+### Next Owner Notes
+- 如果继续抽 vector 相关 mechanics，下一步应优先看 `_coerce_vector_payload`，再决定是否往上触及 `_vector_route`

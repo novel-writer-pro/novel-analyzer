@@ -63,6 +63,7 @@
 - rerank 的 score→hit 重排 helper 也已进入 `rag_core`
 - rerank 文本构造 helper 也已进入 `rag_core`
 - keyword normalization helper 也已进入 `rag_core`
+- cosine similarity helper 也已进入 `rag_core`
 - 现有 `novel_analyzer` 服务实现整体还未迁移过去，这仍然是刻意控制风险的渐进式抽离
 
 ## 3. 已知限制
