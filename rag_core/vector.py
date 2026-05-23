@@ -18,6 +18,12 @@ def cosine_similarity(left: list[float], right: list[float]) -> float:
     return float(dot / (left_norm * right_norm))
 
 
+def embedding_norm(vector: list[float]) -> float:
+    """Compute the L2 norm for a dense embedding vector."""
+
+    return float(sum(value * value for value in vector) ** 0.5)
+
+
 def coerce_vector_payload(raw: object) -> list[float]:
     """Normalize stored vector payloads into dense float lists."""
 

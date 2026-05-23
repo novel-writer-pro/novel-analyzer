@@ -20,7 +20,7 @@ from .keywords import coerce_keywords
 from .protocols import CorpusAdapter, GraphAdapter
 from .rerank import apply_rerank_scores
 from .text import build_rerank_text
-from .vector import coerce_vector_payload, cosine_similarity
+from .vector import coerce_vector_payload, cosine_similarity, embedding_norm
 
 __all__ = [
     "CorpusAdapter",
@@ -38,5 +38,6 @@ __all__ = [
     "coerce_keywords",
     "coerce_vector_payload",
     "cosine_similarity",
+    "embedding_norm",
     "reciprocal_rank_fuse",
 ]
