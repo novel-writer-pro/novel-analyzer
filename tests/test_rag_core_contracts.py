@@ -184,3 +184,18 @@ def test_retrieval_service_uses_rag_core_rerank_text_builder() -> None:
     from novel_analyzer.services.retrieval_service import RetrievalService
 
     assert RetrievalService._hit_rerank_text is core_text_builder
+
+
+def test_rag_core_exports_keyword_normalizer() -> None:
+    from rag_core import coerce_keywords
+
+    assert coerce_keywords(["卫图", 123]) == ["卫图", "123"]
+    assert coerce_keywords('["命格", "养生功"]') == ["命格", "养生功"]
+    assert coerce_keywords("单值") == ["单值"]
+
+
+def test_retrieval_service_uses_rag_core_keyword_normalizer() -> None:
+    from rag_core.keywords import coerce_keywords as core_coerce_keywords
+    from novel_analyzer.services.retrieval_service import RetrievalService
+
+    assert RetrievalService._coerce_keywords is core_coerce_keywords

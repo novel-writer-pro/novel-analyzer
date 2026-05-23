@@ -16,6 +16,7 @@ from .contracts import (
     StructuredQueryPlan,
 )
 from .fusion import reciprocal_rank_fuse
+from .keywords import coerce_keywords
 from .protocols import CorpusAdapter, GraphAdapter
 from .rerank import apply_rerank_scores
 from .text import build_rerank_text
@@ -33,5 +34,6 @@ __all__ = [
     "StructuredQueryPlan",
     "apply_rerank_scores",
     "build_rerank_text",
+    "coerce_keywords",
     "reciprocal_rank_fuse",
 ]

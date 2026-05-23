@@ -1,5 +1,13 @@
 ## Unreleased
 
+### Changed (rag_core keyword normalization adoption - 2026-05-22)
+- rag_core/keywords.py: introduced a shared keyword normalization helper for retrieval payloads
+- novel_analyzer/services/retrieval_service.py: switched local keyword coercion to reuse the shared rag_core helper
+- tests/test_rag_core_contracts.py: extended TDD coverage to prove RetrievalService now uses the shared keyword normalization helper
+- docs/qa_upgrade_v2/12-phase-delivery-log.md: updated the reusable RAG core extraction phase with the new shared helper
+- docs/qa_upgrade_v2/15-audit-and-change-log.md: recorded the eighth extraction step and verification trail
+- docs/handoffs/qa-upgrade-v2-handoff-20260522.md: updated code-extraction status with shared keyword normalization
+
 ### Changed (rag_core rerank text adoption - 2026-05-22)
 - rag_core/text.py: introduced a shared rerank text builder helper for retrieval hits
 - novel_analyzer/services/retrieval_service.py: switched local rerank text formatting to reuse the shared rag_core helper while keeping char-limit control local

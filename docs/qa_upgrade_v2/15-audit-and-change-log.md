@@ -658,3 +658,41 @@
 
 ### Next Owner Notes
 - 如果继续抽 pure helper，下一步应优先考虑 `_coerce_keywords` / keyword normalization 这类无 provider 依赖的小块，再决定是否切更大的 retrieval text/materialization seam
+
+---
+
+## Audit Entry — 2026-05-22 继续推进（Keyword normalization helper 进入 rag_core）
+
+### Trigger
+- shared rerank text helper 已进入 `rag_core`
+- 下一步最小纯 helper 目标是 `_coerce_keywords`，因为它无 DB、无 provider、无 graph 依赖，且在 retrieval 路径里复用频繁
+
+### Inputs Reviewed
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Findings
+- `_coerce_keywords` 是稳定的 payload-normalization helper，适合和其他 retrieval utilities 一起沉到 shared 层
+- 这一步不改变任何 retrieval 语义，只统一 helper 所在位置
+
+### Decisions
+- 新增 `rag_core/keywords.py`
+- 提升 `coerce_keywords` 为 shared helper
+- 让 `RetrievalService` 直接复用 shared implementation
+
+### Files Changed
+- [rag_core/keywords.py](file:///home/user/novel-analyzer/rag_core/keywords.py)
+- [rag_core/__init__.py](file:///home/user/novel-analyzer/rag_core/__init__.py)
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Verification
+- RED：测试先因 `rag_core` 还没有 keyword normalizer 而失败
+- GREEN：同一测试在提升 helper 后通过（`16 passed`）
+- Manual QA：直接导入并打印 `same_object=True`，并验证 list / JSON string / scalar 输入输出一致
+
+### Deferred Risks
+- 这一步仍未触及更大的 materialization / payload-shaping seam
+
+### Next Owner Notes
+- 如果继续抽 retrieval pure helper，下一步可考虑 `_normalize_keywords` / `_query_hints` / `_bm25_text` 这些更接近 materialization 的边界，但要先确认它们是否已经进入 domain adapter 区域

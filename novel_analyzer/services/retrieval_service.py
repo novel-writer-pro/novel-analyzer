@@ -13,6 +13,7 @@ from rag_core import (
     RetrievalSearchDiagnostics,
     apply_rerank_scores,
     build_rerank_text,
+    coerce_keywords,
     reciprocal_rank_fuse,
 )
 from sqlalchemy import select, text
@@ -52,6 +53,7 @@ class RetrievalService:
     RERANK_TEXT_CHAR_LIMIT = 320
     _apply_rerank_scores = staticmethod(apply_rerank_scores)
     _hit_rerank_text = staticmethod(build_rerank_text)
+    _coerce_keywords = staticmethod(coerce_keywords)
 
     def __init__(self, session: Session, settings: Settings | None = None) -> None:
         self.session = session
@@ -144,20 +146,6 @@ class RetrievalService:
     @staticmethod
     def _embedding_norm(vector: list[float]) -> float:
         return float(sum(value * value for value in vector) ** 0.5)
-
-    @staticmethod
-    def _coerce_keywords(raw: Any) -> list[str]:
-        if isinstance(raw, list):
-            return [str(item) for item in raw]
-        if isinstance(raw, str):
-            try:
-                decoded = json.loads(raw)
-            except Exception:  # noqa: BLE001
-                return [raw]
-            if isinstance(decoded, list):
-                return [str(item) for item in decoded]
-            return [str(decoded)]
-        return [str(item) for item in (raw or [])]
 
     @classmethod
     def _row_to_hit(cls, row: RowMapping) -> RetrievalHit:
