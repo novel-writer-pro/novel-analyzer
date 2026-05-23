@@ -14,6 +14,7 @@ from rag_core import (
     apply_rerank_scores,
     build_rerank_text,
     coerce_keywords,
+    coerce_vector_payload,
     cosine_similarity,
     reciprocal_rank_fuse,
 )
@@ -55,6 +56,7 @@ class RetrievalService:
     _apply_rerank_scores = staticmethod(apply_rerank_scores)
     _hit_rerank_text = staticmethod(build_rerank_text)
     _coerce_keywords = staticmethod(coerce_keywords)
+    _coerce_vector_payload = staticmethod(coerce_vector_payload)
     _cosine_similarity = staticmethod(cosine_similarity)
 
     def __init__(self, session: Session, settings: Settings | None = None) -> None:
@@ -559,19 +561,6 @@ class RetrievalService:
                 score = float(node.importance_score) * 0.8
                 chapter_scores[ch] = max(chapter_scores.get(ch, 0.0), score)
         return self._document_hits_for_chapters(branch_id, chapter_scores)[:limit]
-
-    @staticmethod
-    def _coerce_vector_payload(raw: object) -> list[float]:
-        if isinstance(raw, list):
-            return [float(item) for item in raw if isinstance(item, (int, float))]
-        if isinstance(raw, str):
-            try:
-                decoded = json.loads(raw)
-            except Exception:  # noqa: BLE001
-                return []
-            if isinstance(decoded, list):
-                return [float(item) for item in decoded if isinstance(item, (int, float))]
-        return []
 
     def _vector_route(
         self,

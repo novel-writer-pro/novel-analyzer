@@ -214,3 +214,18 @@ def test_retrieval_service_uses_rag_core_cosine_similarity() -> None:
     from novel_analyzer.services.retrieval_service import RetrievalService
 
     assert RetrievalService._cosine_similarity is core_cosine_similarity
+
+
+def test_rag_core_exports_vector_payload_coercion() -> None:
+    from rag_core import coerce_vector_payload
+
+    assert coerce_vector_payload([1, 2.5, "3", None]) == [1.0, 2.5]
+    assert coerce_vector_payload('[1, 2.5, "3", null]') == [1.0, 2.5]
+    assert coerce_vector_payload('{"bad": true}') == []
+
+
+def test_retrieval_service_uses_rag_core_vector_payload_coercion() -> None:
+    from rag_core.vector import coerce_vector_payload as core_coerce_vector_payload
+    from novel_analyzer.services.retrieval_service import RetrievalService
+
+    assert RetrievalService._coerce_vector_payload is core_coerce_vector_payload
