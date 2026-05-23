@@ -5,7 +5,7 @@ from __future__ import annotations
 from .contracts import RetrievalHit
 
 
-def build_rerank_text(hit: RetrievalHit, *, char_limit: int) -> str:
+def build_rerank_text(hit: RetrievalHit, *, char_limit: int = 320) -> str:
     """Build a clipped rerank payload from a retrieval hit."""
 
     keywords = ", ".join(hit.keyword_list[:8])
