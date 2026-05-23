@@ -16,6 +16,7 @@ from rag_core import (
     coerce_keywords,
     coerce_vector_payload,
     cosine_similarity,
+    embedding_norm,
     reciprocal_rank_fuse,
 )
 from sqlalchemy import select, text
@@ -58,6 +59,7 @@ class RetrievalService:
     _coerce_keywords = staticmethod(coerce_keywords)
     _coerce_vector_payload = staticmethod(coerce_vector_payload)
     _cosine_similarity = staticmethod(cosine_similarity)
+    _embedding_norm = staticmethod(embedding_norm)
 
     def __init__(self, session: Session, settings: Settings | None = None) -> None:
         self.session = session
@@ -146,10 +148,6 @@ class RetrievalService:
             else f"第{chapter_index}章\n"
         )
         return [prefix + draft.text for draft in chunk_drafts]
-
-    @staticmethod
-    def _embedding_norm(vector: list[float]) -> float:
-        return float(sum(value * value for value in vector) ** 0.5)
 
     @classmethod
     def _row_to_hit(cls, row: RowMapping) -> RetrievalHit:

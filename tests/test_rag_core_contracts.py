@@ -229,3 +229,17 @@ def test_retrieval_service_uses_rag_core_vector_payload_coercion() -> None:
     from novel_analyzer.services.retrieval_service import RetrievalService
 
     assert RetrievalService._coerce_vector_payload is core_coerce_vector_payload
+
+
+def test_rag_core_exports_embedding_norm_helper() -> None:
+    from rag_core import embedding_norm
+
+    assert embedding_norm([3.0, 4.0]) == 5.0
+    assert embedding_norm([]) == 0.0
+
+
+def test_retrieval_service_uses_rag_core_embedding_norm() -> None:
+    from rag_core.vector import embedding_norm as core_embedding_norm
+    from novel_analyzer.services.retrieval_service import RetrievalService
+
+    assert RetrievalService._embedding_norm is core_embedding_norm
