@@ -1,5 +1,13 @@
 ## Unreleased
 
+### Changed (rag_core rerank adoption - 2026-05-22)
+- rag_core/rerank.py: introduced a shared rerank helper for score-to-hit application
+- novel_analyzer/services/retrieval_service.py: switched rerank score application to reuse the shared rag_core helper while keeping provider invocation local
+- tests/test_rag_core_contracts.py: extended TDD coverage to prove RetrievalService now uses the shared rerank helper
+- docs/qa_upgrade_v2/12-phase-delivery-log.md: recorded the start of reusable RAG core code extraction as a new delivery phase
+- docs/qa_upgrade_v2/15-audit-and-change-log.md: recorded the rerank helper extraction step and verification trail
+- docs/handoffs/qa-upgrade-v2-handoff-20260522.md: updated code-extraction status with shared rerank mechanics
+
 ### Changed (rag_core fusion adoption - 2026-05-22)
 - rag_core/fusion.py: introduced a shared reciprocal-rank fusion helper for retrieval pipelines
 - novel_analyzer/services/retrieval_service.py: switched `_fuse_recall_lists` to reuse the shared rag_core fusion helper

@@ -578,3 +578,44 @@
 
 ### Next Owner Notes
 - 如果继续抽 retrieval mechanics，下一拍优先考虑 `_apply_rerank` 或纯 diagnostics helper，而不是 route SQL 本体
+
+---
+
+## Audit Entry — 2026-05-22 继续推进（Rerank helper 进入 rag_core）
+
+### Trigger
+- shared contracts 与 RRF fusion helper 已经进入 `rag_core`
+- 下一步最自然的纯 mechanics seam 是 rerank 的 score→hit 重排逻辑
+
+### Inputs Reviewed
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [rag_core/fusion.py](file:///home/user/novel-analyzer/rag_core/fusion.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Findings
+- `_apply_rerank` 里混合了两层逻辑：
+  1. provider 调用
+  2. score→hit 的纯重排 mechanics
+- 第 2 层可安全抽离到 core，而不需要提前迁移 provider 调用边界
+
+### Decisions
+- 新增 `rag_core/rerank.py`
+- 提升 `apply_rerank_scores` 为 shared helper
+- 让 `RetrievalService` 只保留 provider 调用与 fallback 控制，纯重排逻辑委托给 shared helper
+
+### Files Changed
+- [rag_core/rerank.py](file:///home/user/novel-analyzer/rag_core/rerank.py)
+- [rag_core/__init__.py](file:///home/user/novel-analyzer/rag_core/__init__.py)
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Verification
+- RED：测试先因 `rag_core` 还没有 rerank helper 而失败
+- GREEN：同一测试在提升 helper 后通过（`12 passed`）
+- Manual QA：直接导入并打印 `same_object=True`
+
+### Deferred Risks
+- 这一步仍未迁移 provider 调用、route SQL 或 graph-aware rerank
+
+### Next Owner Notes
+- 如果继续抽 mechanics，下一步应优先考虑 provider-agnostic 的 text builder 或 diagnostics aggregation，再决定是否拆 provider orchestration

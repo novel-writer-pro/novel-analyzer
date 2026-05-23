@@ -241,3 +241,42 @@
 ### 风险与未完成项
 - Oracle 评审任务未返回有效文字结论，因此本阶段未把“Oracle 观点”写成事实依据
 - 外部研究结果未单独沉淀为研究附录，后续可视需要补 `research note`
+
+---
+
+## Phase E — reusable RAG core 代码抽离起步（持续推进中）
+
+### 交付目标
+从 QA V2 的架构设计推进到真实代码落点，但坚持“先 contracts / mechanics，后 adapter-heavy orchestration”。
+
+### 已落地内容
+- `rag_core/` 最小包骨架已创建
+- shared contracts 已进入 `rag_core`：
+  - `RetrievalHit`
+  - `RetrievalRouteDiagnostics`
+  - `RetrievalSearchDiagnostics`
+  - `PlannedEntity`
+  - `QueryTimeScope`
+  - `QueryConstraints`
+  - `RetrievalPreferences`
+  - `StructuredQueryPlan`
+- shared mechanics 已进入 `rag_core`：
+  - `reciprocal_rank_fuse`
+  - `apply_rerank_scores`
+- 现有服务已开始双栖复用：
+  - `RetrievalService` 复用 `RetrievalHit`
+  - `RetrievalService` 复用 diagnostics contracts
+  - `RetrievalService` 复用 RRF helper
+  - `RetrievalService` 复用 rerank helper
+  - `novel_analyzer.domain.schemas` 复用 query-planning contract 组
+
+### 阶段价值
+这一阶段的价值不在“已经完成核心拆包”，而在于：
+- 可复用 core 已有真实代码落点
+- contract 不再继续分叉
+- mechanics 开始脱离 `novel_analyzer` 局部实现，证明抽离方向可行
+
+### 当前边界
+- graph 仍保持 optional capability，尚未迁移
+- `BranchQAService` orchestration 仍留在 novel adapter 层
+- route SQL / provider wiring / query taxonomy 仍未迁移

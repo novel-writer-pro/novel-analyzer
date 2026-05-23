@@ -17,6 +17,7 @@ from .contracts import (
 )
 from .fusion import reciprocal_rank_fuse
 from .protocols import CorpusAdapter, GraphAdapter
+from .rerank import apply_rerank_scores
 
 __all__ = [
     "CorpusAdapter",
@@ -29,5 +30,6 @@ __all__ = [
     "RetrievalRouteDiagnostics",
     "RetrievalSearchDiagnostics",
     "StructuredQueryPlan",
+    "apply_rerank_scores",
     "reciprocal_rank_fuse",
 ]

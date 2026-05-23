@@ -139,3 +139,24 @@ def test_retrieval_service_uses_rag_core_reciprocal_rank_fusion() -> None:
     from novel_analyzer.services.retrieval_service import RetrievalService
 
     assert RetrievalService._fuse_recall_lists is core_rrf
+
+
+def test_rag_core_exports_rerank_helper() -> None:
+    from rag_core import RetrievalHit, apply_rerank_scores
+
+    hits = [
+        RetrievalHit(chapter_index=1, title="一", summary_text="弱相关", score=0.8, keyword_list=["卫图"]),
+        RetrievalHit(chapter_index=2, title="二", summary_text="强相关", score=0.1, keyword_list=["命格"]),
+    ]
+
+    reranked = apply_rerank_scores(hits, [0.2, 0.9], limit=2)
+
+    assert [hit.chapter_index for hit in reranked] == [2, 1]
+    assert reranked[0].score == 0.9
+
+
+def test_retrieval_service_uses_rag_core_rerank_helper() -> None:
+    from rag_core.rerank import apply_rerank_scores as core_rerank
+    from novel_analyzer.services.retrieval_service import RetrievalService
+
+    assert RetrievalService._apply_rerank_scores is core_rerank

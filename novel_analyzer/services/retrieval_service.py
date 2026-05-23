@@ -7,7 +7,13 @@ import time
 from dataclasses import dataclass
 from typing import Any
 
-from rag_core import RetrievalHit, RetrievalRouteDiagnostics, RetrievalSearchDiagnostics, reciprocal_rank_fuse
+from rag_core import (
+    RetrievalHit,
+    RetrievalRouteDiagnostics,
+    RetrievalSearchDiagnostics,
+    apply_rerank_scores,
+    reciprocal_rank_fuse,
+)
 from sqlalchemy import select, text
 from sqlalchemy.engine import RowMapping
 from sqlalchemy.orm import Session
@@ -43,6 +49,7 @@ class RetrievalService:
     RERANK_CANDIDATE_MULTIPLIER = 2
     MAX_RERANK_CANDIDATES = 10
     RERANK_TEXT_CHAR_LIMIT = 320
+    _apply_rerank_scores = staticmethod(apply_rerank_scores)
 
     def __init__(self, session: Session, settings: Settings | None = None) -> None:
         self.session = session
@@ -198,23 +205,7 @@ class RetrievalService:
             )
         except Exception:
             return hits[:limit], False
-        reranked = sorted(
-            zip(rerank_candidates, rerank_scores, strict=True),
-            key=lambda item: (-item[1], -item[0].score, item[0].chapter_index),
-        )
-        return (
-            [
-                RetrievalHit(
-                    chapter_index=hit.chapter_index,
-                    title=hit.title,
-                    summary_text=hit.summary_text,
-                    score=float(score),
-                    keyword_list=hit.keyword_list,
-                )
-                for hit, score in reranked[:limit]
-            ],
-            True,
-        )
+        return (self._apply_rerank_scores(rerank_candidates, rerank_scores, limit=limit), True)
 
     def _fts_config_name(self) -> str:
         if self.session.bind is None or self.session.bind.dialect.name != "postgresql":
