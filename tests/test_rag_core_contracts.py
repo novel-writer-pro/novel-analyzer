@@ -160,3 +160,27 @@ def test_retrieval_service_uses_rag_core_rerank_helper() -> None:
     from novel_analyzer.services.retrieval_service import RetrievalService
 
     assert RetrievalService._apply_rerank_scores is core_rerank
+
+
+def test_rag_core_exports_rerank_text_builder() -> None:
+    from rag_core import RetrievalHit, build_rerank_text
+
+    hit = RetrievalHit(
+        chapter_index=1,
+        title="标题",
+        summary_text="很长的正文" * 200,
+        score=1.0,
+        keyword_list=["关键词A", "关键词B"],
+    )
+
+    text = build_rerank_text(hit, char_limit=320)
+
+    assert len(text) <= 321
+    assert text.endswith("…")
+
+
+def test_retrieval_service_uses_rag_core_rerank_text_builder() -> None:
+    from rag_core.text import build_rerank_text as core_text_builder
+    from novel_analyzer.services.retrieval_service import RetrievalService
+
+    assert RetrievalService._hit_rerank_text is core_text_builder

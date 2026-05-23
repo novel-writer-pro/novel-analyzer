@@ -12,6 +12,7 @@ from rag_core import (
     RetrievalRouteDiagnostics,
     RetrievalSearchDiagnostics,
     apply_rerank_scores,
+    build_rerank_text,
     reciprocal_rank_fuse,
 )
 from sqlalchemy import select, text
@@ -50,6 +51,7 @@ class RetrievalService:
     MAX_RERANK_CANDIDATES = 10
     RERANK_TEXT_CHAR_LIMIT = 320
     _apply_rerank_scores = staticmethod(apply_rerank_scores)
+    _hit_rerank_text = staticmethod(build_rerank_text)
 
     def __init__(self, session: Session, settings: Settings | None = None) -> None:
         self.session = session
@@ -167,17 +169,6 @@ class RetrievalService:
             keyword_list=cls._coerce_keywords(row["keyword_list"]),
         )
 
-    @staticmethod
-    def _hit_rerank_text(hit: RetrievalHit) -> str:
-        keywords = ", ".join(hit.keyword_list[:8])
-        text = "\n".join(
-            part for part in [hit.title.strip(), hit.summary_text.strip(), keywords.strip()] if part
-        )
-        if len(text) <= RetrievalService.RERANK_TEXT_CHAR_LIMIT:
-            return text
-        clipped = text[: RetrievalService.RERANK_TEXT_CHAR_LIMIT].rstrip('，。；;、, \n')
-        return clipped + '…'
-
     _fuse_recall_lists = staticmethod(reciprocal_rank_fuse)
 
     def _apply_rerank(
@@ -201,7 +192,7 @@ class RetrievalService:
         try:
             rerank_scores = provider.rerank(
                 query,
-                [self._hit_rerank_text(hit) for hit in rerank_candidates],
+                [self._hit_rerank_text(hit, char_limit=self.RERANK_TEXT_CHAR_LIMIT) for hit in rerank_candidates],
             )
         except Exception:
             return hits[:limit], False

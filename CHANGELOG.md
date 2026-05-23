@@ -1,5 +1,13 @@
 ## Unreleased
 
+### Changed (rag_core rerank text adoption - 2026-05-22)
+- rag_core/text.py: introduced a shared rerank text builder helper for retrieval hits
+- novel_analyzer/services/retrieval_service.py: switched local rerank text formatting to reuse the shared rag_core helper while keeping char-limit control local
+- tests/test_rag_core_contracts.py: extended TDD coverage to prove RetrievalService now uses the shared rerank text helper
+- docs/qa_upgrade_v2/12-phase-delivery-log.md: updated the reusable RAG core extraction phase with the new shared helper
+- docs/qa_upgrade_v2/15-audit-and-change-log.md: recorded the seventh extraction step and verification trail
+- docs/handoffs/qa-upgrade-v2-handoff-20260522.md: updated code-extraction status with shared rerank text mechanics
+
 ### Changed (rag_core rerank adoption - 2026-05-22)
 - rag_core/rerank.py: introduced a shared rerank helper for score-to-hit application
 - novel_analyzer/services/retrieval_service.py: switched rerank score application to reuse the shared rag_core helper while keeping provider invocation local

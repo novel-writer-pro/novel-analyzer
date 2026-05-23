@@ -619,3 +619,42 @@
 
 ### Next Owner Notes
 - 如果继续抽 mechanics，下一步应优先考虑 provider-agnostic 的 text builder 或 diagnostics aggregation，再决定是否拆 provider orchestration
+
+---
+
+## Audit Entry — 2026-05-22 继续推进（Rerank text helper 进入 rag_core）
+
+### Trigger
+- shared rerank score application 已进入 `rag_core`
+- 下一步最贴近它的纯 helper 是 rerank 文本构造逻辑 `_hit_rerank_text`
+
+### Inputs Reviewed
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [rag_core/rerank.py](file:///home/user/novel-analyzer/rag_core/rerank.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Findings
+- `_hit_rerank_text` 本质上是纯 formatting helper，不依赖 provider、graph、SQL 或 adapter 语义
+- 它非常适合和 `apply_rerank_scores` 一起进入 shared rerank/text helper 层
+
+### Decisions
+- 新增 `rag_core/text.py`
+- 提升 `build_rerank_text` 为 shared helper
+- 让 `RetrievalService` 复用 shared helper，但仍由本地常量控制 `char_limit`
+
+### Files Changed
+- [rag_core/text.py](file:///home/user/novel-analyzer/rag_core/text.py)
+- [rag_core/__init__.py](file:///home/user/novel-analyzer/rag_core/__init__.py)
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Verification
+- RED：测试先因 `rag_core` 还没有 `build_rerank_text` 而失败
+- GREEN：同一测试在提升 helper 后通过（`14 passed`）
+- Manual QA：直接导入并打印 `same_object=True`，并观察未超长文本不应被强制加省略号
+
+### Deferred Risks
+- 这一步仍未迁移 provider 调用、graph-aware rerank 或 route-level text policy
+
+### Next Owner Notes
+- 如果继续抽 pure helper，下一步应优先考虑 `_coerce_keywords` / keyword normalization 这类无 provider 依赖的小块，再决定是否切更大的 retrieval text/materialization seam
