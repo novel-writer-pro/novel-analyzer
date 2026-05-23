@@ -1,5 +1,13 @@
 ## Unreleased
 
+### Changed (rag_core vector payload coercion adoption - 2026-05-23)
+- rag_core/vector.py: introduced a shared vector payload coercion helper for reusable dense-vector normalization
+- novel_analyzer/services/retrieval_service.py: switched local vector payload parsing to reuse the shared rag_core helper
+- tests/test_rag_core_contracts.py: extended TDD coverage to prove RetrievalService now uses the shared vector payload helper
+- docs/qa_upgrade_v2/12-phase-delivery-log.md: updated the reusable RAG core extraction phase with the shared vector payload coercion step
+- docs/qa_upgrade_v2/15-audit-and-change-log.md: recorded the vector payload extraction step and verification trail
+- docs/handoffs/qa-upgrade-v2-handoff-20260522.md: updated code-extraction status with shared vector payload coercion
+
 ### Changed (rag_core vector helper adoption - 2026-05-22)
 - rag_core/vector.py: introduced a shared cosine similarity helper for retrieval vector math
 - novel_analyzer/services/retrieval_service.py: switched local cosine similarity to reuse the shared rag_core helper

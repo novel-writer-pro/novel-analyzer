@@ -734,3 +734,43 @@
 
 ### Next Owner Notes
 - 如果继续抽 vector 相关 mechanics，下一步应优先看 `_coerce_vector_payload`，再决定是否往上触及 `_vector_route`
+
+---
+
+## Audit Entry — 2026-05-23 继续推进（Vector payload coercion helper 进入 rag_core）
+
+### Trigger
+- 已完成 `cosine_similarity` 抽离，vector mechanics 仍有一个相邻且纯净的 helper：`_coerce_vector_payload`
+- 上一拍审计已把它标为下一优先候选
+
+### Inputs Reviewed
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+- [docs/qa_upgrade_v2/09-implementation-spec.md](file:///home/user/novel-analyzer/docs/qa_upgrade_v2/09-implementation-spec.md)
+
+### Findings
+- `_coerce_vector_payload` 只负责把 DB / JSON 载荷正规化为 float list
+- 它不依赖 graph、route orchestration、provider 调度或会话状态
+- 它与 `cosine_similarity` 同属 reusable vector mechanics，适合进入 shared core
+
+### Decisions
+- 在 `rag_core/vector.py` 中新增 shared `coerce_vector_payload`
+- 通过 `rag_core/__init__.py` 导出该 helper
+- 让 `RetrievalService` 通过静态方法别名复用 shared implementation
+
+### Files Changed
+- [rag_core/vector.py](file:///home/user/novel-analyzer/rag_core/vector.py)
+- [rag_core/__init__.py](file:///home/user/novel-analyzer/rag_core/__init__.py)
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Verification
+- RED：新增测试先因 `rag_core` 尚未导出 `coerce_vector_payload` 而失败（`2 failed, 18 passed`）
+- GREEN：最小实现后同一测试集通过（`20 passed`）
+- Manual QA：验证 `same_object=True`，并确认 list / JSON string / invalid JSON-object 输入分别得到 `[1.0, 2.5]` / `[1.0, 2.5]` / `[]`
+
+### Deferred Risks
+- 这一步依然只迁移 vector payload normalization，不触及 `_vector_route` 本身的查询与候选聚合逻辑
+
+### Next Owner Notes
+- 如果继续沿 vector lane 抽离，优先评估 `_embedding_norm` 是否值得进入 shared core；若收益不足，再等待更大的 vector route seam 一起设计
