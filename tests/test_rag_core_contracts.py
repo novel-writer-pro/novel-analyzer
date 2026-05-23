@@ -199,3 +199,18 @@ def test_retrieval_service_uses_rag_core_keyword_normalizer() -> None:
     from novel_analyzer.services.retrieval_service import RetrievalService
 
     assert RetrievalService._coerce_keywords is core_coerce_keywords
+
+
+def test_rag_core_exports_cosine_similarity_helper() -> None:
+    from rag_core import cosine_similarity
+
+    assert cosine_similarity([1.0, 0.0], [1.0, 0.0]) == 1.0
+    assert cosine_similarity([1.0, 0.0], [0.0, 1.0]) == 0.0
+    assert cosine_similarity([], []) == 0.0
+
+
+def test_retrieval_service_uses_rag_core_cosine_similarity() -> None:
+    from rag_core.vector import cosine_similarity as core_cosine_similarity
+    from novel_analyzer.services.retrieval_service import RetrievalService
+
+    assert RetrievalService._cosine_similarity is core_cosine_similarity

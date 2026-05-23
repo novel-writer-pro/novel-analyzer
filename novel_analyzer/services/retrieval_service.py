@@ -14,6 +14,7 @@ from rag_core import (
     apply_rerank_scores,
     build_rerank_text,
     coerce_keywords,
+    cosine_similarity,
     reciprocal_rank_fuse,
 )
 from sqlalchemy import select, text
@@ -54,6 +55,7 @@ class RetrievalService:
     _apply_rerank_scores = staticmethod(apply_rerank_scores)
     _hit_rerank_text = staticmethod(build_rerank_text)
     _coerce_keywords = staticmethod(coerce_keywords)
+    _cosine_similarity = staticmethod(cosine_similarity)
 
     def __init__(self, session: Session, settings: Settings | None = None) -> None:
         self.session = session
@@ -557,17 +559,6 @@ class RetrievalService:
                 score = float(node.importance_score) * 0.8
                 chapter_scores[ch] = max(chapter_scores.get(ch, 0.0), score)
         return self._document_hits_for_chapters(branch_id, chapter_scores)[:limit]
-
-    @staticmethod
-    def _cosine_similarity(left: list[float], right: list[float]) -> float:
-        if not left or not right or len(left) != len(right):
-            return 0.0
-        left_norm = sum(value * value for value in left) ** 0.5
-        right_norm = sum(value * value for value in right) ** 0.5
-        if left_norm <= 1e-12 or right_norm <= 1e-12:
-            return 0.0
-        dot = sum(float(a) * float(b) for a, b in zip(left, right, strict=True))
-        return float(dot / (left_norm * right_norm))
 
     @staticmethod
     def _coerce_vector_payload(raw: object) -> list[float]:
