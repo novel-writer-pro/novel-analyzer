@@ -774,3 +774,42 @@
 
 ### Next Owner Notes
 - 如果继续沿 vector lane 抽离，优先评估 `_embedding_norm` 是否值得进入 shared core；若收益不足，再等待更大的 vector route seam 一起设计
+
+---
+
+## Audit Entry — 2026-05-23 继续推进（Embedding norm helper 进入 rag_core）
+
+### Trigger
+- 已完成 `coerce_vector_payload` 抽离，当前 vector lane 剩余最小的纯 helper 是 `_embedding_norm`
+- 上一拍审计已把它列为下一优先候选
+
+### Inputs Reviewed
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Findings
+- `_embedding_norm` 只计算 dense vector 的 L2 norm
+- 它不依赖 graph、DB、provider 或 route orchestration
+- 它与 `coerce_vector_payload`、`cosine_similarity` 同属 reusable vector mechanics
+
+### Decisions
+- 在 `rag_core/vector.py` 中新增 shared `embedding_norm`
+- 通过 `rag_core/__init__.py` 导出该 helper
+- 让 `RetrievalService` 通过静态方法别名复用 shared implementation
+
+### Files Changed
+- [rag_core/vector.py](file:///home/user/novel-analyzer/rag_core/vector.py)
+- [rag_core/__init__.py](file:///home/user/novel-analyzer/rag_core/__init__.py)
+- [novel_analyzer/services/retrieval_service.py](file:///home/user/novel-analyzer/novel_analyzer/services/retrieval_service.py)
+- [tests/test_rag_core_contracts.py](file:///home/user/novel-analyzer/tests/test_rag_core_contracts.py)
+
+### Verification
+- RED：新增测试先因 `rag_core` 尚未导出 `embedding_norm` 而失败（`2 failed, 20 passed`）
+- GREEN：最小实现后同一测试集通过（`22 passed`）
+- Manual QA：验证 `same_object=True`，并确认 `[3.0, 4.0] -> 5.0`、`[] -> 0.0`
+
+### Deferred Risks
+- 这一步仍只迁移 vector math primitive，不触及更高层的 chunk materialization / vector route seam
+
+### Next Owner Notes
+- 如果继续沿 vector lane 抽离，优先重新评估 `_embedding_inputs_for_chunks` 是否仍足够“纯”；若不够纯，就暂停 vector lane，转向 materialization helper 候选

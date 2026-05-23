@@ -267,6 +267,7 @@
   - `coerce_keywords`
   - `coerce_vector_payload`
   - `cosine_similarity`
+  - `embedding_norm`
 - 现有服务已开始双栖复用：
   - `RetrievalService` 复用 `RetrievalHit`
   - `RetrievalService` 复用 diagnostics contracts
@@ -276,6 +277,7 @@
   - `RetrievalService` 复用 keyword normalization helper
   - `RetrievalService` 复用 vector payload coercion helper
   - `RetrievalService` 复用 cosine similarity helper
+  - `RetrievalService` 复用 embedding norm helper
 - `novel_analyzer.domain.schemas` 复用 query-planning contract 组
 
 ### 阶段价值
