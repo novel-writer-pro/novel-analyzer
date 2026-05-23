@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 
 def cosine_similarity(left: list[float], right: list[float]) -> float:
     """Compute cosine similarity for two dense vectors."""
@@ -14,3 +16,18 @@ def cosine_similarity(left: list[float], right: list[float]) -> float:
         return 0.0
     dot = sum(float(a) * float(b) for a, b in zip(left, right, strict=True))
     return float(dot / (left_norm * right_norm))
+
+
+def coerce_vector_payload(raw: object) -> list[float]:
+    """Normalize stored vector payloads into dense float lists."""
+
+    if isinstance(raw, list):
+        return [float(item) for item in raw if isinstance(item, (int, float))]
+    if isinstance(raw, str):
+        try:
+            decoded = json.loads(raw)
+        except Exception:
+            return []
+        if isinstance(decoded, list):
+            return [float(item) for item in decoded if isinstance(item, (int, float))]
+    return []
